@@ -1,0 +1,42 @@
+<%- include('./static/start.ejs',{name:'login',async: true,sid_check:"yes"}) %>
+
+<style>
+    * {
+        text-align: center;
+    }
+    iframe{
+        border: 0px;
+        display: none;
+    }
+</style>
+
+<form action="" method="post" id="log_form">
+    <div class="login-page">
+        <input name="login" type="text" id="login" required>
+        <label for="login">login</label>
+    </div>
+    <div class="pass-page">
+        <input name="pass" type="password" id="pass" value="" required>
+        <label for="pass">password</label>
+    </div>
+
+    <button type="button" id="log_btn" onclick="blogin()">login</button>
+    <!-- <input type="submit" value=""  hidden> -->
+    <div id="res"></div>
+
+    <script>
+        // console.log($.cookie("uuid"));
+        log_by_sid();
+
+        var input = document.getElementById("pass");
+        input.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            document.getElementById("log_btn").click();
+        }
+        }); 
+    </script>
+     
+</form>
+
+<%- include('./static/end.ejs') %>
