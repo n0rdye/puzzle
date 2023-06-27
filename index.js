@@ -40,7 +40,7 @@ app.post('/back_login', (req, res) => {
             db.gv("users","login",ilogin,(udata)=>{
                 if(ipass == udata["pass"]){
                     console.log(udata["uuid"]+" logged in by login & pass from "+cook["sid"]);
-                    res.cookie("uuid",udata["uuid"],{maxAge:1000000});
+                    res.cookie("uuid",udata["uuid"],{maxAge:1000000,path:"/;SameSite=Strict"});
 
                     db.gv("users","uuid",udata["uuid"],(rdata)=>{
                         // console.log(rdata["sids"]);
@@ -157,7 +157,7 @@ app.post("/get_sid" , (req,res) =>{
     let inp = req.body;
     let sid = func.get_uuid(inp["name"]);
     var week = 7 * 24 * 3600 * 1000;
-    res.cookie("sid",sid,{maxAge:(week)});
+    res.cookie("sid",sid,{maxAge:(week),path:"/;SameSite=Strict"});
     res.send({out:"good"});
 
 });
@@ -208,7 +208,12 @@ app.get("/main", (req,res) =>{
 });
 
 app.get('/', (req, res) => {
-    res.redirect('login');
+    if(req.cookies["uuid"] != null){
+        res.redirect('main');
+    }
+    else{
+        res.redirect('login');
+    }
 });
 
 app.all('*', (req, res) => {

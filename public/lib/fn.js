@@ -39,7 +39,8 @@ function log_by_sid() {
     // const sid = $.cookie("sid");
     console.log("log");
     if($.cookie('sid') == null){
-        get_sid(location.hostname);
+        // get_sid(location.hostname);
+        clear_ck(false);
     }else{
     $.post( "/sid_log")
     .done(function( res ) {
@@ -53,25 +54,32 @@ function log_by_sid() {
     })}
 }
 
-function clear_ck(){
+function clear_ck(redirect = true){
     $.cookie("uuid",null);
     $.cookie("sid",null);
-    goto("login");
+    get_sid(location.hostname);
+    if (redirect) goto("login");
 }
 
 function check_sid(){
     console.log("checking sid");
-    if($.cookie('sid') == null){
+    if($.cookie('sid') == null || $.cookie('uuid') == null){
         clear_ck();
     }
     else{        
-        console.log("ping");
         $.post( "/sid_log")
         .done(function( res ) {
             if(res["out"] == "bad"){
                 clear_ck();
             }
         })
+    }
+}
+
+function logout() {
+    let dialog = confirm("logout?");
+    if(dialog){
+        clear_ck();
     }
 }
 
