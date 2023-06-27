@@ -32,14 +32,27 @@ module.exports.cv = (table,key,value,callback) => {
     })
 }
 
-// get_from
-module.exports.gv = (table,key,value,callback) => {
-    logcon.query('SELECT * FROM `'+table+'` WHERE `'+key+'` = "'+value+'"', (err, rows, fields) => {
+module.exports.dl = (table,key,value,callback) => {
+    // console.log('SELECT * FROM `'+table+'` WHERE `'+key+'` = '+value);
+    logcon.query('DELETE FROM `'+table+'` WHERE `'+key+'` = '+value, (err, rows, fields) => {
         if (err) {
             console.log("sql err");
             throw err;
         }else{
-            callback(rows[0]);
+            callback(rows);
+        }
+    })
+}
+
+// get_from
+module.exports.gv = (table,key,value,callback) => {
+    // console.log('SELECT * FROM `'+table+'` WHERE `'+key+'` = '+value);
+    logcon.query('SELECT * FROM `'+table+'` WHERE `'+key+'` = '+value, (err, rows, fields) => {
+        if (err) {
+            console.log("sql err");
+            throw err;
+        }else{
+            callback(rows);
         }
     })
 }

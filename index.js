@@ -26,6 +26,7 @@ app.use(express.urlencoded({
 app.use(express.static('public'));
 app.use(cookieParser());
 
+
 app.post('/back_login', (req, res) => {
     let inp = req.body;
     let cook = req.cookies;
@@ -37,37 +38,44 @@ app.post('/back_login', (req, res) => {
             res.status(210).send({out:"bad", err:"user"});
         }
         else if (login != null){
-            db.gv("users","login",ilogin,(udata)=>{
+            db.gv("users","login",`'${ilogin}'`,(udata)=>{udata = udata[0];
                 if(ipass == udata["pass"]){
                     console.log(udata["uuid"]+" logged in by login & pass from "+cook["sid"]);
                     res.cookie("uuid",udata["uuid"],{maxAge:1000000,path:"/;SameSite=Strict"});
 
-                    db.gv("users","uuid",udata["uuid"],(rdata)=>{
-                        // console.log(rdata["sids"]);
-                        let sids = rdata["sids"];
-                        // console.log(sids.split(";"));
-                        if(sids != null){
-                            if(sids.split(";").includes(inp["sid"])){
-                                console.log("good boy");
-                            }
-                            else{
-                                db.sv("users","sids",sids += inp["sid"]+";","uuid",udata["uuid"],()=>{}); 
-                            }
-                        }
-                        else{
-                            db.sv("users","sids",inp["sid"]+";","uuid",udata["uuid"],()=>{}); 
-                        }
-                    });
-                    // db.sv("users","id",udata["id"],"uuid",udata["uuid"]+"|"+uuid);
+                    // db.sv("users","sids",sids += inp["sid"]+";","uuid",udata["uuid"],()=>{}); 
+                    db.nr("sids",'`sid`,`uid`',`'${cook["sid"]}','${udata["id"]}'`);
+                    res.send({out:"goto",url:"/main"});
+                    
+                    // db.gv("users","uuid",udata["uuid"],(rdata)=>{
+                    //     // console.log(rdata["sids"]);
+                    //     let sids = rdata["sids"];
+                    //     // console.log(sids.split(";"));
+                    //     if(sids != null){
+                    //         if(sids.split(";").includes(inp["sid"])){
+                    //             console.log("good boy");
+                    //         }
+                    //         else{
+                    //             db.sv("users","sids",sids += inp["sid"]+";","uuid",udata["uuid"],()=>{}); 
+                    //             db.nr("sids",'`sid`,`uid`',`'${cook["sid"]}','${udata["id"]}'`);
+                    //             // db.sv("sids","uid",sids += inp["sid"]+";","uuid",udata["uuid"],     ()=>{}); 
+                    //         }
+                    //     }
+                    //     else{
+                    //         db.sv("users","sids",inp["sid"]+";","uuid",udata["uuid"],()=>{}); 
+                    //         db.nr("sids",'`sid`,`uid`',`'${cook["sid"]}','${udata["id"]}'`);
+                    //     }
+                    // });
+                    // // db.sv("users","id",udata["id"],"uuid",udata["uuid"]+"|"+uuid);
 
-                    if(udata["admin"] == 1){
-                        res.send({out:"goto",url:"/main"});
+                    // if(udata["admin"] == 1){
+                    //     res.send({out:"goto",url:"/main"});
 
-                    }
-                    else{
-                        res.send({out:"goto",url:"/main"});
-                        // res.redirect("main");
-                    }
+                    // }
+                    // else{
+                    //     res.send({out:"goto",url:"/main"});
+                    //     // res.redirect("main");
+                    // }
 
                 }
                 else{
@@ -94,7 +102,7 @@ app.post('/reg_user', (req, res) => {
                 console.log("/reg_user same uuid recs = "+udata);
                 if(udata==null){
                     if(ldata==null){
-                        good_reg();
+                        good_reg(udata);
                         console.log("/reg_user good reg");
                         console.log("/reg_user reged "+login+" uuid = "+uuid);
                     }
@@ -109,15 +117,18 @@ app.post('/reg_user', (req, res) => {
             })
         })
     }
-    function good_reg(){
+    function good_reg(udata){
         db.nr("users",'`login`,`pass`,`uuid`,`admin`',`'${login}','${pass}','${uuid}',${admin}`);
+        if (admin){
+            db.gv("users","uuid",`'${uuid}'`,(res)=>{ res = res[0]
+                db.nr("admins",'`login`,`uid`',`'${login}',${res["id"]}`);
+            })
+        }
         res.redirect("/reg");
     }
 })
 
 app.post("/sid_log",(req,res) =>{
-    // console.log(req.cookies["sid"]);
-    // console.log(req.cookies["uuid"]);
     let inp = req.body;
     let cook = req.cookies;
 
@@ -133,24 +144,6 @@ app.post("/sid_log",(req,res) =>{
             }
         })    
     }
-    // if(req.cookies["uuid"]!= null){
-    //     let sid = req.cookies["sid"];
-    //     let uuid = func.decrypt(req.cookies["uuid"],"key");
-    //     db.gv("users","uuid",uuid,(rdata)=>{
-    //         let sids = rdata["sids"];
-    //         if(sids != null){
-    //             // console.log(sids.split(";"));
-    //             if(sids.split(";").includes(sid)){
-    //                 console.log("good boy "+rdata["login"]+" logged in by sid");
-    //                 res.send({out:"goto",url:"/user",args:{pass:rdata["pass"],uuid:uuid,login:rdata["login"]}});
-    //             }
-    //             else{
-    //                 res.redirect("/login");
-    //             }
-    //         }
-    //     });
-    // }
-
 })
 
 app.post("/get_sid" , (req,res) =>{
@@ -159,12 +152,50 @@ app.post("/get_sid" , (req,res) =>{
     var week = 7 * 24 * 3600 * 1000;
     res.cookie("sid",sid,{maxAge:(week),path:"/;SameSite=Strict"});
     res.send({out:"good"});
+});
 
+
+app.post("/clear_sid" , (req,res) =>{
+    let inp = req.body;
+    let cook = req.cookies;
+
+    if(cook["uuid"] != null && cook["sid"] != null){
+        res.send({out:"good"});
+        db.dl("sids","sid",`'${cook["sid"]}'`,() =>{
+            console.log(cook["uuid"] + "logged out from "+cook["sid"]);
+        });
+    }
 });
 
 app.post("/get_cr_uuid", (req,res) => {
-    
+    let inp = req.body;
+    if(inp["uuid"] != null && inp["sid"] != null){
+        db.gv("users","uuid",`"${inp["uuid"]}"`,(udata)=>{udata = udata[0];
+            let re = udata;
+            delete re["pass"];
+            delete re["uuid"];
+            // delete re["sids"];
+            func.check_sid(inp,(include,id) => {
+                if(include){
+                    res.send({out:"good",body:re});
+                }
+                else if (!include){
+                    res.send({out:"bad",body:"expired"});
+                }
+                else{
+                    res.send({out:"bad"});
+                }
+            })
+        });
+    }
 })
+
+// app.post("/set_cr_uuid", (req,res) => {
+//     let inp = req.body;
+//     if(inp["uuid"] != null && inp["sid"] != null){
+//         db.sv("users");
+//     }
+// })
 
 // app.post("/get_uuid" , (req,res) =>{
 //     let inp = req.body;

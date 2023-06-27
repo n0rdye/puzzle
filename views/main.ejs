@@ -44,12 +44,6 @@
 <%- include('./header.ejs') %>
 <script src="/lib/interact.min.js"></script>
 
-
-<h1>none</h1>
-<h1>hello</h1>
-
-
-
 <div id="drags"></div>
 
 <div class="dropzone"></div>
@@ -61,54 +55,3 @@
 
 <script src="/lib/inter.js"></script>
 <%- include('./static/end.ejs') %>
-
-
-<!-- template -->
-
-<!-- ondropactivate: function (event) {
-    var drag = event.relatedTarget
-    var zone = event.target
-    // add active dropzone feedback
-    // console.log(drag.getAttribute('data-x'));
-    zone.classList.add('drop-active')
-},
-ondragenter: function (event) {
-    var drag = event.relatedTarget
-    var zone = event.target
-
-    // feedback the possibility of a drop
-    // console.log(drag.getAttribute('data-x'));
-    drag.classList.add('can-drop')
-    // draggableElement.textContent = 'Dragged in'
-},
-ondragleave: function (event) {
-    var drag = event.relatedTarget
-    var zone = event.target
-    // remove the drop feedback style
-    // console.log(drag.getAttribute('data-x'));
-    zone.classList.remove('drop-target')
-    drag.classList.remove('in_zone')
-    drag.classList.remove('can-drop')
-    // event.relatedTarget.textContent = 'Dragged out'
-},
-ondrop: function (event) {
-    var drag = event.relatedTarget
-    var zone = event.target
-
-    // console.log(drag.getAttribute('data-x'));
-    // console.log();
-    objs[drag.classList[0]][drag.id] = {y:drag.getAttribute('data-y'),x:drag.getAttribute('data-x'),body:drag.innerHTML};
-    $.cookie("objs",JSON.stringify(objs));
-    drag.classList.add('in_zone')
-    drag.classList.remove('can-drop')
-    // draggableElement.textContent = 'Dropped'
-},
-ondropdeactivate: function (event) {
-    var drag = event.relatedTarget
-    var zone = event.target
-    // remove active dropzone feedback
-    // console.log(drag.getAttribute('data-x'));
-    zone.classList.remove('drop-active')
-    zone.classList.remove('drop-target')
-}
-}) -->

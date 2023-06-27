@@ -26,27 +26,24 @@ module.exports.check_sid = (Cookies, callback) =>{
     let uuid = Cookies["uuid"];
     let sid = Cookies["sid"];
     // console.log(uuid,sid);
-    db.gv("users","uuid",uuid,(rdata)=>{
-        let sids = rdata["sids"];
-        if(sids != null){
-            if(sids.split(";").includes(sid)){
-                // console.log("good boy ");
-                callback(true,Cookies);
+    db.gv("users","uuid",`'${uuid}'`,(udata)=>{ udata = udata[0];
+        // console.log(udata);
+        db.gv("sids","uid",udata["id"],(rdata)=>{
+            let valid = "";
+            rdata.forEach(rec => {
+                if (rec["sid"] == sid){
+                    valid = rec["sid"];
+                    return;
+                }
+            });
+            if(valid != ""){
+                callback(true,udata);
             }
             else{
-                // console.log("bad boy ");
-                callback(false,Cookies);
+                callback(false,udata);
             }
-        }
-        else{
-            // console.log("bad boy ");
-            callback(false,Cookies);
-        }
-    });
-}
-
-module.exports.get_by_sid = (Cookies) =>{
-    
+        });
+    })
 }
 
 

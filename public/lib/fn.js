@@ -23,13 +23,34 @@ function log(nlogin,npass){
     });
 }
 
-function get_uuid_name(){
+function get_from_uuid(callback){
     const uid = $.cookie("uuid");
     const sid = $.cookie("sid");
     $.post( "/get_cr_uuid", { uuid:uid,sid:sid })
     .done(function( res ) {
         if (res["out"] == "good"){
-            
+            callback(res["body"])
+        }
+        else if (res["out"] == bad){
+            if (res["body"] == "expired"){
+                clear_ck();
+            }
+        }
+    });
+}
+function get_from_uuid(callback){
+    const uid = $.cookie("uuid");
+    const sid = $.cookie("sid");
+    $.post( "/get_cr_uuid", { uuid:uid,sid:sid })
+    .done(function( res ) {
+        if (res["out"] == "good"){
+            console.log("good");
+            callback(res["body"])
+        }
+        else if (res["out"] == bad){
+            if (res["body"] == "expired"){
+                logout(true);
+            }
         }
     });
 }
@@ -37,7 +58,7 @@ function get_uuid_name(){
 function log_by_sid() {
     // const uuid = $.cookie("uuid");
     // const sid = $.cookie("sid");
-    console.log("log");
+    // console.log("log");
     if($.cookie('sid') == null){
         // get_sid(location.hostname);
         clear_ck(false);
@@ -55,6 +76,7 @@ function log_by_sid() {
 }
 
 function clear_ck(redirect = true){
+    console.log("sid");
     $.cookie("uuid",null);
     $.cookie("sid",null);
     get_sid(location.hostname);
@@ -76,10 +98,26 @@ function check_sid(){
     }
 }
 
-function logout() {
-    let dialog = confirm("logout?");
-    if(dialog){
-        clear_ck();
+function logout(quet = false) {
+    if (!quet) 
+    {
+        let dialog = confirm("logout?");
+        if(dialog){
+            $.post( "/clear_sid")
+            .done(function( res ) {
+                if(res["out"] == "good"){
+                    clear_ck();
+                }
+            })
+        }
+    }
+    else{
+        $.post( "/clear_sid")
+        .done(function( res ) {
+            if(res["out"] == "good"){
+                clear_ck();
+            }
+        })
     }
 }
 
