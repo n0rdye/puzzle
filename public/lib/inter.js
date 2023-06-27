@@ -1,10 +1,6 @@
 window.dragMoveListener = dragMoveListener
 let root = document.getElementById("drags");
 var objs = {};
-if ($.cookie("objs") != null){
-    load_local();
-}
-
 
 function add(obj){
     if (objs[obj] == null) objs[obj] = {};
@@ -13,7 +9,7 @@ function add(obj){
     // console.log(obj,objs[obj+"_count"],objs[obj+"_s"]);
     root.innerHTML += "<div class='"+obj+" drag' id="+obj+"_"+count+">"+obj+"</div>";
     objs[obj][obj+"_"+count] = {};
-    objs[obj]["count"]+=1;
+    // objs[obj]["count"]+=1;
     console.log(objs);
 }
 
@@ -21,12 +17,14 @@ function create(clas,obj,x,y,inside){
     if (inside == null || inside == "") inside = "[]";
     root.innerHTML += "<div class='"+clas+" drag' id="+obj+">"+inside+"</div>";
     let obj_doc = document.getElementById(obj);
+    console.log(obj_doc.classList);
     set_pos(obj_doc,x,y);
 }
 
-function load_local(){
-    objs = JSON.parse($.cookie("objs"));
-    // console.log(objs);
+function load_local(objs){
+    // objs = JSON.parse($.cookie("objs"));
+    console.log(objs);
+    globalThis.objs = objs;
     Object.entries(objs).forEach(([keys, values]) => {
         // console.log(keys,values);
         Object.entries(values).forEach(([key, value]) => {
@@ -38,8 +36,30 @@ function load_local(){
     });
 }
 
+function load_proj(){
+    $.post( "/load_proj",{name:proj_name})
+    .done(function( res ) {
+        if(res["out"] == "good"){
+            console.log("good");
+            // console.log(JSON.parse(`'${res["body"]}'`));
+            // console.log(JSON.parse(res["body"]));
+            // $.cookie("objs",res["body"]);
+            load_local(JSON.parse(res["body"]));
+        }
+    })
+}
+
 function save(){
-    $.cookie("objs",JSON.stringify(objs),{path:"/;SameSite=Strict"});
+    // let proj_name = document.getElementById("proj_name").value;
+    // $.cookie("objs",JSON.stringify(objs));
+    console.log(objs);
+    // // console.log(objs);
+    $.post( "/save_proj", {proj:JSON.stringify(objs),name:proj_name})
+    .done(function( res ) {
+        if(res["out"] == "good"){
+            console.log("good");
+        }
+    })
 }
 
 function set_pos(obj,x,y){

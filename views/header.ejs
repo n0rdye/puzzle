@@ -9,9 +9,11 @@
     }
     #top_panel_right{
         float: right;
+        display: flex;
     }
     #top_panel_left{
         float: left;
+        display: flex;
     }
     /* button{
         /* margin-inline: 5px; */
@@ -24,7 +26,8 @@
         let right = document.getElementById("top_panel_right"); 
         let left = document.getElementById("top_panel_left"); 
         
-        left.innerHTML += res["login"];
+        if(document.title != "main") left.innerHTML += `<button onclick="goto('/');">main page</button>`;
+        left.innerHTML += `<div id="user_name">${res["login"]}</div>`;
         
         if (res["admin"] == true){
             right.innerHTML += "<button>admin panel</button>";

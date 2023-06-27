@@ -9,6 +9,7 @@ const {
 } = require('express');
 const { escapeSelector } = require('jquery');
 const { name } = require('ejs');
+const { stringify } = require('uuid');
 const app = express();
 
 // const {
@@ -41,7 +42,7 @@ app.post('/back_login', (req, res) => {
             db.gv("users","login",`'${ilogin}'`,(udata)=>{udata = udata[0];
                 if(ipass == udata["pass"]){
                     console.log(udata["uuid"]+" logged in by login & pass from "+cook["sid"]);
-                    res.cookie("uuid",udata["uuid"],{maxAge:1000000,path:"/;SameSite=Strict"});
+                    res.cookie("uuid",udata["uuid"],{maxAge:1000000,path:"/;SameSite=Lax"});
 
                     // db.sv("users","sids",sids += inp["sid"]+";","uuid",udata["uuid"],()=>{}); 
                     db.nr("sids",'`sid`,`uid`',`'${cook["sid"]}','${udata["id"]}'`);
@@ -150,7 +151,7 @@ app.post("/get_sid" , (req,res) =>{
     let inp = req.body;
     let sid = func.get_uuid(inp["name"]);
     var week = 7 * 24 * 3600 * 1000;
-    res.cookie("sid",sid,{maxAge:(week),path:"/;SameSite=Strict"});
+    res.cookie("sid",sid,{maxAge:(week),path:"/;SameSite=Lax"});
     res.send({out:"good"});
 });
 
@@ -159,12 +160,13 @@ app.post("/clear_sid" , (req,res) =>{
     let inp = req.body;
     let cook = req.cookies;
 
-    if(cook["uuid"] != null && cook["sid"] != null){
-        res.send({out:"good"});
-        db.dl("sids","sid",`'${cook["sid"]}'`,() =>{
-            console.log(cook["uuid"] + "logged out from "+cook["sid"]);
-        });
+    // console.log(cook["uuid"],cook["sid"]);
+    if(cook["sid"] != null){
+        // res.send({out:"good"});
+        console.log(cook["uuid"] + " logged out from "+cook["sid"]);
+        db.dl("sids","sid",`'${cook["sid"]}'`,() =>{});
     }
+    res.send({out:"good"});
 });
 
 app.post("/get_cr_uuid", (req,res) => {
@@ -187,6 +189,75 @@ app.post("/get_cr_uuid", (req,res) => {
                 }
             })
         });
+    }
+})
+
+app.post("/save_proj", (req,res) => {
+    let inp = req.body;
+    let cook = req.cookies;
+    let proj = inp["proj"];
+    let pname = inp["name"];
+    db.gv("users","uuid",`'${cook["uuid"]}'`, (udata)=>{ udata = udata[0]
+        db.gv("projects","uid",udata["id"],(pdata)=>{
+            let projin = null;
+            // console.log(pdata);
+            pdata.forEach(projt => {
+                if(projt["name"] == pname && projt["uid"] == udata["id"]){
+                    projin = projt;
+                    return;
+                }
+            })
+            if(projin == null){
+                // console.log("proj not in");
+                // console.log(pname,udata["id"],proj);
+                db.nr("projects","`uid`,`name`,`body`",`'${udata["id"]}','${pname}','${proj}'`);
+            } else if (projin != null){
+                db.sv("projects","body",proj,"id",projin["id"],()=>{});
+                // console.log("proj in");
+            }
+            console.log(`${udata["uuid"]} saved project ${projin["name"]} from ${cook["sid"]}`);
+        })
+
+    })
+})
+
+app.post("/load_proj", (req,res) => {
+    let inp = req.body;
+    let cook = req.cookies;
+    if(cook['sid'] != null && cook['uuid'] != null){
+        db.gv("users","uuid",`'${cook["uuid"]}'`,(udata)=>{ udata = udata[0];
+            db.gv("projects","uid",udata["id"],(pdata)=>{
+                let projt = null;
+                // console.log(inp["name"]);
+                pdata.forEach(proj => {
+                    if(proj["name"] == inp["name"]){
+                        projt = proj;
+                    }
+                })
+                if (projt != null){
+                    console.log(`${udata["uuid"]} loaded project ${projt["name"]} from ${cook["sid"]}`);
+                    res.send({out:"good",body:projt["body"]});
+                }
+            })
+        })
+    }
+    else{
+        res.send({out:"bad"});
+    }
+})
+
+app.post("/get_projs", (req,res) => {
+    let inp = req.body;
+    let cook = req.cookies;
+    if(cook['sid'] != null && cook['uuid'] != null){
+        db.gv("users","uuid",`'${cook["uuid"]}'`,(udata)=>{ udata = udata[0];
+            db.gv("projects","uid",udata["id"],(pdata)=>{
+                res.send({out:"good",body:pdata});
+            })
+        })
+    }
+    else{
+        res.send({out:"bad"});
     }
 })
 
@@ -230,6 +301,11 @@ app.get("/reg" , (req,res) =>{
     res.render('reg');
 })
 
+app.get("/proj/:name" , (req,res) =>{
+    // res.cookie  
+    res.render('project',{proj_name:req.params["name"]});
+})
+
 app.get("/login" , (req,res) =>{
     res.render('login');
 })
@@ -237,6 +313,10 @@ app.get("/login" , (req,res) =>{
 app.get("/main", (req,res) =>{
     res.render('main');
 });
+
+// app.get("/main/:id", (req,res) =>{
+//     res.render('main');
+// });
 
 app.get('/', (req, res) => {
     if(req.cookies["uuid"] != null){
@@ -248,7 +328,7 @@ app.get('/', (req, res) => {
 });
 
 app.all('*', (req, res) => {
-    res.status(404).send('<h1>404! Page not</h1>');
+    res.status(404).send('<h1>404! Page not</h1> <br> <a href="/">go to main page</a>');
 });
 
 app.listen(process.env.PORT || 3002, () => console.log("started"));

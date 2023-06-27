@@ -59,7 +59,8 @@ module.exports.gv = (table,key,value,callback) => {
 
 // set_in
 module.exports.sv = (table,key,value,ekey,evalue,callback) => {
-    logcon.query('UPDATE `'+table+'` SET `'+key+'` = "'+value+'" WHERE `'+ekey+'` = "'+evalue+'"', (err , res) => {
+    logcon.query("UPDATE `"+table+"` SET `"+key+"` = '"+value+"' WHERE `"+ekey+"` = '"+evalue+"'", (err , res) => {
+        // console.log("UPDATE `"+table+"` SET `"+key+"` = '"+value+"' WHERE `"+ekey+"` = '"+evalue+"'");
         if (err) {
             console.log("sql err");
             throw err;

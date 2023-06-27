@@ -40,23 +40,25 @@
     }
 </style>
 
-<%- include('./static/start.ejs',{name:'main',async: true}) %>
+<%- include('./static/start.ejs',{name:proj_name,async: true}) %>
 <%- include('./header.ejs') %>
-<!-- <script src="/lib/interact.min.js"></script> -->
+<script src="/lib/interact.min.js"></script>
 
-<div id="projs_div"></div>
+<input id="proj_name"></input>
+<div id="drags"></div>
 
-<button >new project</button>
+<div class="dropzone"></div>
+<div class="trash"></div>
 
+<button onclick="add('cube')">add</button>
+<button onclick="save()">save</button>
+
+
+<script src="/lib/inter.js"></script>
 <script>
-    load_projs((projs)=>{
-        projs.forEach(proj => {
-            // console.log(proj);
-            let div = document.getElementById("projs_div");
-            div.innerHTML += `<button id='proj_${proj["name"]}' class='proj' onclick="goto('/proj/${proj["name"]}')">${proj["name"]}</button>`;
-        });
-    });
+    let proj_name = "<%= proj_name %>";
+    load_proj();
+    // console.log(proj_name);
+    document.getElementById("proj_name").value = proj_name;
 </script>
-
-<!-- <script src="/lib/inter.js"></script> -->
 <%- include('./static/end.ejs') %>
