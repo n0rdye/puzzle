@@ -1,9 +1,33 @@
-<script src="/lib/fn.js"></script>
+<%- include('./static/start.ejs',{name:"reg",async: true}) %>
 
-<form action="/reg_user" method="post">
-    <input type="text" name="login">
-    <input type="password" name="pass">
+<form action="" method="get" onsubmit="return false;">
+    <input type="text" id="login" name="login">
+    <input type="password" id="pass" name="pass">
     <input type="checkbox" name="admin" value='false' id="admin_check">
-    <input type="submit" value="">
+    <button onclick='reg();'>reg</button>
+    <div id="reg_response"></div>
+    <script>
+        function reg(){
+            console.log("reg");
+            let login = document.getElementById("login").value;
+            let pass = document.getElementById("pass").value;
+            let admin = document.getElementById("admin_check").checked;
+            // console.log(login,pass,admin);
+            // console.log("cl reg");
+            $.post( "/reg_user", { login:login,pass:pass,admin:admin })
+            .done(function( res ) {
+                // console.log("serv reg");
+                if(res["out"] == "good"){
+                    // console.log(res["body"]);
+                    document.getElementById("reg_response").innerHTML = `user ${login} successfully registered `;
+                }
+                else if (res["out"] == "bad"){
+                    document.getElementById("reg_response").innerHTML = "cannot register user "+login+" already in use";
+                }
+            });
+        }
+    </script>
+    <!-- <input type="submit" value=""> -->
     <!-- <script>test();</script> -->
+    <!-- <iframe id="reg_out" frameborder="0"></iframe> -->
 </form>

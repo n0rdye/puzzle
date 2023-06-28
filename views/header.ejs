@@ -30,7 +30,7 @@
         left.innerHTML += `<div id="user_name">${res["login"]}</div>`;
         
         if (res["admin"] == true){
-            right.innerHTML += "<button>admin panel</button>";
+            right.innerHTML += `<button onclick='goto("/admin")'>admin panel</button>`;
         }
         right.innerHTML += "<button onclick='logout();'>logout</button>";
     });

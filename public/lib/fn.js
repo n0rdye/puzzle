@@ -133,6 +133,10 @@ function get_sid(hostname){
     });
 }
 
+function new_obj(){
+
+}
+
 function load_projs(callback){
     $.post( "/get_projs")
     .done(function( res ) {
@@ -147,6 +151,7 @@ function load_projs(callback){
 function goto(url) {
     location.href = url;
 }
+
 function postForm(path, params, method) {
     method = method || 'post';
 

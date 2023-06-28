@@ -93,28 +93,30 @@ app.post('/reg_user', (req, res) => {
     let inp = req.body;
     let cook = req.cookies;
     let uuid = func.get_uuid(inp["login"]);
-    let admin = Boolean(inp["admin"]);
+    let admin = inp["admin"];
     let pass = inp["pass"];
     let login = inp["login"];
     check_db();
     function check_db() {
         db.cv("users","login",inp["login"], (ldata)=>{
             db.cv("users","login",inp["uuid"],(udata) =>{
-                console.log("/reg_user same login recs = "+ldata);
-                console.log("/reg_user same uuid recs = "+udata);
-                if(udata==null){
-                    if(ldata==null){
-                        good_reg(udata);
-                        console.log("/reg_user good reg");
-                        console.log("/reg_user reged "+login+" uuid = "+uuid);
-                    }
-                    else{
-                        console.log("bad user");
-                    }
+                // console.log("/reg_user same login recs = "+ldata);
+                // console.log("/reg_user same uuid recs = "+udata);
+                if(udata==null && ldata==null){
+                    good_reg(udata);
+                    // console.log("/reg_user good reg");
+                    console.log(`user ${login} registered with uuid = ${uuid} admin = ${admin}`);
+
                 }
                 else if(udata!=null){
                     uuid = func.get_uuid(inp["login"]);
                     check_db();
+                    // res.send({out:"bad", body:"uuid"});
+                }
+                else if (ldata != null){
+                    console.log("bad user");
+                    res.send({out:"bad", body:"login"});
+                    return;
                 }
             })
         })
@@ -126,7 +128,7 @@ app.post('/reg_user', (req, res) => {
                 db.nr("admins",'`login`,`uid`',`'${login}',${res["id"]}`);
             })
         }
-        res.redirect("/reg");
+        res.send({out:"good", body:{uuid:uuid,login:login,admin:admin}});
     }
 })
 
@@ -262,6 +264,11 @@ app.post("/get_projs", (req,res) => {
     }
 })
 
+app.post("/new_obj", (req,res) => {
+    let inp = req.body;
+    let cook = req.cookies;
+})
+
 // app.post("/set_cr_uuid", (req,res) => {
 //     let inp = req.body;
 //     if(inp["uuid"] != null && inp["sid"] != null){
@@ -313,6 +320,10 @@ app.get("/login" , (req,res) =>{
 
 app.get("/main", (req,res) =>{
     res.render('main');
+});
+
+app.get("/admin", (req,res) =>{
+    res.render('admin');
 });
 
 // app.get("/main/:id", (req,res) =>{
