@@ -26,6 +26,7 @@ app.use(express.urlencoded({
 }));
 app.use(express.static('public'));
 app.use(cookieParser());
+var week = 7 * 24 * 3600 * 1000;
 
 
 app.post('/back_login', (req, res) => {
@@ -42,7 +43,7 @@ app.post('/back_login', (req, res) => {
             db.gv("users","login",`'${ilogin}'`,(udata)=>{udata = udata[0];
                 if(ipass == udata["pass"]){
                     console.log(udata["uuid"]+" logged in by login & pass from "+cook["sid"]);
-                    res.cookie("uuid",udata["uuid"],{maxAge:1000000,path:"/;SameSite=Lax"});
+                    res.cookie("uuid",udata["uuid"],{maxAge:week,path:"/;SameSite=None"});
 
                     // db.sv("users","sids",sids += inp["sid"]+";","uuid",udata["uuid"],()=>{}); 
                     db.nr("sids",'`sid`,`uid`',`'${cook["sid"]}','${udata["id"]}'`);
@@ -150,8 +151,7 @@ app.post("/sid_log",(req,res) =>{
 app.post("/get_sid" , (req,res) =>{
     let inp = req.body;
     let sid = func.get_uuid(inp["name"]);
-    var week = 7 * 24 * 3600 * 1000;
-    res.cookie("sid",sid,{maxAge:(week),path:"/;SameSite=Lax"});
+    res.cookie("sid",sid,{maxAge:(week),path:"/;SameSite=None"});
     res.send({out:"good"});
 });
 
@@ -210,12 +210,13 @@ app.post("/save_proj", (req,res) => {
             if(projin == null){
                 // console.log("proj not in");
                 // console.log(pname,udata["id"],proj);
+                console.log(`${udata["uuid"]} created project ${pname} from ${cook["sid"]}`);
                 db.nr("projects","`uid`,`name`,`body`",`'${udata["id"]}','${pname}','${proj}'`);
             } else if (projin != null){
                 db.sv("projects","body",proj,"id",projin["id"],()=>{});
+                console.log(`${udata["uuid"]} saved project ${projin["name"]} from ${cook["sid"]}`);
                 // console.log("proj in");
             }
-            console.log(`${udata["uuid"]} saved project ${projin["name"]} from ${cook["sid"]}`);
         })
 
     })

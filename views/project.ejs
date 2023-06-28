@@ -38,13 +38,27 @@
         border-color: #fff;
         border-style: solid;
     }
+
+    #proj_top{
+        margin: auto;
+        width: 90%;
+        display: flex;
+        justify-content: space-around;
+    }
+    #proj_name{
+        background-color: #aaa;
+        border: 0px;
+        text-align: center;
+    }
 </style>
 
 <%- include('./static/start.ejs',{name:proj_name,async: true}) %>
 <%- include('./header.ejs') %>
 <script src="/lib/interact.min.js"></script>
 
-<input id="proj_name"></input>
+<div id="proj_top">
+    <input id="proj_name"></input>
+</div>
 <div id="drags"></div>
 
 <div class="dropzone"></div>
