@@ -4,6 +4,7 @@
         width: 50px;
         position: absolute;
         text-align: center;
+        margin: auto;
     }
 
     .dropzone {
@@ -14,6 +15,20 @@
         margin: 10px auto 30px;
         padding: 10px;
         width: 80%;
+        transition: background-color 0.3s;
+    }
+    body {
+    height: 100%;
+    overflow-y: hidden;
+    }
+    .createzone {
+        background-color: #bfe4ff;
+        border: dashed 4px transparent;
+        border-radius: 4px;
+        height: 10px;
+        margin: 10px;
+        padding: 10px;
+        width: 10px;
         transition: background-color 0.3s;
     }
 
@@ -27,6 +42,13 @@
         width: 50px;
         transition: background-color 0.3s;
         z-index: -1;
+    }
+    .czones{
+        display: flex;
+        margin: auto;
+        /* justify-content: space-around; */
+        flex-wrap: wrap;
+        width: 80%;
     }
 
     .drop-active {
@@ -56,23 +78,76 @@
 <%- include('./header.ejs') %>
 <script src="/lib/interact.min.js"></script>
 
-<div id="proj_top">
-    <input id="proj_name"></input>
-</div>
-<div id="drags"></div>
 
-<div class="dropzone"></div>
+<div id="drags">
+    <!-- <div class="cube drag spawn" id="cube_0" style="transform: translate(197.7px, 57.8667px);" data-x="197.6999969482422" data-y="57.866668701171875" >cube</div>     -->
+</div>
+<section class="main">
+    <div id="proj_top">
+    <button onclick="save()">save</button>  
+        <input id="proj_name"></input>
+    </div>
+</section>
+
+    
+    <div class="dropzone"></div>
 <div class="trash"></div>
 
-<button onclick="add('cube')">add</button>
-<button onclick="save()">save</button>
-
+<div class="czones">
+    <div class="cube createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+    <div class="buble createzone"></div>
+</div>
 
 <script src="/lib/inter.js"></script>
 <script>
     let proj_name = "<%= proj_name %>";
-    load_proj();
     // console.log(proj_name);
     document.getElementById("proj_name").value = proj_name;
+    // drag_start();
+    load_proj();
 </script>
 <%- include('./static/end.ejs') %>

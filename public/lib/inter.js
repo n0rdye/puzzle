@@ -1,36 +1,45 @@
-window.dragMoveListener = dragMoveListener
+window.dragMoveListener = dragMoveListener;
 let root = document.getElementById("drags");
-var objs = {};
+let objs = {};
 
-function add(obj){
-    if (objs[obj] == null) objs[obj] = {};
-    if ((objs[obj]["count"] == null)){(objs[obj]["count"] = 0)}
-    let count = Object.keys(objs[obj]).length -1;
-    // console.log(obj,objs[obj+"_count"],objs[obj+"_s"]);
-    root.innerHTML += "<div class='"+obj+" drag' id="+obj+"_"+count+">"+obj+"</div>";
-    objs[obj][obj+"_"+count] = {};
-    // objs[obj]["count"]+=1;
-    console.log(objs);
+function get_count(clas){
+    if (objs[clas] == null) objs[clas] = {};
+    let count = Object.keys(objs[clas]).length;
+    return count;
 }
 
-function create(clas,obj,x,y,inside){
-    if (inside == null || inside == "") inside = "[]";
-    root.innerHTML += "<div class='"+clas+" drag' id="+obj+">"+inside+"</div>";
-    let obj_doc = document.getElementById(obj);
-    console.log(obj_doc.classList);
-    set_pos(obj_doc,x,y);
+function create(clas,x,y,body,id){
+    // console.log(clas,x,y,body,parent);
+    // console.log(id);
+    if (body == null || body == "") body = "[]";
+    // root.innerHTML += "<div class='"+clas+" drag' id="+obj+">"+body+"</div>";
+    let obj = document.createElement("div");
+    obj.id = id;
+    clas= clas.split(" ");
+    clas.forEach(cl => {
+        obj.classList.add(cl);
+    });
+    obj.innerHTML = body;
+    // parent.append(obj);
+    root.append(obj);
+    set_pos(obj,x,y);
+    // let obj_doc = document.getElementById(obj);
+    // console.log(obj_doc.classList);
 }
 
-function load_local(objs){
+function load_local(objss){
     // objs = JSON.parse($.cookie("objs"));
-    console.log(objs);
-    globalThis.objs = objs;
+    // console.log(objs);
+    objs = objss;
     Object.entries(objs).forEach(([keys, values]) => {
         // console.log(keys,values);
         Object.entries(values).forEach(([key, value]) => {
-            if(key != "count"){
-                // console.log(key,value);
-                create(keys,key,value["x"],value["y"],value["body"]);
+            if(key != "class"){
+                // console.log(key,keys);
+                // console.log(keys,value["x"],value["y"],value["body"]);
+                // let count = Object.keys(objs[keys]).length;
+                // console.log(count);
+                create(keys+" drag",value["x"],value["y"],value["body"],key);
             }
         })
     });
@@ -40,20 +49,18 @@ function load_proj(){
     $.post( "/load_proj",{name:proj_name})
     .done(function( res ) {
         if(res["out"] == "good"){
-            console.log("good");
+            // console.log("good");
             // console.log(JSON.parse(`'${res["body"]}'`));
             // console.log(JSON.parse(res["body"]));
             // $.cookie("objs",res["body"]);
             load_local(JSON.parse(res["body"]));
+            drag_start();
         }
     })
 }
 
 function save(){
-    // let proj_name = document.getElementById("proj_name").value;
-    // $.cookie("objs",JSON.stringify(objs));
-    console.log(objs);
-    // // console.log(objs);
+    // console.log(objs);
     $.post( "/save_proj", {proj:JSON.stringify(objs),name:proj_name})
     .done(function( res ) {
         if(res["out"] == "good"){
@@ -91,10 +98,11 @@ interact('.trash').dropzone({
     ondragenter: function (event) {var drag = event.relatedTarget;var zone = event.target; zone.classList.add('drop-target');drag.classList.add('can-drop');},
     ondragleave: function (event) {var drag = event.relatedTarget;var zone = event.target;zone.classList.remove('drop-target');drag.classList.remove('in_zone');drag.classList.remove('can-drop');},
     ondrop: function (event) {
-        var drag = event.relatedTarget
+        var drag = event.relatedTarget;
+        // console.log(drag.id);
         delete objs[drag.classList[0]][drag.id];
         drag.remove();
-        console.log(objs);
+        // console.log(objs);
         drag.classList.add('in_zone')
         drag.classList.remove('can-drop')
     },
@@ -105,14 +113,63 @@ interact('.dropzone').dropzone({
     accept: '.drag',
     overlap: 0.5,
 
-    ondragenter: function (event) {var drag = event.relatedTarget;var zone = event.target;zone.classList.add('drop-target');drag.classList.add('can-drop');},
+    ondragenter: function (event) {
+        var drag = event.relatedTarget;
+        var zone = event.target;
+        if(drag.id == "none") drag.id = get_id(drag.classList[0]);
+        zone.classList.add('drop-target');
+        drag.classList.add('can-drop');
+    },
     ondragleave: function (event) {var drag = event.relatedTarget;var zone = event.target;zone.classList.remove('drop-target');drag.classList.remove('in_zone');drag.classList.remove('can-drop');},
     ondrop: function (event) {
         var drag = event.relatedTarget
+        // console.log(drag.classList[0]);
+        if (objs[drag.classList[0]] == null) objs[drag.classList[0]] = {};
         objs[drag.classList[0]][drag.id] = {y:drag.getAttribute('data-y'),x:drag.getAttribute('data-x'),body:drag.innerHTML};
+        // console.log(objs);
         // $.cookie("objs",JSON.stringify(objs));
         drag.classList.add('in_zone')
         drag.classList.remove('can-drop')
     },
     ondropdeactivate: function (event) {var zone = event.target;zone.classList.remove('drop-active');zone.classList.remove('drop-target');}
 })
+
+interact('.createzone').dropzone({
+    accept: '.spawn',
+    overlap: 0.2,
+
+    ondragenter: function (event) {
+        var drag = event.relatedTarget;
+        var zone = event.target;zone.classList.add('drop-target');
+        drag.classList.add('can-drop');
+    },
+    ondragleave: function (event) {
+        var drag = event.relatedTarget;
+        var zone = event.target;
+        zone.classList.remove('drop-target');
+        drag.classList.remove('spawn');
+        let x = zone.getBoundingClientRect().left + window.scrollX - 15;
+        let y = zone.getBoundingClientRect().top + window.scrollY - 20;
+        create(`${zone.classList[0]} drag spawn`,x,y,`${zone.classList[0]}`,`none`);
+    },
+    ondrop: function (event) {var drag = event.relatedTargetdrag.classList.remove('in_zone');drag.classList.remove('can-drop');},
+    ondropdeactivate: function (event) {var zone = event.target;zone.classList.remove('drop-active');zone.classList.remove('drop-target');}
+})
+
+function drag_start() {
+    let zones = document.getElementsByClassName("createzone");
+    Object.entries(zones).forEach(([key, zone]) => {
+        let x = zone.getBoundingClientRect().left - 15;
+        let y = zone.getBoundingClientRect().top - 20;
+        // console.log(x,y);
+        create(`${zone.classList[0]} drag spawn`,x,y,`${zone.classList[0]}`,`none`);
+    });
+}
+
+function get_id(clas){
+    if(objs[clas] == null){  return `${clas}_0`}
+    else{
+        let count = Object.keys(objs[clas]).length;
+        return `${clas}_${count}`;
+    }
+}

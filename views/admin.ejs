@@ -1,13 +1,11 @@
-<style>
-    iframe{
-        width: 100%;
-    }
-</style>
-
 <%- include('./static/start.ejs',{name:"admin",async: true}) %>
 <%- include('./header.ejs') %>
 
-    <h1>hello admin</h1>
-    <iframe src="/reg" frameborder="0"></iframe>
+    <section class="main">
+        <h1>hello admin</h1>
+
+    </section>
+    <!-- <iframe src="/reg" frameborder="0"></iframe> -->
+<%- include('./reg.ejs') %>
 
 <%- include('./static/end.ejs') %>

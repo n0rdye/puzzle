@@ -140,7 +140,7 @@ app.post("/sid_log",(req,res) =>{
         func.check_sid(cook,(include,id) => {
             if (include){
                 if(req.headers.referer.split("http://n0rsrv2:3002/")[1] == "login") console.log("good boy "+ id["uuid"]+" logged in by sid logs from " + id["sid"]);
-                res.send({out:"goto",url:"/main"});
+                res.send({out:"good",url:"/main"});
             }
             else if (!include){
                 if(req.headers.referer.split("http://n0rsrv2:3002/")[1] == "login") console.log("bad boy "+ id["uuid"]+" tried to login by sid but sid expired from " + id["sid"]);
@@ -219,8 +219,8 @@ app.post("/save_proj", (req,res) => {
                 console.log(`${udata["uuid"]} saved project ${projin["name"]} from ${cook["sid"]}`);
                 // console.log("proj in");
             }
+            res.send({out:"good"});
         })
-
     })
 })
 

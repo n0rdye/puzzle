@@ -66,7 +66,7 @@ function log_by_sid() {
     $.post( "/sid_log")
     .done(function( res ) {
         console.log("ping");
-        if(res["out"] == "goto"){
+        if(res["out"] == "good"){
             goto(res["url"]);
         }
         else if (res["out"] == "bad"){
