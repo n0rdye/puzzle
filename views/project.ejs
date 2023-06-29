@@ -1,0 +1,78 @@
+<style>
+    .drag{
+        height: 50px;
+        width: 50px;
+        position: absolute;
+        text-align: center;
+    }
+
+    .dropzone {
+        background-color: #bfe4ff;
+        border: dashed 4px transparent;
+        border-radius: 4px;
+        height: 140px;
+        margin: 10px auto 30px;
+        padding: 10px;
+        width: 80%;
+        transition: background-color 0.3s;
+    }
+
+    .trash {
+        background-color: #bfe4ff;
+        border: dashed 4px transparent;
+        border-radius: 4px;
+        margin: 10px auto 30px;
+        padding: 10px;
+        height: 50px;
+        width: 50px;
+        transition: background-color 0.3s;
+        z-index: -1;
+    }
+
+    .drop-active {
+        border-color: #aaa;
+    }
+
+    .drop-target {
+        background-color: #29e;
+        border-color: #fff;
+        border-style: solid;
+    }
+
+    #proj_top{
+        margin: auto;
+        width: 90%;
+        display: flex;
+        justify-content: space-around;
+    }
+    #proj_name{
+        background-color: #aaa;
+        border: 0px;
+        text-align: center;
+    }
+</style>
+
+<%- include('./static/start.ejs',{name:proj_name,async: true}) %>
+<%- include('./header.ejs') %>
+<script src="/lib/interact.min.js"></script>
+
+<div id="proj_top">
+    <input id="proj_name"></input>
+</div>
+<div id="drags"></div>
+
+<div class="dropzone"></div>
+<div class="trash"></div>
+
+<button onclick="add('cube')">add</button>
+<button onclick="save()">save</button>
+
+
+<script src="/lib/inter.js"></script>
+<script>
+    let proj_name = "<%= proj_name %>";
+    load_proj();
+    // console.log(proj_name);
+    document.getElementById("proj_name").value = proj_name;
+</script>
+<%- include('./static/end.ejs') %>

@@ -1,0 +1,62 @@
+<style>
+    .drag{
+        height: 50px;
+        width: 50px;
+        position: absolute;
+        text-align: center;
+    }
+
+    .dropzone {
+        background-color: #bfe4ff;
+        border: dashed 4px transparent;
+        border-radius: 4px;
+        height: 140px;
+        margin: 10px auto 30px;
+        padding: 10px;
+        width: 80%;
+        transition: background-color 0.3s;
+    }
+
+    .trash {
+        background-color: #bfe4ff;
+        border: dashed 4px transparent;
+        border-radius: 4px;
+        margin: 10px auto 30px;
+        padding: 10px;
+        height: 50px;
+        width: 50px;
+        transition: background-color 0.3s;
+        z-index: -1;
+    }
+
+    .drop-active {
+        border-color: #aaa;
+    }
+
+    .drop-target {
+        background-color: #29e;
+        border-color: #fff;
+        border-style: solid;
+    }
+</style>
+
+<%- include('./static/start.ejs',{name:'main',async: true}) %>
+<%- include('./header.ejs') %>
+<!-- <script src="/lib/interact.min.js"></script> -->
+
+<div id="projs_div"></div>
+
+<button >new project</button>
+
+<script>
+    load_projs((projs)=>{
+        projs.forEach(proj => {
+            // console.log(proj);
+            let div = document.getElementById("projs_div");
+            div.innerHTML += `<button id='proj_${proj["name"]}' class='proj' onclick="goto('/proj/${proj["name"]}')">${proj["name"]}</button>`;
+        });
+    });
+</script>
+
+<!-- <script src="/lib/inter.js"></script> -->
+<%- include('./static/end.ejs') %>
