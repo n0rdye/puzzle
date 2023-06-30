@@ -13,13 +13,14 @@
         <h1>hello admin</h1>
         <div class="nobj">
             <div class="img_preview">
-                <input type="file" onchange="previewFile()" value=""><br>
+                <input type="file" onchange="previewFile()" value="" maxlength="1"><br>
                 <img src="" height="100" alt="Image preview...">
             </div>
             <textarea name="" id="nobj_description" cols="30" rows="5" placeholder="object description"></textarea>
             <div class="nobj_options">
                 <input type="text" id="nobj_name" placeholder="object name">
-                <button >create object</button>
+                <button onclick="create_obj()">create object</button>
+                <div id="obj_resp"></div>
             </div>
         </div>
     </section>
@@ -40,26 +41,50 @@
             }
         }
 
-        async function img(){
-            var preview = document.querySelector('img').src;
-            console.log(preview);
-            fetch(preview)
-            .then(res => res.blob())
-            .then(blob => {
-                let dataUrl = blobToDataUrl(blob);
-                console.log(blob)
-                console.log(dataUrl)
-            })
+        // async function toblob(callback){
+        //     var preview = document.querySelector('img').src;
+        //     // console.log(preview);
+        //     fetch(preview)
+        //     .then(res => res.blob())
+        //     .then(blob => {
+        //         // let dataUrl = blobToDataUrl(blob);
+        //         console.log(blob)
+        //         callback(blob);
+        //         // console.log(dataUrl)
+        //     })
+        // }
+
+        function create_obj(){
+            let name = document.getElementById("nobj_name").value;
+            let description = document.getElementById("nobj_description").value;
+            var img = document.querySelector('img').src;
+            new_obj(name,img,0,0,description,(res)=>{
+                if(res["out"] == "bad" && res["err"] == "name"){
+                    document.getElementById("obj_resp").innerHTML = "object already exist";
+                }
+                else if(res["out"] == "good"){
+                    document.getElementById("obj_resp").innerHTML = "object created";
+                }
+            });
         }
-        function blobToDataUrl(blob) {
-            let reader = new FileReader()
-            reader.readAsDataURL(blob)
-            reader.onload = function(){
-                dataUrl = reader.result
-                console.log(dataUrl)    //DataURL
-                return dataUrl;
-            }
-        }
+
+        // load_obj("asd",(data)=>{
+        //     console.log(data);
+        //     // let dataUrl = blobToDataUrl(data["img"]);
+        //     // console.log(data["img"]["data"].getBlob());
+        //     console.
+        //     // document.querySelector('img').src = data["img"];
+        // })
+
+        // function blobToDataUrl(blob) {
+        //     let reader = new FileReader()
+        //     reader.readAsDataURL(blob)
+        //     reader.onload = function(){
+        //         dataUrl = reader.result
+        //         // console.log(dataUrl)    //DataURL
+        //         return dataUrl;
+        //     }
+        // }
     </script>
     <!-- <iframe src="/reg" frameborder="0"></iframe> -->
 <%- include('./reg.ejs') %>

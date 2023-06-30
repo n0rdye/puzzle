@@ -214,12 +214,13 @@ app.post("/save_proj", (req,res) => {
                 // console.log(pname,udata["id"],proj);
                 console.log(`${udata["uuid"]} created project ${pname} from ${cook["sid"]}`);
                 db.nr("projects","`uid`,`name`,`body`",`'${udata["id"]}','${pname}','${proj}'`);
+                res.send({out:"good"});
             } else if (projin != null){
                 db.sv("projects","body",proj,"id",projin["id"],()=>{});
                 console.log(`${udata["uuid"]} saved project ${projin["name"]} from ${cook["sid"]}`);
                 // console.log("proj in");
+                res.send({out:"good"});
             }
-            res.send({out:"good"});
         })
     })
 })
@@ -270,6 +271,42 @@ app.post("/get_projs", (req,res) => {
 app.post("/new_obj", (req,res) => {
     let inp = req.body;
     let cook = req.cookies;
+    if(cook['sid'] != null && cook['uuid'] != null){
+        // console.log(inp["name"],inp["img"]);
+        db.cv("objects","name",inp["name"],(include)=>{
+            if(include){
+                res.send({out:"bad",err:"name"});
+            }
+            else if (!include){
+                db.nr("objects","`name`,`img`,`height`,`width`,`description`",`'${inp["name"]}','${inp["img"]}','1','1','desc'`);
+                res.send({out:"good"});
+            }
+        })
+    }
+})
+
+app.post("/get_objs", (req,res) => {
+    let inp = req.body;
+    let cook = req.cookies;
+    // console.log(inp["name"]);
+    if(cook['sid'] != null && cook['uuid'] != null){
+        db.gv("objects","gid",0,(odata)=>{
+            // console.log(odata);
+            res.send({out:"good",body:odata});
+        })
+    }
+})
+
+app.post("/get_obj", (req,res) => {
+    let inp = req.body;
+    let cook = req.cookies;
+    // console.log(inp["name"]);
+    if(cook['sid'] != null && cook['uuid'] != null){
+        db.gv("objects","name",`'${inp["name"]}'`,(odata)=>{
+            // console.log(odata);
+            res.send({out:"good",body:odata[0]});
+        })
+    }
 })
 
 // app.post("/set_cr_uuid", (req,res) => {

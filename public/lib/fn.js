@@ -122,27 +122,14 @@ function ask() {
     }
 }
 
-function wall_size_change(type){
-    let wall = document.getElementsByClassName("wall")[0];
-    let scroll;
-    if(type != null && type == "x") {
-        scroll = document.getElementById("wall_x");
-        wall.style.width = `${scroll.value * 200}px`;
-    }
-    if(type != null && type == "y") {
-        scroll = document.getElementById("wall_y");
-        wall.style.height = `${scroll.value * 200}px`;
-    }            
-}
-
-function goto_proj(name){
-    $.post( "/proj/"+name, { name:hostname })
-    .done(function( res ) {
-        // if(res["out"] == "good"){
-        //     console.log(res["body"]);
-        // }
-    });
-}
+// function goto_proj(name){
+//     $.post( "/proj/"+name, { name:hostname })
+//     .done(function( res ) {
+//         // if(res["out"] == "good"){
+//         //     console.log(res["body"]);
+//         // }
+//     });
+// }
 
 function get_sid(hostname){
     $.post( "/get_sid", { name:hostname })
@@ -153,8 +140,14 @@ function get_sid(hostname){
     });
 }
 
-function new_obj(){
-
+function new_obj(name,img,height,width,description,callback){
+    $.post( "/new_obj", { name:name,img:img })
+    .done(function( res ) {
+        // if(res["out"] == "good"){
+        //     console.log(res["body"]);
+        // }
+        callback(res);
+    });
 }
 
 function load_projs(callback){
