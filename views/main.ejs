@@ -45,8 +45,8 @@
 <!-- <script src="/lib/interact.min.js"></script> -->
 
 <section class="main">
-    <div id="projs_div"></div>
     <button onclick="new_proj()">new project</button>
+    <div id="projs_div"></div>
 </section>
 
 <script>
@@ -58,7 +58,7 @@
         projs.forEach(proj => {
             // console.log(proj);
             let div = document.getElementById("projs_div");
-            div.innerHTML += `<button id='proj_${proj["name"]}' class='proj' onclick="goto('/proj/${proj["name"]}')">${proj["name"]}</button>`;
+            div.innerHTML += `<button id='proj_${proj["name"]}' class='proj' onclick="goto('/proj/${proj["name"]}')"><img height="200" width="300" src='${proj["img"]}' alt='${proj["name"]}'></img> <br>${proj["name"]}</button>`;
         });
     });
 </script>

@@ -199,6 +199,7 @@ app.post("/save_proj", (req,res) => {
     let cook = req.cookies;
     let proj = inp["proj"];
     let pname = inp["name"];
+    // console.log(inp["img"]);
     db.gv("users","uuid",`'${cook["uuid"]}'`, (udata)=>{ udata = udata[0]
         db.gv("projects","uid",udata["id"],(pdata)=>{
             let projin = null;
@@ -213,10 +214,11 @@ app.post("/save_proj", (req,res) => {
                 // console.log("proj not in");
                 // console.log(pname,udata["id"],proj);
                 console.log(`${udata["uuid"]} created project ${pname} from ${cook["sid"]}`);
-                db.nr("projects","`uid`,`name`,`body`",`'${udata["id"]}','${pname}','${proj}'`);
+                db.nr("projects","`uid`,`name`,`body`,`img`",`'${udata["id"]}','${pname}','${proj}','${inp["img"]}'`);
                 res.send({out:"good"});
             } else if (projin != null){
                 db.sv("projects","body",proj,"id",projin["id"],()=>{});
+                if(inp["img"] != "") db.sv("projects","img",inp["img"],"id",projin["id"],()=>{});
                 console.log(`${udata["uuid"]} saved project ${projin["name"]} from ${cook["sid"]}`);
                 // console.log("proj in");
                 res.send({out:"good"});

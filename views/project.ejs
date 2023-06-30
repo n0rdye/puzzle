@@ -19,8 +19,8 @@
         transition: background-color 0.3s;
     }
     body {
-    height: 100%;
-    overflow-y: hidden;
+        height: 100%;
+        overflow-y: visible;
     }
     .createzone {
         background-color: #bfe4ff;
@@ -104,6 +104,7 @@
 <%- include('./static/start.ejs',{name:proj_name,async: true}) %>
 <%- include('./header.ejs') %>
 <script src="/lib/interact.min.js"></script>
+<script src="/lib/html2canvas.js"></script>
 
 
 <div id="drags">
@@ -111,7 +112,7 @@
 </div>
 <section class="main">
     <div id="proj_top">
-    <button onclick="save()">save</button>  
+        <button id="proj_save_btn" onclick="save((res)=>{document.getElementById('proj_save_btn').innerHTML='saved';setTimeout((res)=>{document.getElementById('proj_save_btn').innerHTML='save'},3000)})">save</button>  
         <input id="proj_name"></input>
     </div>
 </section>
@@ -120,6 +121,22 @@
     <!-- <div class="dropzone"></div> -->
 
 <div class="inputs">
+    <div id="wall_input">
+        <div>
+            <div style="display: flex;width: 150px;justify-content: space-between;">
+                <label for="wall_height">height </label>
+                <div id="wall_height_value">0</div>
+            </div>
+            <input type="range" step="0.1" min="0.9" max="4" id="wall_height" value="2" oninput="wall_size_change('height')"> 
+        </div>
+        <div>
+            <div style="display: flex;width: 150px;justify-content: space-between;">
+                <label for="wall_width">width</label>
+                <div id="wall_width_value">0</div>
+            </div>
+            <input type="range" step="0.1" min="1.9" max="7" id="wall_width" value="4" oninput="wall_size_change('width')"> 
+        </div>
+    </div>
     <div class="czones">
         <!-- <div class="cube createzone"></div>
         <div class="buble createzone"></div>
@@ -135,27 +152,30 @@
     <div class="trash">trash bin</div>
 </div>
 
-
-<div id="wall_input">
-    <div>
-        <div style="display: flex;width: 150px;justify-content: space-between;">
-            <label for="wall_height">height </label>
-            <div id="wall_height_value">0</div>
-        </div>
-        <input type="range" step="0.1" min="0.9" max="4" id="wall_height" value="2" oninput="wall_size_change('height')"> 
-    </div>
-    <div>
-        <div style="display: flex;width: 150px;justify-content: space-between;">
-            <label for="wall_width">width</label>
-            <div id="wall_width_value">0</div>
-        </div>
-        <input type="range" step="0.1" min="1.9" max="7" id="wall_width" value="4" oninput="wall_size_change('width')"> 
-    </div>
-</div>
-<div class="wall dropzone"></div>
+<div class="wall dropzone" id="wall"></div>
 
 <script src="/lib/inter.js"></script>
 <script>
+    function scree(){
+
+
+        html2canvas(document.querySelector("body"),{height: 1000,y:100}).then(canvas => {
+            let scr = canvas.toDataURL();
+            let img = document.createElement("img");
+            img.src = scr;
+            document.body.append(img);
+            // return canvas;
+            // console.log(scr)
+        });
+
+
+
+        // html2canvas(document.querySelector("#drags")).then(canvas => {
+        //     document.body.appendChild(canvas)
+        // });
+
+
+    }
     load_objs((data)=>{
         data.forEach(value => {
             // console.log(value);

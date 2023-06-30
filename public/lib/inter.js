@@ -37,7 +37,7 @@ function create(clas,x,y,body,id){
                 obj.src = db_data["img"];
                 obj.title = `${db_data["name"]} \n ${db_data["description"]}`;
             }
-            obj.innerHTML = body;
+            // obj.innerHTML = body;
             // parent.append(obj);
             root.append(obj);
             set_pos(obj,x,y);
@@ -116,13 +116,20 @@ function load_proj(){
 
 function save(callback){
     // console.log(objs);
-    $.post( "/save_proj", {proj:JSON.stringify(objs),name:proj_name})
-    .done(function( res ) {
+    html2canvas(document.querySelector("body"),{height: 500, width:(window.innerWidth /1.65),x:(window.innerWidth / 5), y:250}).then(canvas => {
+        let scr = "";
+        console.log(canvas.toDataURL().length);
+        if (canvas.toDataURL().length < 80000) scr = canvas.toDataURL()
+        // console.log(scr);
+        $.post( "/save_proj", {proj:JSON.stringify(objs),name:proj_name,img:scr})
+        .done(function( res ) {
         if(res["out"] == "good"){
-            console.log("good");
-            if(callback) callback(res);
-        }
-    })
+                // console.log(scr)
+                console.log("good");
+                if(callback) callback(res);
+            }
+        })
+    });
 }
 
 function load_objs(callback){
@@ -235,8 +242,8 @@ interact('.createzone').dropzone({
 function drag_start() {
     let zones = document.getElementsByClassName("createzone");
     Object.entries(zones).forEach(([key, zone]) => {
-        let x = zone.getBoundingClientRect().left - 15;
-        let y = zone.getBoundingClientRect().top - 30;
+        let x = zone.getBoundingClientRect().left - scrollX - 15;
+        let y = zone.getBoundingClientRect().top - scrollY - 30;
         // console.log(x,y);
         create(`${zone.classList[0]} drag spawn`,x,y,`${zone.classList[0]}`,`none`);
     });
