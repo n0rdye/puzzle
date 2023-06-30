@@ -46,10 +46,14 @@
 
 <section class="main">
     <div id="projs_div"></div>
-    <button >new project</button>
+    <button onclick="new_proj()">new project</button>
 </section>
 
 <script>
+    function new_proj(){
+        let name = ask();
+        goto(`/proj/${name}`);
+    }
     load_projs((projs)=>{
         projs.forEach(proj => {
             // console.log(proj);

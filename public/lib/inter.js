@@ -56,15 +56,22 @@ function load_proj(){
             load_local(JSON.parse(res["body"]));
             drag_start();
         }
+        else if(res["out"] == "bad proj"){
+            console.log("bad");
+            save(()=>{
+                goto("/proj/"+proj_name);
+            });
+        }
     })
 }
 
-function save(){
+function save(callback){
     // console.log(objs);
     $.post( "/save_proj", {proj:JSON.stringify(objs),name:proj_name})
     .done(function( res ) {
         if(res["out"] == "good"){
             console.log("good");
+            if(callback) callback(res);
         }
     })
 }

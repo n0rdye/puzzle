@@ -5,6 +5,7 @@
         position: absolute;
         text-align: center;
         margin: auto;
+        z-index: 10;
     }
 
     .dropzone {
@@ -41,7 +42,7 @@
         height: 50px;
         width: 50px;
         transition: background-color 0.3s;
-        z-index: -1;
+        /* z-index: -1; */
     }
     .czones{
         display: flex;
@@ -49,6 +50,8 @@
         /* justify-content: space-around; */
         flex-wrap: wrap;
         width: 80%;
+        height: 100px;
+        /* overflow-x: auto; */
     }
 
     .drop-active {
@@ -72,6 +75,29 @@
         border: 0px;
         text-align: center;
     }
+
+    .inputs{
+        display: flex;
+        width: 80vw;
+        margin: auto;
+        padding-block: 20px;
+    }
+
+    .wall{
+        /* display: flex; */
+        /* position: relative; */
+        /* margin: 60px auto; */
+        width: 400px;
+        height: 200px;
+        background-color: #fff;
+        background-image: url("/img/bg1red.png");
+        background-size: 200px;
+        background-repeat: repeat;
+        background-position: bottom 0px left 0px;
+        border: 2px solid black;
+        /* overflow: visible; */
+        z-index: 2;
+    }
 </style>
 
 <%- include('./static/start.ejs',{name:proj_name,async: true}) %>
@@ -90,57 +116,37 @@
 </section>
 
     
-    <div class="dropzone"></div>
-<div class="trash"></div>
+    <!-- <div class="dropzone"></div> -->
 
-<div class="czones">
-    <div class="cube createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
-    <div class="buble createzone"></div>
+
+<div class="inputs">
+    <div class="czones">
+        <div class="cube createzone"></div>
+        <div class="buble createzone"></div>
+        <div class="buble createzone"></div>
+        <div class="buble createzone"></div>
+        <div class="buble createzone"></div>
+        <div class="buble createzone"></div>
+        <div class="buble createzone"></div>
+        <div class="buble createzone"></div>
+        <div class="buble createzone"></div>
+        <div class="buble createzone"></div>
+    </div>
+    <div class="trash"></div>
 </div>
+
+
+<div id="wall_input">
+    <div>
+        <label for="wall_y">height</label> <br>
+        <input type="range" step="0.1" min="0" max="4" id="wall_y" oninput="wall_size_change('y')"> <br>
+    </div>
+    <div>
+        <label for="wall_x">width</label> <br>
+        <input type="range" step="0.1" min="2" max="7" id="wall_x" oninput="wall_size_change('x')"> <br>
+    </div>
+</div>
+<div class="wall dropzone"></div>
 
 <script src="/lib/inter.js"></script>
 <script>

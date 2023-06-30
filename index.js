@@ -241,6 +241,9 @@ app.post("/load_proj", (req,res) => {
                     console.log(`${udata["uuid"]} loaded project ${projt["name"]} from ${cook["sid"]}`);
                     res.send({out:"good",body:projt["body"]});
                 }
+                else{
+                    res.send({out:"bad proj"});
+                }
             })
         })
     }

@@ -1,10 +1,66 @@
+<style>
+    .nobj{
+        display: flex;
+        justify-content: space-between;
+        margin: auto;
+    }
+</style>
+
 <%- include('./static/start.ejs',{name:"admin",async: true}) %>
 <%- include('./header.ejs') %>
 
     <section class="main">
         <h1>hello admin</h1>
-
+        <div class="nobj">
+            <div class="img_preview">
+                <input type="file" onchange="previewFile()" value=""><br>
+                <img src="" height="100" alt="Image preview...">
+            </div>
+            <textarea name="" id="nobj_description" cols="30" rows="5" placeholder="object description"></textarea>
+            <div class="nobj_options">
+                <input type="text" id="nobj_name" placeholder="object name">
+                <button >create object</button>
+            </div>
+        </div>
     </section>
+    <script>
+        function previewFile() {
+            var preview = document.querySelector('img');
+            var file    = document.querySelector('input[type=file]').files[0];
+            var reader  = new FileReader();
+
+            reader.onloadend = function () {
+                preview.src = reader.result;
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = "";
+            }
+        }
+
+        async function img(){
+            var preview = document.querySelector('img').src;
+            console.log(preview);
+            fetch(preview)
+            .then(res => res.blob())
+            .then(blob => {
+                let dataUrl = blobToDataUrl(blob);
+                console.log(blob)
+                console.log(dataUrl)
+            })
+        }
+        function blobToDataUrl(blob) {
+            let reader = new FileReader()
+            reader.readAsDataURL(blob)
+            reader.onload = function(){
+                dataUrl = reader.result
+                console.log(dataUrl)    //DataURL
+                return dataUrl;
+            }
+        }
+    </script>
     <!-- <iframe src="/reg" frameborder="0"></iframe> -->
 <%- include('./reg.ejs') %>
 

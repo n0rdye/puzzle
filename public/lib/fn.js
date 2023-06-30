@@ -115,6 +115,26 @@ function logout(redirect = true) {
     }
 }
 
+function ask() {
+    let name = prompt("please enter project name");
+    if(name != "" && name != " "){
+        return name;
+    }
+}
+
+function wall_size_change(type){
+    let wall = document.getElementsByClassName("wall")[0];
+    let scroll;
+    if(type != null && type == "x") {
+        scroll = document.getElementById("wall_x");
+        wall.style.width = `${scroll.value * 200}px`;
+    }
+    if(type != null && type == "y") {
+        scroll = document.getElementById("wall_y");
+        wall.style.height = `${scroll.value * 200}px`;
+    }            
+}
+
 function goto_proj(name){
     $.post( "/proj/"+name, { name:hostname })
     .done(function( res ) {
