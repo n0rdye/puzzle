@@ -280,7 +280,7 @@ app.post("/new_obj", (req,res) => {
                 res.send({out:"bad",err:"name"});
             }
             else if (!include){
-                db.nr("objects","`name`,`img`,`height`,`width`,`description`",`'${inp["name"]}','${inp["img"]}','1','1','desc'`);
+                db.nr("objects","`name`,`img`,`height`,`width`,`description`",`'${inp["name"]}','${inp["img"]}','1','1','${inp["desc"]}'`);
                 res.send({out:"good"});
             }
         })

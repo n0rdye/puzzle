@@ -13,7 +13,7 @@
         <h1>hello admin</h1>
         <div class="nobj">
             <div class="img_preview">
-                <input type="file" onchange="previewFile()" value="" maxlength="1"><br>
+                <input type="file" onchange="previewFile()"  accept="image/*" value="" maxlength="1"><br>
                 <img src="" height="100" alt="Image preview...">
             </div>
             <textarea name="" id="nobj_description" cols="30" rows="5" placeholder="object description"></textarea>
@@ -58,7 +58,8 @@
             let name = document.getElementById("nobj_name").value;
             let description = document.getElementById("nobj_description").value;
             var img = document.querySelector('img').src;
-            new_obj(name,img,0,0,description,(res)=>{
+            if (img != "http://n0rsrv2:3002/admin"){
+                new_obj(name,img,0,0,description,(res)=>{
                 if(res["out"] == "bad" && res["err"] == "name"){
                     document.getElementById("obj_resp").innerHTML = "object already exist";
                 }
@@ -66,6 +67,10 @@
                     document.getElementById("obj_resp").innerHTML = "object created";
                 }
             });
+            }
+            else{
+                document.getElementById("obj_resp").innerHTML = "image not selected";
+            }
         }
 
         // load_obj("asd",(data)=>{

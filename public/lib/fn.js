@@ -141,7 +141,7 @@ function get_sid(hostname){
 }
 
 function new_obj(name,img,height,width,description,callback){
-    $.post( "/new_obj", { name:name,img:img })
+    $.post( "/new_obj", { name:name,img:img,desc:description })
     .done(function( res ) {
         // if(res["out"] == "good"){
         //     console.log(res["body"]);

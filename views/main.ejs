@@ -52,13 +52,15 @@
 <script>
     function new_proj(){
         let name = ask();
-        goto(`/proj/${name}`);
+        if(name != null && name!= "" && name!=" " && typeof name != "undefined" && name!="undefined"){
+            goto(`/proj/${name}`);
+        }
     }
     load_projs((projs)=>{
         projs.forEach(proj => {
             // console.log(proj);
             let div = document.getElementById("projs_div");
-            div.innerHTML += `<button id='proj_${proj["name"]}' class='proj' onclick="goto('/proj/${proj["name"]}')"><img height="200" width="300" src='${proj["img"]}' alt='${proj["name"]}'></img> <br>${proj["name"]}</button>`;
+            div.innerHTML += `<button id='proj_${proj["name"]}' class='proj' onclick="goto('/proj/${proj["name"]}')"><img height="200" width="290" src='${proj["img"]}' alt='${proj["name"]}'></img> <br>${proj["name"]}</button>`;
         });
     });
 </script>

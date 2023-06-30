@@ -39,6 +39,7 @@ function create(clas,x,y,body,id){
             }
             // obj.innerHTML = body;
             // parent.append(obj);
+            obj.setAttribute("max-width","100px");
             root.append(obj);
             set_pos(obj,x,y);
             // let obj_doc = document.getElementById(obj);
@@ -53,7 +54,7 @@ function wall_size_change(type,value){
     if(type != null && type == "width") {
         if (value == null) scroll = document.getElementById("wall_width").value;
         else scroll = value;
-        document.getElementById("wall_width_value").innerHTML = scroll;
+        document.getElementById("wall_width_value").innerHTML = (Math.ceil((parseFloat(scroll)+0.1)*10)/ 10);
 
         // console.log(scroll);
         wall.style.width = `${scroll * 200}px`;
@@ -62,7 +63,7 @@ function wall_size_change(type,value){
     if(type != null && type == "height") {
         if (value == null) scroll = document.getElementById("wall_height").value;
         else scroll = value;        
-        document.getElementById("wall_height_value").innerHTML = scroll;
+        document.getElementById("wall_height_value").innerHTML = (Math.ceil((parseFloat(scroll)+0.1)*10)/ 10);
         
         // console.log(scroll);
         wall.style.height = `${scroll * 200}px`;
