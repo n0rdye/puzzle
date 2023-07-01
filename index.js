@@ -385,4 +385,4 @@ app.all('*', (req, res) => {
     res.status(404).send('<h1>404! Page not</h1> <br> <a href="/">go to main page</a>');
 });
 
-app.listen(process.env.PORT || 3002, () => console.log("started"));
+app.listen(process.env.PORT || 8080, () => console.log("started"));
