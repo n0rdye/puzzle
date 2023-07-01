@@ -4,7 +4,7 @@ const logcon = mysql.createConnection({
     host: 'db',
     user: 'user',
     password: 'user',
-    database: 'users'
+    database: 'test'
 });
 
 logcon.connect();
