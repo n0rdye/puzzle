@@ -59,15 +59,17 @@
             let name = document.getElementById("nobj_name").value;
             let description = document.getElementById("nobj_description").value;
             var img = document.querySelector('img').src;
+            name = name.replace(" ","_");
             if (img != "http://n0rsrv2:3002/admin"){
                 new_obj(name,img,0,0,description,(res)=>{
-                if(res["out"] == "bad" && res["err"] == "name"){
-                    document.getElementById("obj_resp").innerHTML = "object already exist";
-                }
-                else if(res["out"] == "good"){
-                    document.getElementById("obj_resp").innerHTML = "object created";
-                }
-            });
+                    document.getElementById("obj_resp").innerHTML = "creating object";
+                    if(res["out"] == "bad" && res["err"] == "name"){
+                        document.getElementById("obj_resp").innerHTML = "object already exist";
+                    }
+                    else if(res["out"] == "good"){
+                        document.getElementById("obj_resp").innerHTML = "object created";
+                    }
+                });
             }
             else{
                 document.getElementById("obj_resp").innerHTML = "image not selected";

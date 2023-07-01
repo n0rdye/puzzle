@@ -11,21 +11,14 @@ function get_count(clas){
 function create(clas,x,y,body,id){
     let main_clas = clas.split(" ")[0];
     // if (body == null || body == "") body = "[]";
+    let obj = document.createElement("img");
+    obj.id = id;
+    obj.alt = id;
+    clas= clas.split(" ");
+    clas.forEach(cl => {
+        obj.classList.add(cl);
+    });
     load_obj(main_clas,(db_data)=>{
-        // let data = db_data;
-        // body = data["img"];
-        // console.log(data["img"].toString());
-        // console.log(db_data[0]);
-        // console.log(clas,x,y,body,parent);
-        // console.log(id);
-        // root.innerHTML += "<div class='"+clas+" drag' id="+obj+">"+body+"</div>";
-        // let img = document.createElement("img");
-        let obj = document.createElement("img");
-        obj.id = id;
-        clas= clas.split(" ");
-        clas.forEach(cl => {
-            obj.classList.add(cl);
-        });
         if (db_data == null) {
             delete objs[main_clas][id];
             save(()=>{
@@ -36,14 +29,10 @@ function create(clas,x,y,body,id){
             obj.src = db_data["img"];
             obj.title = `${db_data["name"]} \n ${db_data["description"]}`;
         }
-        // obj.innerHTML = body;
-        // parent.append(obj);
-        obj.setAttribute("max-width","100px");
-        root.append(obj);
-        set_pos(obj,x,y);
-        // let obj_doc = document.getElementById(obj);
-        // console.log(obj_doc.classList);
     })
+    obj.setAttribute("max-width","100px");
+    root.append(obj);
+    set_pos(obj,x,y);
 }
 
 function wall_size_change(type,value){
@@ -96,13 +85,13 @@ function load_local(objss){
 function load_proj(){
     $.post( "/load_proj",{name:proj_name})
     .done(function( res ) {
+        drag_start();
         if(res["out"] == "good"){
             // console.log("good");
             // console.log(JSON.parse(`'${res["body"]}'`));
             // console.log(JSON.parse(res["body"]));
             // $.cookie("objs",res["body"]);
             load_local(JSON.parse(res["body"]));
-            drag_start();
         }
         else if(res["out"] == "bad proj"){
             console.log("bad");
