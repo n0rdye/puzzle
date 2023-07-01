@@ -13,7 +13,8 @@
         <h1>hello admin</h1>
         <div class="nobj">
             <div class="img_preview">
-                <input type="file" onchange="previewFile()"  accept="image/*" value="" maxlength="1"><br>
+                <label for="img_file">max size 1mb</label><br>
+                <input type="file" id="img_file" onchange="previewFile()"  accept="image/*" value="" maxlength="1"><br>
                 <img src="" height="100" alt="Image preview...">
             </div>
             <textarea name="" id="nobj_description" cols="30" rows="5" placeholder="object description"></textarea>

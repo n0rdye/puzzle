@@ -100,7 +100,7 @@
 
 <%- include('./static/start.ejs',{name:proj_name,async: true}) %>
 <%- include('./header.ejs') %>
-<script src="/lib/interact.min.js"></script>
+<script src="/lib/interact.js"></script>
 <script src="/lib/html2canvas.js"></script>
 
 
@@ -124,14 +124,14 @@
                 <label for="wall_height">height </label>
                 <div id="wall_height_value">0</div>
             </div>
-            <input type="range" step="0.1" min="0" max="4.9" id="wall_height" value="2" oninput="wall_size_change('height')"> 
+            <input type="range" step="0.1" min="0" max="4.9" id="wall_height" value="1.9" oninput="wall_size_change('height')"> 
         </div>
         <div>
             <div style="display: flex;width: 150px;justify-content: space-between;">
                 <label for="wall_width">width</label>
                 <div id="wall_width_value">0</div>
             </div>
-            <input type="range" step="0.1" min="0" max="6.9" id="wall_width" value="4" oninput="wall_size_change('width')"> 
+            <input type="range" step="0.1" min="0" max="6.9" id="wall_width" value="3.9" oninput="wall_size_change('width')"> 
         </div>
     </div>
     <div class="czones">
@@ -177,7 +177,7 @@
         data.forEach(value => {
             // console.log(value);
             let czones = document.getElementsByClassName("czones")[0];
-            let czone =  document.createElement('img');
+            let czone =  document.createElement('div');
             czone.classList.add(value["name"]);
             czone.classList.add("createzone");
             czones.append(czone)

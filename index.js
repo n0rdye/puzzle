@@ -20,9 +20,11 @@ const app = express();
 // const { mainModule } = require('process');
 // const { name } = require('ejs');
 
+const maxRequestBodySize = '10mb';
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({
-    extended: false
+    extended: false,
+    limit: maxRequestBodySize
 }));
 app.use(express.static('public'));
 app.use(cookieParser());
@@ -43,7 +45,7 @@ app.post('/back_login', (req, res) => {
             db.gv("users","login",`'${ilogin}'`,(udata)=>{udata = udata[0];
                 if(ipass == udata["pass"]){
                     console.log(udata["uuid"]+" logged in by login & pass from "+cook["sid"]);
-                    res.cookie("uuid",udata["uuid"],{maxAge:week,path:"/;SameSite=None"});
+                    res.cookie("uuid",udata["uuid"],{maxAge:week,path:"/;SameSite=Strict"});
 
                     // db.sv("users","sids",sids += inp["sid"]+";","uuid",udata["uuid"],()=>{}); 
                     db.nr("sids",'`sid`,`uid`',`'${cook["sid"]}','${udata["id"]}'`);
@@ -153,7 +155,7 @@ app.post("/sid_log",(req,res) =>{
 app.post("/get_sid" , (req,res) =>{
     let inp = req.body;
     let sid = func.get_uuid(inp["name"]);
-    res.cookie("sid",sid,{maxAge:(week),path:"/;SameSite=None"});
+    res.cookie("sid",sid,{maxAge:(week),path:"/;SameSite=Strict"});
     res.send({out:"good"});
 });
 
