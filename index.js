@@ -37,7 +37,7 @@ app.post('/back_login', (req, res) => {
     let ilogin = func.decrypt(inp["login"],inp["sid"]);
     let ipass = func.decrypt(inp["pass"],inp["sid"]);
 
-    db.cv("users","login",ilogin,(login) => {
+    db.cv("users","id","login",ilogin,(login) => {
         if(login == null){
             res.status(210).send({out:"bad", err:"user"});
         }
@@ -100,8 +100,8 @@ app.post('/reg_user', (req, res) => {
     let login = inp["login"];
     check_db();
     function check_db() {
-        db.cv("users","login",inp["login"], (ldata)=>{
-            db.cv("users","login",inp["uuid"],(udata) =>{
+        db.cv("users","id","login",inp["login"], (ldata)=>{
+            db.cv("users","id","uuid",inp["uuid"],(udata) =>{
                 // console.log("/reg_user same login recs = "+ldata);
                 // console.log("/reg_user same uuid recs = "+udata);
                 if(udata==null && ldata==null){
@@ -277,7 +277,7 @@ app.post("/new_obj", (req,res) => {
     let cook = req.cookies;
     if(cook['sid'] != null && cook['uuid'] != null){
         // console.log(inp["name"],inp["img"]);
-        db.cv("objects","name",inp["name"],(include)=>{
+        db.cv("objects","id","name",inp["name"],(include)=>{
             if(include){
                 res.send({out:"bad",err:"name"});
             }
@@ -378,6 +378,13 @@ app.get("/admin", (req,res) =>{
 // app.get("/main/:id", (req,res) =>{
 //     res.render('main');
 // });
+
+app.get("/test", (req,res) =>{
+    // db.ccv("users","login","id",35,(include)=>{
+    //     console.log(include);
+    // });
+});
+
 
 app.get('/', (req, res) => {
     if(req.cookies["uuid"] != null){

@@ -1,7 +1,7 @@
 const mysql = require('mysql');
 
 const logcon = mysql.createConnection({
-    host: 'db',
+    host: 'localhost',
     user: 'user',
     password: 'user',
     database: 'test'
@@ -10,7 +10,7 @@ const logcon = mysql.createConnection({
 logcon.connect();
 
 // check_for
-module.exports.cv = (table,key,value,callback) => {
+module.exports.cvs = (table,key,value,callback) => {
     logcon.query('SELECT * FROM `'+table+'`', (err, rows, fields) => {
         let log = '';
         if (err) {
@@ -28,6 +28,23 @@ module.exports.cv = (table,key,value,callback) => {
         }
         else{
             callback(null);
+        }
+    })
+}
+
+module.exports.cv = (table,key,ekey,evalue,callback) => {
+    logcon.query('SELECT `'+key+'` FROM `'+table+'` WHERE `'+ekey+'` = "'+evalue+'"', (err, response) => {
+        console.log('SELECT `'+key+'` FROM `'+table+'` WHERE `'+ekey+'` = '+evalue);
+        if (err) {
+            console.log("sql err");
+            throw err;
+        } 
+        console.log(response); 
+        if(response[0] != null){
+            callback(true)
+        }
+        else{
+            callback(false)
         }
     })
 }
