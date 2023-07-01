@@ -25,7 +25,7 @@ function create(clas,x,y,body,id){
                 goto("/proj/"+proj_name);
             });
         }
-        else{
+        else if (db_data != null){
             obj.src = db_data["img"];
             obj.title = `${db_data["name"]} \n ${db_data["description"]}`;
         }
@@ -107,7 +107,7 @@ function save(callback){
     html2canvas(document.querySelector("body"),{height: 500, width:(window.innerWidth /1.65),x:(window.innerWidth / 5), y:250}).then(canvas => {
         let scr = "";
         console.log(canvas.toDataURL().length);
-        if (canvas.toDataURL().length < 80000) scr = canvas.toDataURL()
+        if (canvas.toDataURL().length < 100000) scr = canvas.toDataURL()
         // console.log(scr);
         $.post( "/save_proj", {proj:JSON.stringify(objs),name:proj_name,img:scr})
         .done(function( res ) {

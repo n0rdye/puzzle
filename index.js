@@ -20,7 +20,7 @@ const app = express();
 // const { mainModule } = require('process');
 // const { name } = require('ejs');
 
-const maxRequestBodySize = '10mb';
+const maxRequestBodySize = '50mb';
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({
     extended: false,
@@ -296,6 +296,11 @@ app.post("/get_objs", (req,res) => {
     if(cook['sid'] != null && cook['uuid'] != null){
         db.gv("objects","gid",0,(odata)=>{
             // console.log(odata);
+            // Object.keys(odata).forEach(([key,value]) => {   
+            // });
+            odata.forEach(element => {
+                delete element["img"]
+            });
             res.send({out:"good",body:odata});
         })
     }

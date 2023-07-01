@@ -13,7 +13,7 @@
         <h1>hello admin</h1>
         <div class="nobj">
             <div class="img_preview">
-                <label for="img_file">max size 1mb</label><br>
+                <label for="img_file">max size 2mb</label><br>
                 <input type="file" id="img_file" onchange="previewFile()"  accept="image/*" value="" maxlength="1"><br>
                 <img src="" height="100" alt="Image preview...">
             </div>
@@ -61,8 +61,8 @@
             var img = document.querySelector('img').src;
             name = name.replace(" ","_");
             if (img != "http://n0rsrv2:3002/admin"){
+                document.getElementById("obj_resp").innerHTML = "creating object";
                 new_obj(name,img,0,0,description,(res)=>{
-                    document.getElementById("obj_resp").innerHTML = "creating object";
                     if(res["out"] == "bad" && res["err"] == "name"){
                         document.getElementById("obj_resp").innerHTML = "object already exist";
                     }

@@ -15,10 +15,15 @@
 <form action="" method="get" onsubmit="return false;" id="reg_form">
     <h1>user registration</h1>
     <section class="main_sec">
-        <input type="text" id="login" name="login">
-        <input type="password" id="pass" name="pass">
-        <input type="checkbox" name="admin" value='false' id="admin_check">
-        <button onclick='reg();'>reg</button>
+        <div>
+            <input type="text" id="login" name="login" placeholder="login">
+            <input type="password" id="pass" name="pass" placeholder="password">
+            <button onclick='reg();'>reg</button>
+        </div>
+        <div>
+            <label for="admin_check">admin</label>
+            <input type="checkbox" name="admin" value='false' id="admin_check">
+        </div>
         <div id="reg_response"></div>
     </section>
     <script>

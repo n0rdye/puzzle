@@ -109,7 +109,7 @@
 </div>
 <section class="main">
     <div id="proj_top">
-        <button id="proj_save_btn" onclick="save((res)=>{document.getElementById('proj_save_btn').innerHTML='saved';setTimeout((res)=>{document.getElementById('proj_save_btn').innerHTML='save'},3000)})">save</button>  
+        <button id="proj_save_btn" onclick="document.getElementById('proj_save_btn').innerHTML='saving';save((res)=>{document.getElementById('proj_save_btn').innerHTML='saved';setTimeout((res)=>{document.getElementById('proj_save_btn').innerHTML='save'},3000)})">save</button>  
         <input id="proj_name"></input>
     </div>
 </section>
@@ -182,6 +182,7 @@
             czone.classList.add("createzone");
             czones.append(czone)
         });
+        load_proj();
     })
 </script>
 <script>
@@ -189,6 +190,5 @@
     // console.log(proj_name);
     document.getElementById("proj_name").value = proj_name;
     // drag_start();
-    load_proj();
 </script>
 <%- include('./static/end.ejs') %>
