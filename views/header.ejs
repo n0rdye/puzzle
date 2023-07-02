@@ -25,6 +25,23 @@
     /* button{
         /* margin-inline: 5px; */
     /* } */
+    #ctxmenu {
+    position: fixed;
+    background: ghostwhite;
+    color: black;
+    cursor: pointer;
+    border: 1px black solid
+    }
+
+    #ctxmenu > p {
+    padding: 0 1rem;
+    margin: 0
+    }
+
+    #ctxmenu > p:hover {
+    background: black;
+    color: ghostwhite
+    }
 </style>
 <header id="top_panel">
     <!-- <div id="user_name"></div> -->
@@ -50,4 +67,17 @@
     }
     right.innerHTML += "<button onclick='logout();'>logout</button>";
 });
+
+oncontextmenu = (e) => {
+  e.preventDefault()
+//   console.log(e);
+  if(e.target.id == "user_name"){
+    let menu = document.createElement("div")
+    menu.id = "ctxmenu"
+    menu.style = `top:${e.pageY+20}px;left:${e.pageX-40}px`
+    menu.onmouseleave = () => ctxmenu.outerHTML = ''
+    menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
+    document.body.appendChild(menu)
+  }
+}
 </script>
