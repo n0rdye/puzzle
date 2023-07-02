@@ -8,24 +8,32 @@
         z-index: 10;
     }
 
+    #drags{
+        position: absolute;
+        margin: auto;
+    }
+
     .dropzone {
         background-color: #bfe4ff;
         border: dashed 4px transparent;
         border-radius: 4px;
         height: 140px;
         margin: 10px auto 30px;
-        padding: 10px;
+        /* padding: 10px; */
         width: 80%;
         transition: background-color 0.3s;
+        position: absolute;
+        inset: 0px;
+        margin: 250px auto;
     }
     .createzone {
         background-color: #bfe4ff;
         border: dashed 4px transparent;
         border-radius: 4px;
-        height: 10px;
+        height: 22px;
+        width: 22px;
         margin: 10px;
         padding: 10px;
-        width: 10px;
         transition: background-color 0.3s;
     }
 
@@ -34,7 +42,7 @@
         border: dashed 4px transparent;
         border-radius: 4px;
         margin: 10px auto 30px;
-        padding: 10px;
+        /* padding: 10px; */
         height: 50px;
         width: 50px;
         transition: background-color 0.3s;
@@ -124,14 +132,14 @@
                 <label for="wall_height">height </label>
                 <div id="wall_height_value">0</div>
             </div>
-            <input type="range" step="0.1" min="0" max="4.9" id="wall_height" value="1.9" oninput="wall_size_change('height')"> 
+            <input type="range" step="0.1" min="0" max="5" id="wall_height" value="2" oninput="wall_size_change('height')"> 
         </div>
         <div>
             <div style="display: flex;width: 150px;justify-content: space-between;">
                 <label for="wall_width">width</label>
                 <div id="wall_width_value">0</div>
             </div>
-            <input type="range" step="0.1" min="0" max="6.9" id="wall_width" value="3.9" oninput="wall_size_change('width')"> 
+            <input type="range" step="0.1" min="0" max="7" id="wall_width" value="4" oninput="wall_size_change('width')"> 
         </div>
     </div>
     <div class="czones">
@@ -146,7 +154,7 @@
         <div class="buble createzone"></div>
         <div class="buble createzone"></div> -->
     </div>
-    <div class="trash">trash bin</div>
+    <img class="trash" style="height: 100px; width: 100px;" src="https://media.tenor.com/9Ec_X487U1kAAAAj/shadow-energy.gif" alt="black hole">
 </div>
 
 <div class="wall dropzone" id="wall"></div>

@@ -1,43 +1,3 @@
-function blogin(){
-    log(document.getElementById('login').value,document.getElementById('pass').value);
-}
-
-function log(nlogin,npass){
-    const login = CryptoJS.AES.encrypt(nlogin,$.cookie("sid")).toString();
-    const pass = CryptoJS.AES.encrypt(npass,$.cookie("sid")).toString();
-    const sid = $.cookie("sid");
-    $.post( "/back_login", { login:login,pass:pass,sid:sid })
-    .done(function( res ) {
-        if (res["out"] == "bad"){
-            console.log(res["err"]);
-            if (res["err"] == "user" || res["err"] == "pass"){
-                document.querySelector("#res").innerHTML = "<p>wrong password or login</p>";
-            }
-        }
-        else{
-            if(res["out"] == "goto"){
-                // postForm(res["url"], res["args"]);
-                goto(res["url"]);
-            }
-        }
-    });
-}
-
-// function get_from_uuid(callback){
-//     const uid = $.cookie("uuid");
-//     const sid = $.cookie("sid");
-//     $.post( "/get_cr_uuid", { uuid:uid,sid:sid })
-//     .done(function( res ) {
-//         if (res["out"] == "good"){
-//             callback(res["body"])
-//         }
-//         else if (res["out"] == bad){
-//             if (res["body"] == "expired"){
-//                 clear_ck();
-//             }
-//         }
-//     });
-// }
 function get_from_uuid(callback){
     const uid = $.cookie("uuid");
     const sid = $.cookie("sid");
@@ -61,7 +21,7 @@ function log_by_sid() {
     // console.log("log");
     if($.cookie('uuid') == null && $.cookie('sid') == null){
         // get_sid(location.hostname);
-        get_sid(location.hostname);
+        get_sid();
     }else if ($.cookie('sid') != null && $.cookie('uuid') != null){
     $.post( "/sid_log")
     .done(function( res ) {
@@ -85,7 +45,7 @@ function clear_ck(redirect = true){
         $.removeCookie("uuid");
         $.removeCookie('sid');    
         console.log("clear");
-        get_sid(location.hostname);
+        get_sid();
         if(res["out"] == "good"){
             if (redirect) goto("/login");
         }
@@ -122,41 +82,13 @@ function ask() {
     }
 }
 
-// function goto_proj(name){
-//     $.post( "/proj/"+name, { name:hostname })
-//     .done(function( res ) {
-//         // if(res["out"] == "good"){
-//         //     console.log(res["body"]);
-//         // }
-//     });
-// }
 
-function get_sid(hostname){
-    $.post( "/get_sid", { name:hostname })
+function get_sid(){
+    $.post( "/get_sid", {})
     .done(function( res ) {
         // if(res["out"] == "good"){
         //     console.log(res["body"]);
         // }
-    });
-}
-
-function new_obj(name,img,height,width,description,callback){
-    $.post( "/new_obj", { name:name,img:img,desc:description })
-    .done(function( res ) {
-        // if(res["out"] == "good"){
-        //     console.log(res["body"]);
-        // }
-        callback(res);
-    });
-}
-
-function load_projs(callback){
-    $.post( "/get_projs")
-    .done(function( res ) {
-        if(res["out"] == "good"){
-            // console.log(res["body"]);
-            callback(res["body"]);
-        }
     });
 }
 

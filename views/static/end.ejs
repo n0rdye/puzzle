@@ -1,3 +1,11 @@
+<div class="scale_block">
+   <div>
+    oh no html breaking! <br>
+    please don't use custom scale for this window 
+   </div>
+</div>
+</body>
+</html>
 <script>
     if(document.title == "login"){
         console.log(document.title);
@@ -7,5 +15,34 @@
         console.log("check");
     }
 </script>
-</body>
-</html>
+<script>
+    px_ratio = window.devicePixelRatio || window.screen.availWidth / document.documentElement.clientWidth;
+    // console.log(px_ratio);
+    isZooming();
+    $(window).resize(function(){isZooming();});
+
+    function isZooming(){
+        var newPx_ratio = window.devicePixelRatio || window.screen.availWidth / document.documentElement.clientWidth;
+        if(newPx_ratio != px_ratio){
+            px_ratio = newPx_ratio;
+            // console.log(px_ratio);
+            if (px_ratio != 1){
+                // console.log("zooming");
+                document.getElementsByClassName("scale_block")[0].style.display = "block";
+            }
+            else{
+                document.getElementsByClassName("scale_block")[0].style.display = "none";
+            }
+            return true;
+        }else{
+            // console.log("just resizing");
+            if (px_ratio != 1){
+                document.getElementsByClassName("scale_block")[0].style.display = "block";
+            }
+            else{
+                document.getElementsByClassName("scale_block")[0].style.display = "none";
+            }
+            return false;
+        }
+    }
+</script>

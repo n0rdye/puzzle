@@ -1,4 +1,4 @@
-<%- include('./static/start.ejs',{name:'login',async: true,sid_check:"yes"}) %>
+<%- include('./static/start.ejs',{name:'login',async: true}) %>
 
 <style>
     * {
@@ -20,23 +20,44 @@
         <label for="pass">password</label>
     </div>
 
-    <button type="button" id="log_btn" onclick="blogin()">login</button>
+    <button type="button" id="log_btn" onclick="log(document.getElementById('login').value,document.getElementById('pass').value);">login</button>
     <!-- <input type="submit" value=""  hidden> -->
     <div id="res"></div>
-
-    <script>
-        // console.log($.cookie("uuid"));
-        // log_by_sid();
-
-        var input = document.getElementById("pass");
-        input.addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            document.getElementById("log_btn").click();
-        }
-        }); 
-    </script>
      
 </form>
 
 <%- include('./static/end.ejs') %>
+
+<script>
+    // console.log($.cookie("uuid"));
+    // log_by_sid();
+
+    function log(nlogin,npass){
+        const login = CryptoJS.AES.encrypt(nlogin,$.cookie("sid")).toString();
+        const pass = CryptoJS.AES.encrypt(npass,$.cookie("sid")).toString();
+        const sid = $.cookie("sid");
+        $.post( "/back_login", { login:login,pass:pass,sid:sid })
+        .done(function( res ) {
+            if (res["out"] == "bad"){
+                console.log(res["err"]);
+                if (res["err"] == "user" || res["err"] == "pass"){
+                    document.querySelector("#res").innerHTML = "<p>wrong password or login</p>";
+                }
+            }
+            else{
+                if(res["out"] == "goto"){
+                    // postForm(res["url"], res["args"]);
+                    goto(res["url"]);
+                }
+            }
+        });
+    }
+    
+    var input = document.getElementById("pass");
+    input.addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        document.getElementById("log_btn").click();
+    }
+    }); 
+</script>

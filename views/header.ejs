@@ -27,21 +27,6 @@
     /* } */
 </style>
 <header id="top_panel">
-    <script>get_from_uuid((res)=>{
-        let uname = document.getElementById("user_name"); 
-        let header = document.getElementById("top_panel"); 
-        let right = document.getElementById("top_panel_right"); 
-        let left = document.getElementById("top_panel_left"); 
-        
-        if(document.title != "main") left.innerHTML += `<button onclick="goto('/');">main page</button>`;
-        left.innerHTML += `<div id="user_name">${res["login"]}</div>`;
-        
-        if (res["admin"] == true){
-            right.innerHTML += `<button onclick='goto("/admin")'>admin panel</button>`;
-        }
-        right.innerHTML += "<button onclick='logout();'>logout</button>";
-    });
-    </script>
     <!-- <div id="user_name"></div> -->
     <div id="proj_top_panel">
         <div id="top_panel_left"></div>
@@ -50,3 +35,19 @@
     </div>
     <!-- <div><button onclick="logout();">logout</button></div> -->
 </header>
+
+<script>get_from_uuid((res)=>{
+    let uname = document.getElementById("user_name"); 
+    let header = document.getElementById("top_panel"); 
+    let right = document.getElementById("top_panel_right"); 
+    let left = document.getElementById("top_panel_left"); 
+    
+    if(document.title != "main") left.innerHTML += `<button onclick="goto('/');">main page</button>`;
+    left.innerHTML += `<div id="user_name">${res["login"]}</div>`;
+    
+    if (res["admin"] == true){
+        right.innerHTML += `<button onclick='goto("/admin")'>admin panel</button>`;
+    }
+    right.innerHTML += "<button onclick='logout();'>logout</button>";
+});
+</script>

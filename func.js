@@ -5,6 +5,8 @@ const cryptojs = require('crypto-js');
 const e = require('express');
 const fs = require('fs');
 const db = require('./db');
+const moment = require("moment");
+const vars = require('./vars');
 
 module.exports.sendfile = (fileName, response) => {
     const filePath = "./files/"+fileName; 
@@ -46,9 +48,42 @@ module.exports.check_sid = (Cookies, callback) =>{
     })
 }
 
+module.exports.sid = (cook,res,callback,auto = true)=>{
+    let uuid = cook["uuid"];
+    let sid = cook["sid"];
+    if(cook["uuid"] != null && cook["sid"] != null){
+        db.ggv("sids","`uid`","sid",`'${sid}'`,(sdata)=>{ sdata = sdata[0]
+            // console.log(sdata);
+            if(sdata != null){
+                db.ggv("users","`uuid`,`id`","id",`'${sdata["uid"]}'`,(udata)=>{ udata = udata[0]
+                    if (udata != null && udata["id"] == sdata["uid"] && uuid == udata["uuid"]){
+                        callback(true);
+                    }
+                    else{
+                        if(auto) res.send({out:"bad",err:"wrong"});
+                        callback(false);
+                    }
+                });
+            }
+            else{
+                if(auto) res.send({out:"bad",err:"expired"});
+                callback(false);
+            }
+        });
+    }else{
+        if(auto) res.send({out:"bad",err:"nocr"});
+        callback(false);
+    }
+}
 
-module.exports.get_uuid = (name) =>{
-    let unid = uuid.v4() + '%'+name+'%%' + uuid.v4() +'#'+(621);
+module.exports.log = (comment) =>{
+    var date = moment().format('YYYY-MM-DD_hh:mm')
+    console.log(`${date}|${comment}`);
+}
+
+
+module.exports.get_uuid = () =>{
+    let unid = uuid.v4() + '%%' + uuid.v4() +'#'+(621);
     return unid;
 }
 

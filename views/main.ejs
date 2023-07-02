@@ -49,7 +49,19 @@
     <div id="projs_div"></div>
 </section>
 
+<!-- <script src="/lib/inter.js"></script> -->
+<%- include('./static/end.ejs') %>
+
 <script>
+    function load_projs(callback){
+        $.post( "/get_projs")
+        .done(function( res ) {
+            if(res["out"] == "good"){
+                // console.log(res["body"]);
+                callback(res["body"]);
+            }
+        });
+    }
     function new_proj(){
         let name = ask();
         if(name != null && name!= "" && name!=" " && typeof name != "undefined" && name!="undefined"){
@@ -64,6 +76,3 @@
         });
     });
 </script>
-
-<!-- <script src="/lib/inter.js"></script> -->
-<%- include('./static/end.ejs') %>
