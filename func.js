@@ -24,29 +24,29 @@ module.exports.sendfile = (fileName, response) => {
     });
 }
 
-module.exports.check_sid = (Cookies, callback) =>{
-    let uuid = Cookies["uuid"];
-    let sid = Cookies["sid"];
-    // console.log(uuid,sid);
-    db.gv("users","uuid",`'${uuid}'`,(udata)=>{ udata = udata[0];
-        // console.log(udata);
-        db.gv("sids","uid",udata["id"],(rdata)=>{
-            let valid = "";
-            rdata.forEach(rec => {
-                if (rec["sid"] == sid){
-                    valid = rec["sid"];
-                    return;
-                }
-            });
-            if(valid != ""){
-                callback(true,udata);
-            }
-            else{
-                callback(false,udata);
-            }
-        });
-    })
-}
+// module.exports.check_sid = (Cookies, callback) =>{
+//     let uuid = Cookies["uuid"];
+//     let sid = Cookies["sid"];
+//     // console.log(uuid,sid);
+//     db.gv("users","uuid",`'${uuid}'`,(udata)=>{ udata = udata[0];
+//         // console.log(udata);
+//         db.gv("sids","uid",udata["id"],(rdata)=>{
+//             let valid = "";
+//             rdata.forEach(rec => {
+//                 if (rec["sid"] == sid){
+//                     valid = rec["sid"];
+//                     return;
+//                 }
+//             });
+//             if(valid != ""){
+//                 callback(true,udata);
+//             }
+//             else{
+//                 callback(false,udata);
+//             }
+//         });
+//     })
+// }
 
 module.exports.sid = (cook,res,callback,auto = true)=>{
     let uuid = cook["uuid"];
@@ -61,24 +61,26 @@ module.exports.sid = (cook,res,callback,auto = true)=>{
                     }
                     else{
                         if(auto) res.send({out:"bad",err:"wrong"});
-                        callback(false);
+                        if(!auto) callback(false);
                     }
                 });
             }
             else{
                 if(auto) res.send({out:"bad",err:"expired"});
-                callback(false);
+                if(!auto) callback(false);
             }
         });
     }else{
         if(auto) res.send({out:"bad",err:"nocr"});
-        callback(false);
+        if(!auto) callback(false);
     }
 }
 
-module.exports.log = (comment) =>{
-    var date = moment().format('YYYY-MM-DD_hh:mm')
-    console.log(`${date}|${comment}`);
+module.exports.log = (message) =>{
+    var date = moment().format('YYYY-MM-DD')
+    var time = moment().format('hh:mm:ss')
+    console.log(`${date}_${time}|${message}`);
+    db.nr("logs","`date`,`time`,`log`",`'${date}','${time}','${message}'`);
 }
 
 
@@ -87,13 +89,13 @@ module.exports.get_uuid = () =>{
     return unid;
 }
 
-module.exports.encrypt = (password,uuid) => {
+module.exports.encrypt = (text,cipher) => {
     // return bcrypt.hashSync(password,bcrypt.genSaltSync());
-    return cryptojs.AES.encrypt(password,uuid).toString();
+    return cryptojs.AES.encrypt(text,cipher).toString();
 }
 
-module.exports.decrypt = (password,uuid) =>{
-    const en = cryptojs.AES.decrypt(password,uuid);
+module.exports.decrypt = (text,cipher) =>{
+    const en = cryptojs.AES.decrypt(text,cipher);
     const de = en.toString(cryptojs.enc.Utf8);
     // console.log(de + "-dec");
     return de;

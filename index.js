@@ -26,7 +26,7 @@ const app = express();
 // const { mainModule } = require('process');
 // const { name } = require('ejs');
 
-const maxRequestBodySize = '50mb';
+const maxRequestBodySize = '20mb';
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({
     extended: false,
@@ -79,7 +79,6 @@ app.post("/get_cr_uuid", (req,res) => {
 app.post("/save_proj", (req,res) => {
     let inp = req.body;
     let cook = req.cookies;
-    // func.log(inp["img"]);
     func.sid(cook,res,()=>{
         proj.save(inp,cook,res);
     })

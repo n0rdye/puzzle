@@ -1,48 +1,23 @@
-<div class="scale_block">
-   <div>
-    oh no html breaking! <br>
-    please don't use custom scale for this window 
-   </div>
-</div>
 </body>
 </html>
 <script>
-    if(document.title == "login"){
-        console.log(document.title);
-        log_by_sid();
-    }else if(document.title != "login"){
-        check_sid(true);
-        console.log("check");
+    function hide_menus(){
+        let menus = document.getElementsByClassName("cmenu");
+        Object.entries(menus).forEach(([key,menu]) => {
+            menu.style.display = "none";
+        });
     }
-</script>
-<script>
-    px_ratio = window.devicePixelRatio || window.screen.availWidth / document.documentElement.clientWidth;
-    // console.log(px_ratio);
-    isZooming();
-    $(window).resize(function(){isZooming();});
-
-    function isZooming(){
-        var newPx_ratio = window.devicePixelRatio || window.screen.availWidth / document.documentElement.clientWidth;
-        if(newPx_ratio != px_ratio){
-            px_ratio = newPx_ratio;
-            // console.log(px_ratio);
-            if (px_ratio != 1){
-                // console.log("zooming");
-                document.getElementsByClassName("scale_block")[0].style.display = "block";
-            }
-            else{
-                document.getElementsByClassName("scale_block")[0].style.display = "none";
-            }
-            return true;
-        }else{
-            // console.log("just resizing");
-            if (px_ratio != 1){
-                document.getElementsByClassName("scale_block")[0].style.display = "block";
-            }
-            else{
-                document.getElementsByClassName("scale_block")[0].style.display = "none";
-            }
-            return false;
-        }
+    hide_menus();
+    oncontextmenu = (e) => {
+            e.preventDefault()
     }
+    $(window).focus(function(){
+        if(document.title == "login"){
+            console.log(document.title);
+            log_by_sid();
+        }else if(document.title != "login"){
+            check_sid(true);
+            console.log("check");
+        }    
+    });
 </script>

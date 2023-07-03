@@ -87,6 +87,7 @@
         margin: auto;
         padding-block: 20px;
         padding-bottom: 0px;
+        margin-top: 50px;
     }
 
     .wall{
@@ -115,12 +116,8 @@
 <div id="drags">
     <!-- <div class="cube drag spawn" id="cube_0" style="transform: translate(197.7px, 57.8667px);" data-x="197.6999969482422" data-y="57.866668701171875" >cube</div>     -->
 </div>
-<section class="main">
-    <div id="proj_top">
-        <button id="proj_save_btn" onclick="document.getElementById('proj_save_btn').innerHTML='saving';save((res)=>{document.getElementById('proj_save_btn').innerHTML='saved';setTimeout((res)=>{document.getElementById('proj_save_btn').innerHTML='save'},3000)})">save</button>  
-        <input id="proj_name"></input>
-    </div>
-</section>
+
+<div id="project_menu" class="cmenu"></div>
 
     
     <!-- <div class="dropzone"></div> -->
@@ -139,7 +136,7 @@
                 <label for="wall_width">width</label>
                 <div id="wall_width_value">0</div>
             </div>
-            <input type="range" step="0.1" min="0" max="7" id="wall_width" value="4" oninput="wall_size_change('width')"> 
+            <input type="range" step="0.1" min="0" max="7" id="wall_width" value="4" oninput="wall_size_change('width')" onchange="resize_drags()"> 
         </div>
     </div>
     <div class="czones">
@@ -154,33 +151,34 @@
         <div class="buble createzone"></div>
         <div class="buble createzone"></div> -->
     </div>
-    <img class="trash" style="height: 100px; width: 100px;" src="https://media.tenor.com/9Ec_X487U1kAAAAj/shadow-energy.gif" alt="black hole">
+    <img class="trash" style="height: 100px; width: 100px;" src="/img/shadow-energy.gif" alt="black hole">
 </div>
 
 <div class="wall dropzone" id="wall"></div>
 
 <script src="/lib/inter.js"></script>
+<%- include('./static/end.ejs') %>
 <script>
-    function scree(){
+    // function scree(){
+    //     // console.log(document.getElementById("wall").style.height.split("p")[0]);
+    //     html2canvas(document.querySelector("body"),{height: document.getElementById("wall").style.height.split("p")[0], width:document.getElementById("wall").style.width.split("p")[0], y:255}).then(canvas => {
+    //         console.log(canvas.toDataURL().length);
+    //         let scr = canvas.toDataURL();
+    //         let img = document.createElement("img");
+    //         img.src = scr;
+    //         document.body.append(img);
+    //         // return canvas;
+    //         // console.log(scr)
+    //     });
 
 
-        html2canvas(document.querySelector("body"),{height: 1000,y:100}).then(canvas => {
-            let scr = canvas.toDataURL();
-            let img = document.createElement("img");
-            img.src = scr;
-            document.body.append(img);
-            // return canvas;
-            // console.log(scr)
-        });
+
+    //     // html2canvas(document.querySelector("#drags")).then(canvas => {
+    //     //     document.body.appendChild(canvas)
+    //     // });
 
 
-
-        // html2canvas(document.querySelector("#drags")).then(canvas => {
-        //     document.body.appendChild(canvas)
-        // });
-
-
-    }
+    // }
     load_objs((data)=>{
         data.forEach(value => {
             // console.log(value);
@@ -190,13 +188,53 @@
             czone.classList.add("createzone");
             czones.append(czone)
         });
-        load_proj();
+        load_proj_cloud();
     })
 </script>
 <script>
     let proj_name = "<%= proj_name %>";
+    if($.cookie("cache") ==null)$.cookie("cache","true",{path:"/proj;SameSite=Strict"});
     // console.log(proj_name);
-    document.getElementById("proj_name").value = proj_name;
+    let menu = document.getElementById("project_menu");
+    document.getElementById("top_panel_left").innerHTML = `<div id='proj_menu' class="menu_btn">file</div>`;
+    menu.innerHTML += "<button id='proj_csave_btn' onclick='save_proj()'>save to cloud</button> <br>";
+    menu.innerHTML += "<button id='proj_cload_btn' onclick='load_proj_cloud()'>load from cloud</button> <br>";
+    menu.innerHTML += "<button id='proj_lsave_btn' onclick='save_proj_local()'>save to local storage</button> <br>";
+    menu.innerHTML += "<button id='proj_lload_btn' onclick='load_proj_local()'>load from local storage</button> <br>";
+    if ($.cookie("cache") == "false") menu.innerHTML += "<div id='cache_switch' title='if its on browser will stop large data in local storage (better performance)'><button onclick='cache_change(true);'>cache is off</button></div>";
+    else if ($.cookie("cache") == "true") menu.innerHTML += "<div id='cache_switch' title='if its on browser will stop large data in local storage (better performance)'><button onclick='cache_change(false);'>cache is on</button></div>";
+
+
+    function cache_change(to){
+        let cache_switch = document.getElementById("cache_switch");
+        if(to) {cache_switch.innerHTML = "<button onclick='cache_change(false);' title='if its on browser will stop large data in local storage (better performance)'>cache is on</button></div>";$.cookie("cache","true",{path:"/proj;SameSite=Strict"});}
+        else if(!to) {cache_switch.innerHTML = "<button onclick='cache_change(true);' title='if its on browser will stop large data in local storage (better performance)'>cache is off</button></div>";$.cookie("cache","false",{path:"/proj;SameSite=Strict"});}
+    }
+    function save_proj(type){
+        document.getElementById('top_panel_center').innerHTML=`saving ${proj_name}`;
+        save((res)=>{
+            document.getElementById('top_panel_center').innerHTML=`saved ${proj_name} to cloud`;
+            setTimeout((res)=>{
+                document.getElementById("top_panel_center").innerText = `${proj_name} (cloud)`;
+
+            },3000)
+        })
+    }
+
+    function save_proj_local(type){
+        document.getElementById('top_panel_center').innerHTML=`saving ${proj_name}`;
+        save_local();
+        document.getElementById('top_panel_center').innerHTML=`saved ${proj_name} to local storage`;
+        setTimeout((res)=>{
+            document.getElementById("top_panel_center").innerText = `${proj_name} (local)`;
+        },3000)
+    }
+    
     // drag_start();
+    // console.log(px_ratio);
+    $(window).resize(function(){isZooming();});
+
+    function isZooming(){
+        resize_drags();
+    }
 </script>
-<%- include('./static/end.ejs') %>

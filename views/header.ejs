@@ -11,13 +11,15 @@
         /* float: right; */
         justify-content: space-between;
         display: flex;
-        width: 20vw;
+        cursor: pointer;
+        /* width: 20vw; */
     }
     #top_panel_left{
         /* float: left; */
         justify-content: space-between;
+        cursor: pointer;
         display: flex;
-        width: 20vw;
+        /* width: 20vw; */
     }
     #top_panel{
         height: 20px;
@@ -25,59 +27,85 @@
     /* button{
         /* margin-inline: 5px; */
     /* } */
-    #ctxmenu {
-    position: fixed;
-    background: ghostwhite;
-    color: black;
-    cursor: pointer;
-    border: 1px black solid
-    }
 
-    #ctxmenu > p {
-    padding: 0 1rem;
-    margin: 0
-    }
 
-    #ctxmenu > p:hover {
-    background: black;
-    color: ghostwhite
+    .menu_btn{
+        background: ghostwhite;
+        cursor: pointer;
+        border: 1px black dashed;
+        padding: 5px;
+    }
+    .cmenu{
+        position: fixed;
+        display: block;
+        background: ghostwhite;
+        color: black;
+        cursor: pointer;
+        border: 1px black solid;
     }
 </style>
+
+
 <header id="top_panel">
     <!-- <div id="user_name"></div> -->
     <div id="proj_top_panel">
         <div id="top_panel_left"></div>
-        <!-- <div>puzzle</div> -->
+        <div id="top_panel_center"></div>
         <div id="top_panel_right"></div>
-    </div>
-    <!-- <div><button onclick="logout();">logout</button></div> -->
+    </div>        <!-- <div><button onclick="logout();">logout</button></div> -->
 </header>
+<div id="user_menu" class="cmenu"></div>
+
+
 
 <script>get_from_uuid((res)=>{
     let uname = document.getElementById("user_name"); 
+    let menu = document.getElementById("user_menu"); 
     let header = document.getElementById("top_panel"); 
     let right = document.getElementById("top_panel_right"); 
     let left = document.getElementById("top_panel_left"); 
     
-    if(document.title != "main") left.innerHTML += `<button onclick="goto('/');">main page</button>`;
-    left.innerHTML += `<div id="user_name">${res["login"]}</div>`;
+    if(document.title != "main") menu.innerHTML += `<button onclick="goto('/');">main page</button> <br>`;
+    right.innerHTML += `<div id="user_name" class="menu_btn">${res["login"]}</div>`;
     
     if (res["admin"] == true){
-        right.innerHTML += `<button onclick='goto("/admin")'>admin panel</button>`;
+        menu.innerHTML += `<button onclick='goto("/admin")'>admin panel</button><br>`;
     }
-    right.innerHTML += "<button onclick='logout();'>logout</button>";
+    menu.innerHTML += "<button onclick='logout();'>logout</button><br>";
 });
 
-oncontextmenu = (e) => {
-  e.preventDefault()
-//   console.log(e);
-  if(e.target.id == "user_name"){
-    let menu = document.createElement("div")
-    menu.id = "ctxmenu"
-    menu.style = `top:${e.pageY+20}px;left:${e.pageX-40}px`
-    menu.onmouseleave = () => ctxmenu.outerHTML = ''
-    menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
-    document.body.appendChild(menu)
-  }
+onclick = (e) => {
+    e.preventDefault()
+    //   console.log(e);
+    //   console.log(document.getElementById(e.target.id).parentElement);
+      if(e.target.onclick != null){
+        if(document.title == "login"){
+            console.log(document.title);
+            log_by_sid();
+        }else if(document.title != "login"){
+            check_sid(true);
+            console.log("check");
+        }
+      }
+    if(e.target.id == "user_name"){
+        hide_menus();
+        let menu = document.getElementById("user_menu");
+        menu.style.display = 'block';
+        menu.style = `top:${e.target.getBoundingClientRect().top+30}px;left:${e.target.getBoundingClientRect().left}px`
+        // menu.onmouseleave = () => menu.style.display = 'none';
+        // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
+        // document.body.appendChild(menu)
+    }else if(e.target.id == "proj_menu"){
+        hide_menus();
+        let menu = document.getElementById("project_menu");
+        menu.style.display = 'block';
+        menu.style = `top:${e.target.getBoundingClientRect().top+30}px;left:${e.target.getBoundingClientRect().left}px`
+            // menu.onmouseleave = () => menu.style.display = 'none';
+            // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
+            // document.body.appendChild(menu)
+    }
+    else{
+        hide_menus();
+    }
 }
 </script>

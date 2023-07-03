@@ -2,7 +2,7 @@ const mysql = require('mysql');
 const vars = require('./vars');
 
 const logcon = mysql.createConnection({
-    host: 'localhost',
+    host: 'db',
     user: 'user',
     password: 'user',
     database: 'users'

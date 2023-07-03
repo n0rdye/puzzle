@@ -10,21 +10,18 @@
     }
 </style>
 
-<form action="" method="post" id="log_form">
-    <div class="login-page">
-        <input name="login" type="text" id="login" required>
-        <label for="login">login</label>
-    </div>
-    <div class="pass-page">
-        <input name="pass" type="password" id="pass" value="" required>
-        <label for="pass">password</label>
-    </div>
+<div class="login-page">
+    <input name="login" type="text" id="login" required>
+    <label for="login">login</label>
+</div>
+<div class="pass-page">
+    <input name="pass" type="password" id="pass" value="" required>
+    <label for="pass">password</label>
+</div>
 
-    <button type="button" id="log_btn" onclick="log(document.getElementById('login').value,document.getElementById('pass').value);">login</button>
-    <!-- <input type="submit" value=""  hidden> -->
-    <div id="res"></div>
-     
-</form>
+<button type="button" id="log_btn" onclick="log(document.getElementById('login').value,document.getElementById('pass').value);">login</button>
+<!-- <input type="submit" value=""  hidden> -->
+<div id="res"></div>
 
 <%- include('./static/end.ejs') %>
 
@@ -32,9 +29,9 @@
     // console.log($.cookie("uuid"));
     // log_by_sid();
 
-    function log(nlogin,npass){
-        const login = CryptoJS.AES.encrypt(nlogin,$.cookie("sid")).toString();
-        const pass = CryptoJS.AES.encrypt(npass,$.cookie("sid")).toString();
+    function log(){
+        const login = CryptoJS.AES.encrypt(document.getElementById('login').value,$.cookie("sid")).toString();
+        const pass = CryptoJS.AES.encrypt(document.getElementById('pass').value,$.cookie("sid")).toString();
         const sid = $.cookie("sid");
         $.post( "/back_login", { login:login,pass:pass,sid:sid })
         .done(function( res ) {
@@ -49,6 +46,10 @@
                     // postForm(res["url"], res["args"]);
                     goto(res["url"]);
                 }
+                // if(res["out"] == "logged"){
+                //     // postForm(res["url"], res["args"]);
+                //     // document.querySelector("#res").innerHTML = `<p>user already logged in from sid - ${res["sid"]}</p> <br> <button onclick="$.cookie('sid','${res["sid"]}');clear_ck();">log him out</button>`;
+                // }
             }
         });
     }

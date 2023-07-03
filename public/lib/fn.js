@@ -7,11 +7,6 @@ function get_from_uuid(callback){
             // console.log("good");
             callback(res["body"])
         }
-        else if (res["out"] == bad){
-            if (res["body"] == "expired"){
-                logout(true);
-            }
-        }
     });
 }
 
@@ -19,37 +14,40 @@ function log_by_sid() {
     // const uuid = $.cookie("uuid");
     // const sid = $.cookie("sid");
     // console.log("log");
-    if($.cookie('uuid') == null && $.cookie('sid') == null){
+    if($.cookie('sid') == null){
         // get_sid(location.hostname);
         get_sid();
-    }else if ($.cookie('sid') != null && $.cookie('uuid') != null){
-    $.post( "/sid_log")
-    .done(function( res ) {
-        console.log("ping");
-        if(res["out"] == "good"){
-            goto(res["url"]);
-        }
-        else if (res["out"] == "bad"){
-            clear_ck(false);
-        }
-    })}
+    }
+    // else if ($.cookie('sid') != null && $.cookie('uuid') != null){
+    // $.post( "/sid_log")
+    // .done(function( res ) {
+    //     console.log("ping");
+    //     if(res["out"] == "good"){
+    //         goto(res["url"]);
+    //     }
+    //     else if (res["out"] == "bad"){
+    //         clear_ck(false);
+    //     }
+    // })}
 }
 
 function clear_ck(redirect = true){
+    let uuid = $.cookie("uuid");
+    let sid = $.cookie("sid");
+    $.removeCookie("uuid");
+    $.removeCookie('sid');    
     console.log("sid");
-    $.post( "/clear_sid")
-    .done(function( res ) {
-        console.log("sid");
-        $.cookie("uuid",null);
-        $.cookie("sid",null);
-        $.removeCookie("uuid");
-        $.removeCookie('sid');    
-        console.log("clear");
-        get_sid();
-        if(res["out"] == "good"){
-            if (redirect) goto("/login");
-        }
-    })
+    setTimeout(()=>{
+        $.post( "/clear_sid",{uuid:uuid,sid:sid})
+        .done(function( res ) {
+            console.log("sid");
+            if(res["out"] == "good"){
+                // get_sid();
+                if (redirect) goto("/login");
+            }
+            console.log("clear");
+        })
+    },100)
 }
 
 
