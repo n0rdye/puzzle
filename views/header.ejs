@@ -44,7 +44,11 @@
         border: 1px black solid;
     }
 </style>
-
+<script>
+    "<%- include('./static/language.ejs') %>"
+    let language = JSON.parse('<%= lang_json() %>'.replaceAll("&#34;",'"'));
+    lang = (text)=>{return language["<%= cur_lang %>"][text]}
+</script>
 
 <header id="top_panel">
     <!-- <div id="user_name"></div> -->
@@ -56,8 +60,6 @@
 </header>
 <div id="user_menu" class="cmenu"></div>
 
-
-
 <script>get_from_uuid((res)=>{
     let uname = document.getElementById("user_name"); 
     let menu = document.getElementById("user_menu"); 
@@ -65,26 +67,26 @@
     let right = document.getElementById("top_panel_right"); 
     let left = document.getElementById("top_panel_left"); 
     
-    if(document.title != "main") menu.innerHTML += `<button onclick="goto('/');">main page</button> <br>`;
+    if(document.title != "main") menu.innerHTML += `<button onclick="goto('/');"><%= lang("main page") %></button> <br>`;
     right.innerHTML += `<div id="user_name" class="menu_btn">${res["login"]}</div>`;
     
     if (res["admin"] == true){
-        menu.innerHTML += `<button onclick='goto("/admin")'>admin panel</button><br>`;
+        menu.innerHTML += `<button onclick='goto("/admin")'><%= lang("admin panel") %></button><br>`;
     }
-    menu.innerHTML += "<button onclick='logout();'>logout</button><br>";
+    menu.innerHTML += "<button onclick='logout();'><%= lang('logout') %></button><br>";
 });
 
 onclick = (e) => {
-    e.preventDefault()
+    // e.preventDefault()
     //   console.log(e);
     //   console.log(document.getElementById(e.target.id).parentElement);
       if(e.target.onclick != null){
         if(document.title == "login"){
-            console.log(document.title);
+            // console.log(document.title);
             log_by_sid();
         }else if(document.title != "login"){
             check_sid(true);
-            console.log("check");
+            // console.log("check");
         }
       }
     if(e.target.id == "user_name"){

@@ -9,7 +9,7 @@ const moment = require("moment");
 const vars = require('./vars');
 
 module.exports.sendfile = (fileName, response) => {
-    const filePath = "./files/"+fileName; 
+    const filePath = "./"+fileName; 
     fs.exists(filePath, function (exists) {
         if (exists) {
             response.writeHead(200, {
@@ -49,38 +49,80 @@ module.exports.sendfile = (fileName, response) => {
 // }
 
 module.exports.sid = (cook,res,callback,auto = true)=>{
-    let uuid = cook["uuid"];
-    let sid = cook["sid"];
-    if(cook["uuid"] != null && cook["sid"] != null){
-        db.ggv("sids","`uid`","sid",`'${sid}'`,(sdata)=>{ sdata = sdata[0]
-            // console.log(sdata);
-            if(sdata != null){
-                db.ggv("users","`uuid`,`id`","id",`'${sdata["uid"]}'`,(udata)=>{ udata = udata[0]
-                    if (udata != null && udata["id"] == sdata["uid"] && uuid == udata["uuid"]){
-                        callback(true);
-                    }
-                    else{
-                        if(auto) res.send({out:"bad",err:"wrong"});
-                        if(!auto) callback(false);
-                    }
-                });
-            }
-            else{
-                if(auto) res.send({out:"bad",err:"expired"});
-                if(!auto) callback(false);
-            }
-        });
-    }else{
-        if(auto) res.send({out:"bad",err:"nocr"});
-        if(!auto) callback(false);
+    try {
+        let uuid = cook["uuid"];
+        let sid = cook["sid"];
+        if(cook["uuid"] != null && cook["sid"] != null){
+            db.ggv("sids","`uid`","sid",`'${sid}'`,(sdata)=>{ sdata = sdata[0]
+                // console.log(sdata);
+                if(sdata != null){
+                    db.ggv("users","`uuid`,`id`","id",`'${sdata["uid"]}'`,(udata)=>{ udata = udata[0]
+                        if (udata != null && udata["id"] == sdata["uid"] && uuid == udata["uuid"]){
+                            callback(true);
+                        }
+                        else{
+                            if(auto) res.send({out:"bad",err:"wrong"});
+                            if(!auto) callback(false);
+                        }
+                    });
+                }
+                else{
+                    if(auto) res.send({out:"bad",err:"expired"});
+                    if(!auto) callback(false);
+                }
+            });
+        }else{
+            if(auto) res.send({out:"bad",err:"nocr"});
+            if(!auto) callback(false);
+        }
+    } catch (error) {
+        this.log("backend sid checking err0r - "+error);
     }
 }
 
 module.exports.log = (message) =>{
-    var date = moment().format('YYYY-MM-DD')
-    var time = moment().format('hh:mm:ss')
-    console.log(`${date}_${time}|${message}`);
-    db.nr("logs","`date`,`time`,`log`",`'${date}','${time}','${message}'`);
+    var date = moment().format('YYYY-MM-DD');
+    var time = moment().format('hh:mm:ss');
+    let clog = `${date}_${time}|${message}`;
+    console.log(clog);
+    // if(vars.log_to_file) fs.appendFile('./logs.txt', `${clog} \n`, function (err) {if (err) throw err;}); 
+    if(vars.log_to_db) db.nr("logs","`date`,`time`,`log`",`'${date}','${time}','${message}'`);
+}
+
+module.exports.logs_file = (res)=>{
+    let path = './logs.txt';
+    fs.exists(path, function(exists) {
+        if(exists) {
+            fs.unlink(path,function(err){
+                if(err) throw err;
+                write_logs(res);
+            });
+        } else {
+            write_logs(res);
+        }
+      });
+
+    function write_logs(res){
+        db.gav("logs",(db_logs)=>{
+            db.glv(`logs`,`id`,(last)=>{last = last[0];
+                db_logs.forEach(log => {
+                    let date = moment(log[`date_time`]).utc().format('YYYY-MM-DD');
+                    fs.appendFile(path, `${date}_${log["time"]}|${log["log"]} \n`, function (err) {
+                        if (err) throw err;
+                        if(log["id"] == last["id"]-1){
+                            res.download(path, (err) => {
+                                if (err) { throw err; }
+                                console.log("logs downloaded");
+                                fs.unlink(path, (err) => {
+                                  if (err) { throw err; }
+                                });
+                            });                        
+                        }
+                    }); 
+                });
+            })
+        });   
+    }
 }
 
 

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="/lib/ejs.js"></script>
     <script src="/lib/fn.js"></script>
     <!-- <script src="/lib/interact.min.js"></script> -->
     <script src="/lib/jquery.js"></script>
     <script src="/lib/jquery.cookie.js"></script>
-    <script src="/lib/ejs.js"></script>
     <script src="/lib/aes.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,12 +22,13 @@
     </style>
     <script>
         if(document.title == "login"){
-            console.log(document.title);
+            // console.log(document.title);
             log_by_sid();
         }else if(document.title != "login"){
             check_sid(true);
-            console.log("check");
+            // console.log("check");
         }
     </script>
 </head>
 <body>
+

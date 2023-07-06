@@ -37,95 +37,148 @@ app.use(cookieParser());
 
 
 app.post('/back_login', (req, res) => {
-    let inp = req.body;
-    let cook = req.cookies;
-    user.login(inp,cook,res);
+    try {
+        let inp = req.body;
+        let cook = req.cookies;
+        user.login(inp,cook,res);
+    } catch (error) {
+        func.log("router login error - "+error);
+    }
 });
 
 app.post('/reg_user', (req, res) => {
-    let inp = req.body;
-    let cook = req.cookies;
-    user.reg(inp,cook,res)
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        user.reg(inp,cook,res)
+    } catch (error) {
+        func.log("router registration error - "+error);
+    }
 })
 
 app.post("/sid_log",(req,res) =>{
-    let inp = req.body;
-    let cook = req.cookies;
-    user.sid_log(inp,cook,res,req);
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        user.sid_log(inp,cook,res,req);
+    } catch (error) {
+        func.log("router sid logging in error - "+error);
+    }
 })
 
 app.post("/get_sid" , (req,res) =>{
-    let inp = req.body;
-    let sid = func.get_uuid();
-    res.cookie("sid",sid,{maxAge:(vars.week),path:"/;SameSite=Strict"});
-    res.send({out:"good"});
+    try{
+        let inp = req.body;
+        let sid = func.get_uuid();
+        res.cookie("sid",sid,{maxAge:(vars.week),path:"/;SameSite=Strict"});
+        res.send({out:"good"});
+    } catch (error) {
+        func.log("router sid getting error - "+error);
+    }
 });
 
 
 app.post("/clear_sid" , (req,res) =>{
-    let inp = req.body;
-    let cook = req.cookies;
-    user.clear_sid(inp,cook,res);
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        user.clear_sid(inp,cook,res);
+    } catch (error) {
+        func.log("router sid clearing error - "+error);
+    }
 });
 
 app.post("/get_cr_uuid", (req,res) => {
-    let inp = req.body;
-    let cook = req.cookies;
-    func.sid(cook,res,()=>{
-        user.get_cr(inp,cook,res);
-    })
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            user.get_cr(inp,cook,res);
+        })
+    } catch (error) {
+        func.log("router getting user information by uuid error - "+error);
+    }
 })
 
 app.post("/save_proj", (req,res) => {
-    let inp = req.body;
-    let cook = req.cookies;
-    func.sid(cook,res,()=>{
-        proj.save(inp,cook,res);
-    })
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            proj.save(inp,cook,res);
+        })
+    } catch (error) {
+        func.log("router project saving error - "+error);
+    }
 })
 
 app.post("/load_proj", (req,res) => {
-    let inp = req.body;
-    let cook = req.cookies;
-    func.sid(cook,res,()=>{
-        proj.load(inp,cook,res);
-    })
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            proj.load(inp,cook,res);
+        })
+    } catch (error) {
+        func.log("router project loading error - "+error);
+    }
 })
 
 app.post("/get_projs", (req,res) => {
-    let inp = req.body;
-    let cook = req.cookies;
-    func.sid(cook,res,()=>{
-        proj.loads(inp,cook,res);
-    })
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            proj.loads(inp,cook,res);
+        })
+    } catch (error) {
+        func.log("router user projects getting error - "+error);
+    }
 })
 
 app.post("/new_obj", (req,res) => {
-    let inp = req.body;
-    let cook = req.cookies;
-    func.sid(cook,res,()=>{
-        obj.new(inp,cook,res);
-    })
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            obj.new(inp,cook,res);
+        })
+    } catch (error) {
+        func.log("router object creating error - "+error);
+    }
 })
 
 app.post("/get_objs", (req,res) => {
-    let inp = req.body;
-    let cook = req.cookies;
-    // func.log(inp["name"]);
-    func.sid(cook,res,()=>{
-        obj.loads(inp,cook,res);
-    })
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        // func.log(inp["name"]);
+        func.sid(cook,res,()=>{
+            obj.loads(inp,cook,res);
+        })
+    } catch (error) {
+        func.log("router objects getting error - "+error);
+    }
 })
 
 app.post("/get_obj", (req,res) => {
-    let inp = req.body;
-    let cook = req.cookies;
-    // func.log(inp["name"]);
-    func.sid(cook,res,()=>{
-        obj.load(inp,cook,res);
-    })
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        // func.log(inp["name"]);
+        func.sid(cook,res,()=>{
+            obj.load(inp,cook,res);
+        })
+    } catch (error) {
+        func.log("router single object getting error - "+error);
+    }
 })
 
+
+app.get("/get_logs", (req,res) => {
+    try{let cook = req.cookies;func.sid(cook,res,()=>{func.logs_file(res);})} 
+    catch (error) {func.log("router logs download error - "+error);}
+})
 
 // pages
 app.get("/reg" , (req,res) =>{

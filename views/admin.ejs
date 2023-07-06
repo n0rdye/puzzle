@@ -18,14 +18,12 @@
         height: 200px;
         width: 200px;
     }
-</style>
-<style>
     .main_sec{
         margin: auto;
         /* display: flex; */
         text-align: center;
     }
-    #reg_form{
+    section{
         width: 80vw;
         margin: auto;
     }
@@ -34,61 +32,69 @@
 <%- include('./static/start.ejs',{name:"admin",async: true}) %>
 <%- include('./header.ejs') %>
 
-    <section class="main">
-        <h1>hello admin</h1>
+<h1 style="text-align: center;"><%= lang("hello admin") %></h1> <br>
+    <section>
+        <h1><%= lang("create new object") %></h1>
         <div class="nobj">
             <div>
                 <div class="img_preview">
-                    <label for="img_file">max size 2mb</label><br>
+                    <label for="img_file"><%= lang("img max size") %></label><br>
                     <input type="file" id="img_file" onchange="previewFile()"  accept="image/*" value="" maxlength="1"><br>
     
                 </div>
                 <div style="width: 200px; height: 200px;">
-                    <img src="" id="img_prev" height="100" alt="Image preview...">
+                    <img src="" id="img_prev" height="100" alt="<%= lang('Image preview') %>">
                 </div>
             </div>
-            <textarea name="" id="nobj_description" cols="30" rows="5" placeholder="object description"></textarea>
-        <div>
-            <div class="nobj_options">
-                <input type="text" id="nobj_name" placeholder="object name">
-                <button onclick="create_obj()">create object</button>
-                <div id="obj_resp"></div>
-            </div>
-            <div id="obj_input">
-                <div>
-                    <div style="display: flex;width: 150px;justify-content: space-between;">
-                        <label for="obj_height">height </label>
-                        <div id="obj_height_value">100см</div>
+            <textarea id="nobj_description" cols="30" rows="5" placeholder="<%= lang("object description") %>"></textarea>
+            <div>
+                <div class="nobj_options">
+                    <input type="text" id="nobj_name" placeholder="<%= lang("object name") %>">
+                    <button onclick="create_obj()"><%= lang("create object")%></button>
+                    <div id="obj_resp"></div>
+                </div>
+                <div id="obj_input">
+                    <div>
+                        <div style="display: flex;width: 100%;justify-content: space-between;">
+                            <label for="obj_height"><%= lang("height") %> </label>
+                            <div id="obj_height_value">100см</div>
+                        </div>
+                        <input style="width: 100%;" type="range" step="0.5" min="1" max="100" id="obj_height" value="100" oninput="obj_size_change('height')"> 
                     </div>
-                    <input type="range" step="0.1" min="1" max="100" id="obj_height" value="100" oninput="obj_size_change('height')"> 
-                </div>
-                <div>
-                    <div style="display: flex;width: 150px;justify-content: space-between;">
-                        <label for="obj_width">width</label>
-                        <div id="obj_width_value">100см</div>
+                    <div>
+                        <div style="display: flex;width: 100%;justify-content: space-between;">
+                            <label for="obj_width"><%= lang("width") %></label>
+                            <div id="obj_width_value">100см</div>
+                        </div>
+                        <input style="width: 100%;" type="range" step="0.5" min="1" max="100" id="obj_width" value="100" oninput="obj_size_change('width')"> 
                     </div>
-                    <input type="range" step="0.1" min="1" max="100" id="obj_width" value="100" oninput="obj_size_change('width')"> 
                 </div>
             </div>
-        </div>
         </div>
     </section>
 
-    <form action="" method="get" onsubmit="return false;" id="reg_form">
-        <h1>user registration</h1>
-        <section class="main_sec">
+    <section>
+        <h1><%= lang("user registration") %></h1>
+        <div class="main_sec">
             <div>
-                <input type="text" id="login" name="login" placeholder="login">
-                <input type="password" id="pass" name="pass" placeholder="password">
-                <button onclick='reg();'>reg</button>
+                <input type="text" id="login" name="login" placeholder="<%= lang("login") %>">
+                <input type="password" id="pass" name="pass" placeholder="<%= lang("password") %>">
+                <button onclick='reg();'><%= lang("register") %></button>
             </div>
             <div>
-                <label for="admin_check">admin</label>
+                <label for="admin_check"><%= lang("admin") %></label>
                 <input type="checkbox" name="admin" value='false' id="admin_check">
             </div>
             <div id="reg_response"></div>
-        </section>
-    </form>
+        </div>
+    </section>
+
+    <section style="display: flex; justify-content: space-between;">
+        <h1><%= lang("logs") %></h1> <br>
+        <div class="logs_div" style="margin: auto 0px;display: flex;">
+            <button onclick="goto('/get_logs');"><%= lang("download logs") %></button>
+        </div>
+    </section>
 
 <%- include('./static/end.ejs') %>
 

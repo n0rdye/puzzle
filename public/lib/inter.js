@@ -40,7 +40,7 @@ function create(clas,x,y,body,id,size){
             }
             else if (db_data != null){
                 obj.src = img;
-                obj.title = `${db_data["name"]}\n${db_data["description"]}\nwidth:${db_data["width"]}см height:${db_data["height"]}см`;
+                obj.title = `${db_data["name"]}\n${db_data["description"]}\n${lang("width")}:${db_data["width"]}см ${lang("height")}:${db_data["height"]}см`;
                 // drag.transform = `translate(${drag.getAttribute("data-y")}px, ${drag.getAttribute("data-y")}px) scale(${db_data["width"] * 2} ${db_data["height"] * 2})`;
                 if(size){
                     obj.style.width = `${db_data["width"] * 2}px`;
@@ -114,7 +114,7 @@ function load(objss){
 
 function load_proj_cloud(){
     document.getElementById("drags").innerHTML = "";
-    document.getElementById("top_panel_center").innerText = `loading ${proj_name} from cloud`;
+    document.getElementById("top_panel_center").innerText = `${lang("loading")} ${proj_name} ${lang("from")} ${lang("cloud")}`;
     $.post( "/load_proj",{name:proj_name})
     .done(function( res ) {
         if(res["out"] == "good"){
@@ -123,7 +123,7 @@ function load_proj_cloud(){
             // console.log(JSON.parse(res["body"]));
             // $.cookie("objs",res["body"]);
             load(JSON.parse(res["body"]));
-            document.getElementById("top_panel_center").innerText = `${proj_name} (cloud)`;
+            document.getElementById("top_panel_center").innerText = `${proj_name} (${lang("cloud")})`;
         }
         else if(res["out"] == "bad proj"){
             console.log("bad");
@@ -139,7 +139,7 @@ function load_proj_local(){
     if(localStorage.getItem(proj_name) == null){
         save_local()
     }
-    document.getElementById("top_panel_center").innerText = `${proj_name} (local)`;
+    document.getElementById("top_panel_center").innerText = `${proj_name} (${lang("local")})`;
     document.getElementById("drags").innerHTML = "";
     load(JSON.parse(localStorage.getItem(proj_name)));
 }
@@ -153,7 +153,7 @@ function save(callback){
     // console.log(objs);
     html2canvas(document.querySelector("body"),{height: document.getElementById("wall").style.height.split("p")[0], width:document.getElementById("wall").style.width.split("p")[0], y:document.getElementById("wall").getBoundingClientRect().top,x:document.getElementById("wall").getBoundingClientRect().left}).then(canvas => {
         let scr = "";
-        console.log(canvas.toDataURL().length);
+        // console.log(canvas.toDataURL().length);
         scr = canvas.toDataURL();
         // if (canvas.toDataURL().length < 120000) scr = canvas.toDataURL()
         // console.log(scr);
@@ -161,7 +161,7 @@ function save(callback){
         .done(function( res ) {
         if(res["out"] == "good"){
                 // console.log(scr)
-                console.log("good");
+                // console.log("good");
                 if(callback) callback(res);
             }
         })
@@ -232,10 +232,11 @@ interact('.trash').dropzone({
     ondragenter: function (event) {
         var drag = event.relatedTarget;
         var zone = event.target; 
-        delete objs[drag.classList[0]][drag.id];
-        drag.remove();
+        console.log(drag.classList);
+        if(objs[drag.classList[0]] != null&&objs[drag.classList[0]][drag.id] != null) delete objs[drag.classList[0]][drag.id];
         zone.classList.add('drop-target');
         drag.classList.add('can-drop');
+        drag.remove();
     },
     ondragleave: function (event) {var drag = event.relatedTarget;var zone = event.target;zone.classList.remove('drop-target');drag.classList.remove('in_zone');drag.classList.remove('can-drop');},
     ondrop: function (event) {

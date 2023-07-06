@@ -36,23 +36,23 @@ function clear_ck(redirect = true){
     let sid = $.cookie("sid");
     $.removeCookie("uuid");
     $.removeCookie('sid');    
-    console.log("sid");
+    // console.log("sid");
     setTimeout(()=>{
         $.post( "/clear_sid",{uuid:uuid,sid:sid})
         .done(function( res ) {
-            console.log("sid");
+            // console.log("sid");
             if(res["out"] == "good"){
                 // get_sid();
                 if (redirect) goto("/login");
             }
-            console.log("clear");
+            // console.log("clear");
         })
     },100)
 }
 
 
 function check_sid(redirect = true){
-    console.log("checking sid");
+    // console.log("checking sid");
     if($.cookie('sid') == null || $.cookie('uuid') == null){
         clear_ck(redirect);
     }
