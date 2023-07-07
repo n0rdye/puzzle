@@ -1,5 +1,4 @@
-<%- include('./static/start.ejs',{name:'login',async: true}) %>
-
+<!DOCTYPE html>
 <style>
     * {
         text-align: center;
@@ -9,6 +8,8 @@
         display: none;
     }
 </style>
+<%- include('./static/start.ejs',{name:'login',async: true}) %>
+
 
 <div class="login-page">
     <input name="login" type="text" id="login" required>
@@ -22,8 +23,6 @@
 <button type="button" id="log_btn" onclick="log(document.getElementById('login').value,document.getElementById('pass').value);">login</button>
 <!-- <input type="submit" value=""  hidden> -->
 <div id="res"></div>
-
-<%- include('./static/end.ejs') %>
 
 <script>
     // console.log($.cookie("uuid"));
@@ -62,3 +61,4 @@
     }
     }); 
 </script>
+<%- include('./static/end.ejs') %>

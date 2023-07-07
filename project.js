@@ -59,7 +59,7 @@ module.exports.save = (inp,cook,res)=>{
                     res.send({out:"good"});
                 } else if (projin != null){
                     db.sv("projects","body",inp["proj"],"id",projin["id"],()=>{});
-                    if(inp["img"] != "") db.sv("projects","img",inp["img"],"id",projin["id"],()=>{});
+                    if(inp["img"] != "") db.sv("projects","img",inp["img"],"id",projin["id"],()=>{},"user");
                     func.log(`good boy ${udata["uuid"]} saved project ${projin["name"]} from ${cook["sid"]}`);
                     // func.log("proj in");
                     res.send({out:"good"});

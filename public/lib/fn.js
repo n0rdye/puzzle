@@ -67,14 +67,14 @@ function check_sid(redirect = true){
 }
 
 function logout(redirect = true) {
-    let dialog = confirm("logout?");
+    let dialog = confirm(`${lang("logout")}?`);
     if(dialog){
         clear_ck(redirect);
     }
 }
 
-function ask() {
-    let name = prompt("please enter project name");
+function ask(text,def = "") {
+    let name = prompt(text,def);
     if(name != "" && name != " "){
         return name;
     }

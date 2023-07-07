@@ -2,6 +2,7 @@ window.dragMoveListener = dragMoveListener;
 let root = document.getElementById("drags");
 let objs = { height:"2",width:"4"};
 let objs_store = {};
+let proj_from = "cloud";
 
 function create(clas,x,y,body,id,size){
     let main_clas = clas.split(" ")[0];
@@ -34,9 +35,15 @@ function create(clas,x,y,body,id,size){
         function make(img){
             if (db_data == null) {
                 delete objs[main_clas][id];
-                save(()=>{
-                    goto("/proj/"+proj_name);
-                });
+                if(proj_from == "cloud"){
+                    save(()=>{
+                        goto("/proj/"+proj_name);
+                    },false);
+                }
+                else if (proj_from == "local"){
+                    save_local();
+                    load_proj_local();
+                }
             }
             else if (db_data != null){
                 obj.src = img;
@@ -49,14 +56,14 @@ function create(clas,x,y,body,id,size){
             }
         }
     })
-    obj.setAttribute("max-width","100px");
     root.append(obj);
     set_pos(obj,x,y);
 }
 
 function resize_drags(){
-    document.getElementById('drags').style.left = $('.dropzone')[0].getBoundingClientRect().x;
-    document.getElementById('drags').style.width = $('.dropzone')[0].style.width;
+    document.getElementById('drags').setAttribute("data-x",document.getElementsByClassName("wall")[0].getBoundingClientRect().left.toString()+"px");
+    document.getElementById('drags').style.left = document.getElementsByClassName("wall")[0].getBoundingClientRect().left.toString()+"px";
+    document.getElementById('drags').style.width = document.getElementsByClassName("wall")[0].style.width;
     drag_start();
 }
 
@@ -108,11 +115,11 @@ function load(objss){
             // document.getElementById("drags").style.left = $(".dropzone")[0].getBoundingClientRect().x;
         }
     });
-    document.getElementById("drags").style.left = $(".dropzone")[0].getBoundingClientRect().x;
-    drag_start();
+    resize_drags();
 }
 
 function load_proj_cloud(){
+    proj_from = "cloud";
     document.getElementById("drags").innerHTML = "";
     document.getElementById("top_panel_center").innerText = `${lang("loading")} ${proj_name} ${lang("from")} ${lang("cloud")}`;
     $.post( "/load_proj",{name:proj_name})
@@ -136,6 +143,7 @@ function load_proj_cloud(){
 
 function load_proj_local(){
     // document.getElementById("top_panel_center").innerText = `loading ${proj_name} from local storage`;
+    proj_from = "local";
     if(localStorage.getItem(proj_name) == null){
         save_local()
     }
@@ -146,18 +154,30 @@ function load_proj_local(){
 
 function save_local(){
     // console.log(objs);
+    proj_from = "local";
     localStorage.setItem(proj_name,JSON.stringify(objs));
 }
 
-function save(callback){
+function save(callback,with_pic = true){
     // console.log(objs);
-    html2canvas(document.querySelector("body"),{height: document.getElementById("wall").style.height.split("p")[0], width:document.getElementById("wall").style.width.split("p")[0], y:document.getElementById("wall").getBoundingClientRect().top,x:document.getElementById("wall").getBoundingClientRect().left}).then(canvas => {
-        let scr = "";
-        // console.log(canvas.toDataURL().length);
-        scr = canvas.toDataURL();
-        // if (canvas.toDataURL().length < 120000) scr = canvas.toDataURL()
-        // console.log(scr);
-        $.post( "/save_proj", {proj:JSON.stringify(objs),name:proj_name,img:scr})
+    proj_from = "cloud";
+    if(with_pic){
+        html2canvas(document.querySelector("body"),{
+            height: document.getElementById("wall").style.height.split("p")[0], 
+            width:document.getElementById("wall").style.width.split("p")[0], 
+            y:document.getElementById("wall").getBoundingClientRect().top,
+            x:document.getElementById("wall").getBoundingClientRect().left
+        }).then(canvas => {
+            let src = "";
+            src = canvas.toDataURL();
+            make_save(src);
+        });
+    }
+    else{
+        make_save("none");
+    }
+    function make_save(src = "none"){
+        $.post( "/save_proj", {proj:JSON.stringify(objs),name:proj_name,img:src})
         .done(function( res ) {
         if(res["out"] == "good"){
                 // console.log(scr)
@@ -165,7 +185,7 @@ function save(callback){
                 if(callback) callback(res);
             }
         })
-    });
+    }
 }
 
 function load_objs(callback){

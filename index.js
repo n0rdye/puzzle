@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('./db');
 const func = require('./func');
 const user = require('./user');
+const admin = require('./admin');
 const obj = require('./object');
 const proj = require('./project');
 const vars = require('./vars');
@@ -36,6 +37,26 @@ app.use(express.static('public'));
 app.use(cookieParser());
 
 
+
+/// user
+app.get('/', (req, res) => {
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,(include)=>{
+        if(include){
+            res.redirect('main');
+        }
+        else{
+            res.redirect('login');
+        }
+    },false)
+});
+app.get("/login" , (req,res) =>{
+    res.render('login');
+})
+app.get("/main", (req,res) =>{
+    res.render('main');
+});
 app.post('/back_login', (req, res) => {
     try {
         let inp = req.body;
@@ -45,17 +66,6 @@ app.post('/back_login', (req, res) => {
         func.log("router login error - "+error);
     }
 });
-
-app.post('/reg_user', (req, res) => {
-    try{
-        let inp = req.body;
-        let cook = req.cookies;
-        user.reg(inp,cook,res)
-    } catch (error) {
-        func.log("router registration error - "+error);
-    }
-})
-
 app.post("/sid_log",(req,res) =>{
     try{
         let inp = req.body;
@@ -65,7 +75,6 @@ app.post("/sid_log",(req,res) =>{
         func.log("router sid logging in error - "+error);
     }
 })
-
 app.post("/get_sid" , (req,res) =>{
     try{
         let inp = req.body;
@@ -76,8 +85,6 @@ app.post("/get_sid" , (req,res) =>{
         func.log("router sid getting error - "+error);
     }
 });
-
-
 app.post("/clear_sid" , (req,res) =>{
     try{
         let inp = req.body;
@@ -87,7 +94,6 @@ app.post("/clear_sid" , (req,res) =>{
         func.log("router sid clearing error - "+error);
     }
 });
-
 app.post("/get_cr_uuid", (req,res) => {
     try{
         let inp = req.body;
@@ -99,7 +105,10 @@ app.post("/get_cr_uuid", (req,res) => {
         func.log("router getting user information by uuid error - "+error);
     }
 })
-
+/// project
+app.get("/proj/:name" , (req,res) =>{
+    res.render('project',{proj_name:req.params["name"]});
+})
 app.post("/save_proj", (req,res) => {
     try{
         let inp = req.body;
@@ -111,7 +120,6 @@ app.post("/save_proj", (req,res) => {
         func.log("router project saving error - "+error);
     }
 })
-
 app.post("/load_proj", (req,res) => {
     try{
         let inp = req.body;
@@ -123,7 +131,6 @@ app.post("/load_proj", (req,res) => {
         func.log("router project loading error - "+error);
     }
 })
-
 app.post("/get_projs", (req,res) => {
     try{
         let inp = req.body;
@@ -135,19 +142,6 @@ app.post("/get_projs", (req,res) => {
         func.log("router user projects getting error - "+error);
     }
 })
-
-app.post("/new_obj", (req,res) => {
-    try{
-        let inp = req.body;
-        let cook = req.cookies;
-        func.sid(cook,res,()=>{
-            obj.new(inp,cook,res);
-        })
-    } catch (error) {
-        func.log("router object creating error - "+error);
-    }
-})
-
 app.post("/get_objs", (req,res) => {
     try{
         let inp = req.body;
@@ -160,7 +154,6 @@ app.post("/get_objs", (req,res) => {
         func.log("router objects getting error - "+error);
     }
 })
-
 app.post("/get_obj", (req,res) => {
     try{
         let inp = req.body;
@@ -173,54 +166,115 @@ app.post("/get_obj", (req,res) => {
         func.log("router single object getting error - "+error);
     }
 })
-
-
+/// admin
+app.get("/admin", (req,res) =>{
+    try {
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            res.render('admin');
+        },true,true)
+    } catch (error) {
+        func.log("router admin page error - "+error);
+    }
+});
+// app.get("/admin/edit/:edit" , (req,res) =>{
+//     try {
+//         let inp = req.body;
+//         let cook = req.cookies;
+//         func.sid(cook,res,()=>{
+//             switch (req.params["edit"]) {
+//                 case "users":
+//                     res.render('admin/user_edit');break;
+//                 case "projects":
+//                     res.render('admin/project_edit');break;        
+//                 case "objects":
+//                     res.render('admin/object_edit');break;
+//             }
+//         },true,true)
+//     } catch (error) {
+//         func.log("router admin edit page error - "+error);
+//     }
+// })
 app.get("/get_logs", (req,res) => {
     try{let cook = req.cookies;func.sid(cook,res,()=>{func.logs_file(res);})} 
     catch (error) {func.log("router logs download error - "+error);}
 })
-
-// pages
-app.get("/reg" , (req,res) =>{
-    res.render('reg');
-})
-
-app.get("/proj/:name" , (req,res) =>{
-    res.render('project',{proj_name:req.params["name"]});
-})
-
-app.get("/login" , (req,res) =>{
-    res.render('login');
-})
-
-app.get("/main", (req,res) =>{
-    res.render('main');
-});
-
-app.get("/admin", (req,res) =>{
-    res.render('admin');
-});
-
-// app.get("/test", (req,res) =>{
-//     let inp = req.body;
-//     let cook = req.cookies;
-//     func.sid(cook,res,()=>{
-//         console.log("asd");
-//     })
-
-// });
-
-app.get('/', (req, res) => {
-    if(req.cookies["uuid"] != null){
-        res.redirect('main');
+app.post("/new_obj", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            obj.new(inp,cook,res);
+        },true,true)
+    } catch (error) {
+        func.log("router object creating error - "+error);
     }
-    else{
-        res.redirect('login');
+})
+app.post("/admin/users/get", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            admin.get_users(inp,cook,res);
+        },true,true)
+    } catch (error) {
+        func.log("router object creating error - "+error);
     }
-});
+})
+app.post('/admin/users/reg', (req, res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            admin.reg(inp,cook,res);
+        },true,true)
+    } catch (error) {
+        func.log("router registration error - "+error);
+    }
+})
+app.post("/admin/users/edit", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            admin.edit_user(inp,cook,res);
+        },true,true)
+    } catch (error) {
+        func.log("router object creating error - "+error);
+    }
+})
+app.post("/admin/users/get/user", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            admin.get_users(inp,cook,res);
+        },true,true)
+    } catch (error) {
+        func.log("router object creating error - "+error);
+    }
+})
+app.post("/admin/users/del/user", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            admin.del_user(inp,cook,res);
+        },true,true)
+    } catch (error) {
+        func.log("router object creating error - "+error);
+    }
+})
+app.post("/admin/change_objs", (req,res) => {
+    try{let cook = req.cookies;func.sid(cook,res,()=>{func.logs_file(res);})} 
+    catch (error) {func.log("router logs download error - "+error);}
+})
+
+
+
 
 app.all('*', (req, res) => {
     res.status(404).send('<h1>404! Page not</h1> <br> <a href="/">go to main page</a>');
 });
-
 app.listen(process.env.PORT || 8080, () => func.log("server for puzzle started UwU"));

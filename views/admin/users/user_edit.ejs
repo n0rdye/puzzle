@@ -1,0 +1,163 @@
+<style>
+    #users_section{
+        width: 80vw;
+        margin: auto;
+    }
+    #users_section li{
+        display: flex;
+        justify-content: space-between;
+        text-align: center;
+        margin: 20px auto;
+        padding: 10px;
+        background-color:cornsilk;
+    }
+    #users_section li div:not(#first_user div){
+        /* margin: auto; */
+        width: 100px;
+        text-align: center;
+    }
+    #first_user div{
+        /* text-align: center; */
+        width: 100px;
+        text-align: center;
+    }
+    #users_section ul{
+        padding: 0px;
+        margin: 0px;
+        list-style: none;
+        height: 320px;
+    }
+</style>
+
+<h1><%=lang("users")%></h1>
+<section id="users_section">
+    <div style="display: flex;justify-content: space-between;margin: auto;">
+        <div style="display: flex;"><h1><%= lang("total") %>:&nbsp;</h1> <h1 id="users_count">0</h1></div>
+        <div style="display: flex;margin: auto 0px;"><%=lang("from")%>&nbsp;<div id="users_from">0</div>&nbsp;<%=lang("to")%>&nbsp;<div id="users_to">10</div></div>
+        <div style="margin: auto 0px;"><button onclick="if(users_from-load_interval>=0){users_from-=load_interval;load_users_data(users_from);}">< 10 <%= lang("back") %></button></div>
+        <div style="margin: auto 0px;"><button onclick="users_from+=load_interval;load_users_data(users_from);"><%= lang("next") %> 10 ></button></div>
+    </div>
+    <div>
+        <li id="first_user"><div><%= lang("login") %></div><div><%= lang("privileges") %></div><div><%= lang("edit") %></div></li>
+        <ul id="user_list">
+        </ul>
+    </div>
+</section>
+
+
+<script>
+    let users_from = 0;
+    let load_interval = 5;
+    load_users_data(users_from);
+    function load_users_data(from,to){
+        // if(to == "forward") {users_from+=load_interval;}
+        // else if(to == "back") {users_from-=load_interval;}
+        document.getElementById("user_list").innerHTML = "";
+        document.getElementById("users_from").innerText = from;
+        document.getElementById("users_to").innerText = from+load_interval;
+        $.post( "/admin/users/get",{from:from,load_interval:load_interval})
+        .done(function( res ) {
+            // console.log("serv reg");
+            if(res["out"] == "good"){
+                // console.log(res["body"]);
+                document.getElementById("users_count").innerText = res["count"];
+                res["body"].forEach(user => {
+                    let user_sec = document.createElement("li");
+                    user_sec.id = `user_${user["id"]}`;
+
+                    let user_name = document.createElement("div");
+                    user_name.id = `login_${user["id"]}`;
+                    user_name.innerText = user["login"];
+
+                    let user_pass = document.createElement("div");
+                    user_pass.id = `pass_${user["id"]}`;
+                    user_pass.innerText = user["pass"];
+                    user_pass.style.display = "none";
+
+                    let user_prevs = document.createElement("div");
+                    user_prevs.id = `admin_${user["id"]}`;
+                    user_prevs.innerText = Boolean(user["admin"]);
+
+                    let user_buttons = document.createElement("button");
+                    user_buttons.id = "user_buttons"; 
+                    user_buttons.innerText = "<%=lang('edit')%>"; 
+                    user_buttons.classList.add(user["id"]); 
+                    user_buttons.classList.add("menu_btn"); 
+
+                    user_sec.append(user_pass);
+                    user_sec.append(user_name);
+                    user_sec.append(user_prevs);
+                    user_sec.append(user_buttons);
+
+                    document.getElementById("user_list").append(user_sec);
+                });
+                // document.getElementById("reg_response").innerHTML = `user ${login} successfully registered `;
+            }
+            else if (res["out"] == "bad"){
+
+            }
+        });
+    }
+    function user_edit(key){
+        let user = document.getElementById("user_edit_menu");
+        let id = user.getAttribute("login_id");
+        let login = user.getAttribute("login_name");
+        let admin = JSON.parse(user.getAttribute("login_admin"));
+        let pass= user.getAttribute("login_pass");
+        let value = null;
+
+        if(key!="admin") {value = ask(key,document.getElementById(`${key}_${id}`).innerText)}
+        else if (confirm(`<%=lang('are you sure you want to change')%> <%=lang('admin privileges')%> <%=lang('for')%> ${login} <%=lang("to the")%> ${!admin}?`) == true){value = (!admin)};
+        if(value != null){
+            $.post( "/admin/users/edit",{key:key,value:value,id:id,login:login})
+            .done(function( res ) {
+                // console.log("serv reg");
+                if(res["out"] == "good"){
+                    document.getElementById(`${key}_${id}`).innerText = value;
+                }
+                if(res["out"] == "bad"){
+                    alert("cant change name in use")
+                }
+            });
+        }
+    }
+    function user_del(){
+        let user = document.getElementById("user_edit_menu");
+        let id = user.getAttribute("login_id");
+        let login = user.getAttribute("login_name");
+        if(confirm(`<%= lang("are you sure you want to delete user") %> ${login}?`) == true){
+            $.post( "/admin/users/del/user",{login:login,id:id})
+            .done(function( res ) {
+                if(res["out"] == "good"){
+                    load_users_data(users_from);
+                }
+            });
+        }
+    }
+
+    let user_edit_menu = document.createElement("div");
+    user_edit_menu.id = "user_edit_menu"; 
+    user_edit_menu.classList.add("cmenu"); 
+
+    let user_chenge_name = document.createElement("button");
+    user_chenge_name.innerHTML = "<%= lang('change login') %>"; 
+    user_chenge_name.setAttribute("onclick","user_edit('login')"); 
+
+    let user_chenge_pass = document.createElement("button");
+    user_chenge_pass.innerHTML = "<%= lang('change password') %>"; 
+    user_chenge_pass.setAttribute("onclick","user_edit('pass')"); 
+
+    let user_chenge_prevs = document.createElement("button");
+    user_chenge_prevs.innerHTML = "<%= lang('change privileges') %>";
+    user_chenge_prevs.setAttribute("onclick","user_edit('admin')"); 
+
+    let user_delete = document.createElement("button");
+    user_delete.innerHTML = "<%= lang('delete user') %>";
+    user_delete.setAttribute("onclick","user_del()"); 
+
+    user_edit_menu.append(user_chenge_name);
+    user_edit_menu.append(user_chenge_pass);
+    user_edit_menu.append(user_chenge_prevs);
+    user_edit_menu.append(user_delete);
+    document.body.append(user_edit_menu);
+</script>

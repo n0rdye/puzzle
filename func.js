@@ -24,31 +24,7 @@ module.exports.sendfile = (fileName, response) => {
     });
 }
 
-// module.exports.check_sid = (Cookies, callback) =>{
-//     let uuid = Cookies["uuid"];
-//     let sid = Cookies["sid"];
-//     // console.log(uuid,sid);
-//     db.gv("users","uuid",`'${uuid}'`,(udata)=>{ udata = udata[0];
-//         // console.log(udata);
-//         db.gv("sids","uid",udata["id"],(rdata)=>{
-//             let valid = "";
-//             rdata.forEach(rec => {
-//                 if (rec["sid"] == sid){
-//                     valid = rec["sid"];
-//                     return;
-//                 }
-//             });
-//             if(valid != ""){
-//                 callback(true,udata);
-//             }
-//             else{
-//                 callback(false,udata);
-//             }
-//         });
-//     })
-// }
-
-module.exports.sid = (cook,res,callback,auto = true)=>{
+module.exports.sid = (cook,res,callback,auto = true,admin_check = false)=>{
     try {
         let uuid = cook["uuid"];
         let sid = cook["sid"];
@@ -56,24 +32,43 @@ module.exports.sid = (cook,res,callback,auto = true)=>{
             db.ggv("sids","`uid`","sid",`'${sid}'`,(sdata)=>{ sdata = sdata[0]
                 // console.log(sdata);
                 if(sdata != null){
-                    db.ggv("users","`uuid`,`id`","id",`'${sdata["uid"]}'`,(udata)=>{ udata = udata[0]
+                    db.ggv("users","`uuid`,`id`, `admin`","id",`'${sdata["uid"]}'`,(udata)=>{ udata = udata[0]
                         if (udata != null && udata["id"] == sdata["uid"] && uuid == udata["uuid"]){
-                            callback(true);
+                            if (!admin_check) callback(true);
+                            else if (admin_check && udata["admin"] != false){
+                                db.ggv("admins","`login`,`uid` ","uid",`'${udata["id"]}'`,(adata)=>{ adata = adata[0]
+                                    if(adata != null){
+                                        callback(true);                                    
+                                    }
+                                    else{
+                                        db.sv("users","admin","0","id",udata["id"],()=>{},true);
+                                        db.dl("admins","uid",udata["id"],()=>{},true);
+                                        if(auto) res.redirect('/');
+                                        else if(!auto) callback(false);                                    
+                                    }
+                                },true)
+                            }
+                            else{
+                                db.sv("users","admin","0","id",udata["id"],()=>{},true);
+                                db.dl("admins","uid",udata["id"],()=>{},true);
+                                if(auto) res.redirect('/');
+                                else if(!auto) callback(false);                           
+                            }
                         }
                         else{
                             if(auto) res.send({out:"bad",err:"wrong"});
-                            if(!auto) callback(false);
+                            else if(!auto) callback(false);
                         }
                     });
                 }
                 else{
                     if(auto) res.send({out:"bad",err:"expired"});
-                    if(!auto) callback(false);
+                    else if(!auto) callback(false);
                 }
             });
         }else{
             if(auto) res.send({out:"bad",err:"nocr"});
-            if(!auto) callback(false);
+            else if(!auto) callback(false);
         }
     } catch (error) {
         this.log("backend sid checking err0r - "+error);
@@ -81,12 +76,13 @@ module.exports.sid = (cook,res,callback,auto = true)=>{
 }
 
 module.exports.log = (message) =>{
+    message = message.replaceAll("'","*")
     var date = moment().format('YYYY-MM-DD');
     var time = moment().format('hh:mm:ss');
     let clog = `${date}_${time}|${message}`;
     console.log(clog);
     // if(vars.log_to_file) fs.appendFile('./logs.txt', `${clog} \n`, function (err) {if (err) throw err;}); 
-    if(vars.log_to_db) db.nr("logs","`date`,`time`,`log`",`'${date}','${time}','${message}'`);
+    if(vars.log_to_db) db.nr("logs","`date`,`time`,`log`",`'${date}','${time}','${message}'`,true);
 }
 
 module.exports.logs_file = (res)=>{
@@ -103,31 +99,30 @@ module.exports.logs_file = (res)=>{
       });
 
     function write_logs(res){
-        db.gav("logs",(db_logs)=>{
-            db.glv(`logs`,`id`,(last)=>{last = last[0];
-                db_logs.forEach(log => {
-                    let date = moment(log[`date_time`]).utc().format('YYYY-MM-DD');
-                    fs.appendFile(path, `${date}_${log["time"]}|${log["log"]} \n`, function (err) {
-                        if (err) throw err;
-                        if(log["id"] == last["id"]-1){
-                            res.download(path, (err) => {
-                                if (err) { throw err; }
-                                console.log("logs downloaded");
-                                fs.unlink(path, (err) => {
-                                  if (err) { throw err; }
-                                });
-                            });                        
-                        }
-                    }); 
-                });
-            })
-        });   
+        db.gav("logs","0",(db_logs)=>{
+            db_logs.forEach(log => {
+                let date = moment(log[`date_time`]).utc().format('YYYY-MM-DD');
+                fs.appendFile(path, `${date}_${log["time"]}|${log["log"]} \n`, function (err) {
+                    if (err) throw err;
+                    if(log["id"] == db_logs.at(-1)["id"]){
+                        res.download(path, (err) => {
+                            if (err) { throw err; }
+                            console.log("logs downloaded");
+                            fs.unlink(path, (err) => {
+                              if (err) { throw err; }
+                            });
+                        });                        
+                    }
+                }); 
+            });
+        },true);   
     }
 }
 
 
-module.exports.get_uuid = () =>{
-    let unid = uuid.v4() + '%%' + uuid.v4() +'#'+(621);
+module.exports.get_uuid = (name = "") =>{
+    name = (name != "")? this.encrypt(name,"name"):"";
+    let unid = uuid.v4() + '%%'+name+'#e'+(621);
     return unid;
 }
 

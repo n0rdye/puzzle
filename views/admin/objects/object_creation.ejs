@@ -1,0 +1,127 @@
+
+<style>
+    .nobj{
+        display: flex;
+        justify-content: space-between;
+        margin: auto;
+        /* margin-bottom: 50px; */
+    }
+    #img_file{
+        text-overflow:ellipsis;
+        max-width:100px;
+    }
+    .img_preview{
+        /* width: 50px;
+        height: 20px; */
+        display: flex;
+    }
+    #img_prev{
+        height: 200px;
+        width: 200px;
+    }
+</style>
+
+<h1><%= lang("create new object") %></h1>
+<div class="nobj">
+    <div>
+        <div class="img_preview">
+            <label for="img_file"><%= lang("img max size") %></label><br>
+            <input type="file" id="img_file" onchange="previewFile()"  accept="image/*" value="" maxlength="1"><br>
+
+        </div>
+        <div style="width: 200px; height: 200px;">
+            <img src="" id="img_prev" height="100" alt="<%= lang('Image preview') %>">
+        </div>
+    </div>
+    <textarea id="nobj_description" cols="30" rows="5" placeholder="<%= lang("object description") %>"></textarea>
+    <div>
+        <div class="nobj_options">
+            <input type="text" id="nobj_name" placeholder="<%= lang("object name") %>">
+            <button onclick="create_obj()"><%= lang("create object")%></button>
+            <div id="obj_resp"></div>
+        </div>
+        <div id="obj_input">
+            <div>
+                <div style="display: flex;width: 100%;justify-content: space-between;">
+                    <label for="obj_height"><%= lang("height") %> </label>
+                    <div id="obj_height_value">100см</div>
+                </div>
+                <input style="width: 100%;" type="range" step="0.5" min="1" max="100" id="obj_height" value="100" oninput="obj_size_change('height')"> 
+            </div>
+            <div>
+                <div style="display: flex;width: 100%;justify-content: space-between;">
+                    <label for="obj_width"><%= lang("width") %></label>
+                    <div id="obj_width_value">100см</div>
+                </div>
+                <input style="width: 100%;" type="range" step="0.5" min="1" max="100" id="obj_width" value="100" oninput="obj_size_change('width')"> 
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        function obj_size_change(type){
+        if(type == "height"){
+            let img = document.getElementById('img_prev');
+            let range = document.getElementById('obj_height');
+            let text = document.getElementById('obj_height_value');
+            img.style.height = `${range.value * 2}px`;
+            text.innerHTML = `${range.value}см`;
+        }else if (type == "width"){
+            let img = document.getElementById('img_prev');
+            let range = document.getElementById('obj_width');
+            let text = document.getElementById('obj_width_value');
+            img.style.width = `${range.value * 2}px`;
+            text.innerHTML = `${range.value}см`;
+
+        }
+    }
+    function previewFile() {
+        var preview = document.querySelector('img');
+        var file    = document.querySelector('input[type=file]').files[0];
+        var reader  = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+        }
+    }
+
+    function new_obj(name,img,height,width,description,callback){
+        $.post( "/new_obj", { name:name,img:img,desc:description,height:height,width:width })
+        .done(function( res ) {
+            // if(res["out"] == "good"){
+            //     console.log(res["body"]);
+            // }
+            callback(res);
+        });
+    }
+
+    function create_obj(){
+        let name = document.getElementById("nobj_name").value;
+        let description = document.getElementById("nobj_description").value;
+        let height = document.getElementById("obj_height").value;
+        let width = document.getElementById("obj_width").value;
+        var img = document.querySelector('img').src;
+        name = name.replace(" ","_");
+        if (img != "http://n0rsrv2:3002/admin"){
+            document.getElementById("obj_resp").innerHTML = "creating object";
+            new_obj(name,img,height,width,description,(res)=>{
+                if(res["out"] == "bad" && res["err"] == "name"){
+                    document.getElementById("obj_resp").innerHTML = "object already exist";
+                }
+                else if(res["out"] == "good"){
+                    document.getElementById("obj_resp").innerHTML = "object created";
+                }
+            });
+        }
+        else{
+            document.getElementById("obj_resp").innerHTML = "image not selected";
+        }
+    }
+</script>

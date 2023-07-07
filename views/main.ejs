@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <style>
     .drag{
         height: 50px;
@@ -39,9 +40,10 @@
         border-style: solid;
     }
 </style>
-
 <%- include('./static/start.ejs',{name:'main',async: true}) %>
 <%- include('./header.ejs') %>
+
+
 <!-- <script src="/lib/interact.min.js"></script> -->
 
 <section class="main">
@@ -50,7 +52,6 @@
 </section>
 
 <!-- <script src="/lib/inter.js"></script> -->
-<%- include('./static/end.ejs') %>
 
 <script>
     function load_projs(callback){
@@ -63,7 +64,7 @@
         });
     }
     function new_proj(){
-        let name = ask();
+        let name = ask("please enter project name");
         if(name != null && name!= "" && name!=" " && typeof name != "undefined" && name!="undefined"){
             goto(`/proj/${name}`);
         }
@@ -76,3 +77,4 @@
         });
     });
 </script>
+<%- include('./static/end.ejs') %>

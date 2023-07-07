@@ -37,7 +37,7 @@
     }
     .cmenu{
         position: fixed;
-        display: block;
+        display: grid;
         background: ghostwhite;
         color: black;
         cursor: pointer;
@@ -60,54 +60,70 @@
 </header>
 <div id="user_menu" class="cmenu"></div>
 
-<script>get_from_uuid((res)=>{
-    let uname = document.getElementById("user_name"); 
-    let menu = document.getElementById("user_menu"); 
-    let header = document.getElementById("top_panel"); 
-    let right = document.getElementById("top_panel_right"); 
-    let left = document.getElementById("top_panel_left"); 
-    
-    if(document.title != "main") menu.innerHTML += `<button onclick="goto('/');"><%= lang("main page") %></button> <br>`;
-    right.innerHTML += `<div id="user_name" class="menu_btn">${res["login"]}</div>`;
-    
-    if (res["admin"] == true){
-        menu.innerHTML += `<button onclick='goto("/admin")'><%= lang("admin panel") %></button><br>`;
-    }
-    menu.innerHTML += "<button onclick='logout();'><%= lang('logout') %></button><br>";
-});
 
-onclick = (e) => {
-    // e.preventDefault()
-    //   console.log(e);
-    //   console.log(document.getElementById(e.target.id).parentElement);
-      if(e.target.onclick != null){
-        if(document.title == "login"){
-            // console.log(document.title);
-            log_by_sid();
-        }else if(document.title != "login"){
-            check_sid(true);
-            // console.log("check");
+<script>
+    get_from_uuid((res)=>{
+        let uname = document.getElementById("user_name"); 
+        let menu = document.getElementById("user_menu"); 
+        let header = document.getElementById("top_panel"); 
+        let right = document.getElementById("top_panel_right"); 
+        let left = document.getElementById("top_panel_left"); 
+        
+        if(document.title != "main") menu.innerHTML += `<button onclick="goto('/');"><%= lang("main page") %></button> <br>`;
+        right.innerHTML += `<div id="user_name" class="menu_btn">${res["login"]}</div>`;
+        
+        if (res["admin"] == true){
+            menu.innerHTML += `<button onclick='goto("/admin")'><%= lang("admin panel") %></button><br>`;
         }
-      }
-    if(e.target.id == "user_name"){
-        hide_menus();
-        let menu = document.getElementById("user_menu");
-        menu.style.display = 'block';
-        menu.style = `top:${e.target.getBoundingClientRect().top+30}px;left:${e.target.getBoundingClientRect().left}px`
-        // menu.onmouseleave = () => menu.style.display = 'none';
-        // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
-        // document.body.appendChild(menu)
-    }else if(e.target.id == "proj_menu"){
-        hide_menus();
-        let menu = document.getElementById("project_menu");
-        menu.style.display = 'block';
-        menu.style = `top:${e.target.getBoundingClientRect().top+30}px;left:${e.target.getBoundingClientRect().left}px`
+        menu.innerHTML += "<button onclick='logout();'><%= lang('logout') %></button><br>";
+    });
+
+    onclick = (e) => {
+        // e.preventDefault()
+        //   console.log(e);
+        //   console.log(document.getElementById(e.target.id).parentElement);
+        // if(e.target.onclick != null){
+        //     if(document.title == "login"){
+        //         // console.log(document.title);
+        //         log_by_sid();
+        //     }else if(document.title != "login"){
+        //         check_sid(true);
+        //         // console.log("check");
+        //     }
+        // }
+        if(e.target.id == "user_name"){
+            hide_menus();
+            let menu = document.getElementById("user_menu");
+            menu.style.display = 'block';
+            menu.style = `top:${e.target.getBoundingClientRect().top+30}px;left:${e.target.getBoundingClientRect().left}px`;
             // menu.onmouseleave = () => menu.style.display = 'none';
             // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
             // document.body.appendChild(menu)
+        }else if(e.target.id == "proj_menu"){
+            hide_menus();
+            let menu = document.getElementById("project_menu");
+            menu.style.display = 'block';
+            menu.style = `top:${e.target.getBoundingClientRect().top+30}px;left:${e.target.getBoundingClientRect().left}px`;
+                // menu.onmouseleave = () => menu.style.display = 'none';
+                // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
+                // document.body.appendChild(menu)
+        }
+        else if(e.target.id == "user_buttons"){
+            hide_menus();
+            let menu = document.getElementById("user_edit_menu");
+            menu.setAttribute("login_id",e.target.classList[0]);
+            menu.setAttribute("login_name",document.getElementById(`login_${e.target.classList[0]}`).innerText);
+            menu.setAttribute("login_pass",document.getElementById(`pass_${e.target.classList[0]}`).innerText);
+            menu.setAttribute("login_admin",document.getElementById(`admin_${e.target.classList[0]}`).innerText);
+            menu.style.display = 'block';
+            menu.style = `top:${e.target.getBoundingClientRect().top+30}px;left:${e.target.getBoundingClientRect().left-40}px`;
+            // menu.onmouseleave = () => menu.style.display = 'none';
+            // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
+            // document.body.appendChild(menu)
+        
+        }
+        else{
+            hide_menus();
+        }
     }
-    else{
-        hide_menus();
-    }
-}
 </script>

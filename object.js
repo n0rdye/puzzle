@@ -27,15 +27,15 @@ module.exports.load = (inp,cook,res)=>{
 
 module.exports.new = (inp,cook,res)=>{
     try {
-        db.cv("objects","name",inp["name"],(include)=>{
-            if(include){
+        db.ggv("objects","id","name",`'${inp["name"]}'`,(db_name)=>{db_name= db_name[0]
+            if(db_name != null){
                 res.send({out:"bad",err:"name"});
             }
-            else if (!include){
-                db.nr("objects","`name`,`img`,`height`,`width`,`description`",`'${inp["name"]}','${inp["img"]}','${inp["height"]}','${inp["width"]}','${inp["desc"]}'`);
+            else if (db_name == null){
+                db.nr("objects","`name`,`img`,`height`,`width`,`description`",`'${inp["name"]}','${inp["img"]}','${inp["height"]}','${inp["width"]}','${inp["desc"]}'`,true);
                 res.send({out:"good"});
             }
-        })
+        },true)
     } catch (error) {
         func.log("backend object creating error - "+error);
     }

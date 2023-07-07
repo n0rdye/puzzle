@@ -1,3 +1,7 @@
+<%- include('./static/start.ejs',{name:proj_name,async:true}) %>
+<%- include('./header.ejs') %>
+<script src="/lib/interact.js"></script>
+<script src="/lib/html2canvas.js"></script>
 <style>
     .drag{
         height: 50px;
@@ -13,19 +17,25 @@
         margin: auto;
     }
 
-    .dropzone {
-        background-color: #bfe4ff;
-        border: dashed 4px transparent;
+    .wall {
+        /* border: dashed 4px transparent; */
         border-radius: 4px;
-        height: 140px;
-        margin: 10px auto 30px;
-        /* padding: 10px; */
-        width: 80%;
         transition: background-color 0.3s;
         position: absolute;
         inset: 0px;
         margin: 250px auto;
+        width: 400px;
+        height: 200px;
+        background-color: #fff;
+        background-image: url("/img/bg1red.png");
+        background-size: 200px;
+        background-repeat: repeat;
+        background-position: bottom 0px left 0px;
+        border: 2px solid black;
+        /* overflow: visible; */
+        z-index: 2;
     }
+
     .createzone {
         background-color: #bfe4ff;
         border: dashed 4px transparent;
@@ -63,11 +73,11 @@
         border-color: #aaa;
     }
 
-    .drop-target {
+    /* .drop-target {
         background-color: #29e;
         border-color: #fff;
         border-style: solid;
-    }
+    } */
 
     #proj_top{
         margin: auto;
@@ -89,32 +99,8 @@
         padding-bottom: 0px;
         margin-top: 50px;
     }
-
-    .wall{
-        /* display: flex; */
-        /* position: relative; */
-        /* margin: 60px auto; */
-        width: 400px;
-        height: 200px;
-        background-color: #fff;
-        background-image: url("/img/bg1red.png");
-        background-size: 200px;
-        background-repeat: repeat;
-        background-position: bottom 0px left 0px;
-        border: 2px solid black;
-        /* overflow: visible; */
-        z-index: 2;
-    }
 </style>
 
-<%- include('./static/start.ejs',{name:proj_name,async: true}) %>
-<%- include('./header.ejs',{async: true}) %>
-<script src="/lib/interact.js"></script>
-<script src="/lib/html2canvas.js"></script>
-
-<div id="drags">
-    <!-- <div class="cube drag spawn" id="cube_0" style="transform: translate(197.7px, 57.8667px);" data-x="197.6999969482422" data-y="57.866668701171875" >cube</div>     -->
-</div>
 
 <div id="project_menu" class="cmenu"></div>
 
@@ -128,7 +114,7 @@
                 <label for="wall_height"><%= lang("height") %> </label>
                 <div id="wall_height_value">0</div>
             </div>
-            <input type="range" step="0.1" min="0" max="5" id="wall_height" value="2" oninput="wall_size_change('height')"> 
+            <input type="range" step="0.1" min="0" max="5" id="wall_height" value="2" oninput="wall_size_change('height')" onchange="resize_drags()"> 
         </div>
         <div>
             <div style="display: flex;width: 150px;justify-content: space-between;">
@@ -142,31 +128,12 @@
     <img class="trash" style="height: 100px; width: 100px;" src="/img/shadow-energy.gif" alt="<%= lang('black hole') %>">
 </div>
 
+<div id="drags"></div>
 <div class="wall dropzone" id="wall"></div>
 
+
 <script src="/lib/inter.js"></script>
-<%- include('./static/end.ejs') %>
 <script>
-    // function scree(){
-    //     // console.log(document.getElementById("wall").style.height.split("p")[0]);
-    //     html2canvas(document.querySelector("body"),{height: document.getElementById("wall").style.height.split("p")[0], width:document.getElementById("wall").style.width.split("p")[0], y:255}).then(canvas => {
-    //         console.log(canvas.toDataURL().length);
-    //         let scr = canvas.toDataURL();
-    //         let img = document.createElement("img");
-    //         img.src = scr;
-    //         document.body.append(img);
-    //         // return canvas;
-    //         // console.log(scr)
-    //     });
-
-
-
-    //     // html2canvas(document.querySelector("#drags")).then(canvas => {
-    //     //     document.body.appendChild(canvas)
-    //     // });
-
-
-    // }
     load_objs((data)=>{
         data.forEach(value => {
             // console.log(value);
@@ -178,8 +145,7 @@
         });
         load_proj_cloud();
     })
-</script>
-<script>
+
     let proj_name = "<%= proj_name %>";
     if($.cookie("cache") ==null)$.cookie("cache","true",{path:"/proj;SameSite=Strict"});
     // console.log(proj_name);
@@ -226,3 +192,4 @@
         resize_drags();
     }
 </script>
+<%- include('./static/end.ejs') %>
