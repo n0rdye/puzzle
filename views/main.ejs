@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<%- include('./static/start.ejs',{name:'main',async: true}) %>
+<%- include('./header.ejs') %>
 <style>
     .drag{
         height: 50px;
@@ -40,8 +41,6 @@
         border-style: solid;
     }
 </style>
-<%- include('./static/start.ejs',{name:'main',async: true}) %>
-<%- include('./header.ejs') %>
 
 
 <!-- <script src="/lib/interact.min.js"></script> -->

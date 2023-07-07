@@ -1,12 +1,11 @@
-<!DOCTYPE html>
+<%- include('./static/start.ejs',{name:"admin",async: true}) %>
+<%- include('./header.ejs') %>
 <style>
     section{
         width: 80vw;
         margin: auto;
     }
 </style>
-<%- include('./static/start.ejs',{name:"admin",async: true}) %>
-<%- include('./header.ejs') %>
 
 <h1 style="text-align: center;"><%= lang("hello admin") %></h1> <br>
     <section>
