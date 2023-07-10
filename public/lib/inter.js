@@ -15,44 +15,47 @@ function create(clas,x,y,body,id,size){
         obj.classList.add(cl);
     });
     get_obj(main_clas,(db_data)=>{
-        if ($.cookie("cache") == "true"){
-            if (localStorage.getItem(`${main_clas}`) == null){
+        // console.log(db_data);
+        // db_data.forEach(db_data => {
+        // });
+        if (db_data == null) {
+            delete objs[main_clas][id];
+            if(proj_from == "cloud"){
+                save(()=>{
+                    goto("/proj/"+proj_name);
+                },false);
+            }
+            else if (proj_from == "local"){
+                save_local();
+                load_proj_local();
+            }
+        }
+        else if (db_data != null){
+            if ($.cookie("cache") == "true"){
+                if (localStorage.getItem(`${main_clas}`) == null){
+                    load_obj(main_clas,"`img`",(odata)=>{
+                        localStorage.setItem(main_clas,odata["img"]);
+                        make(odata["img"]);
+                    })
+                }
+                else{
+                    make(localStorage.getItem(main_clas))
+                }
+            }
+            else{
                 load_obj(main_clas,"`img`",(odata)=>{
                     localStorage.setItem(main_clas,odata["img"]);
                     make(odata["img"]);
                 })
             }
-            else{
-                make(localStorage.getItem(main_clas))
-            }
-        }
-        else{
-            load_obj(main_clas,"`img`",(odata)=>{
-                localStorage.setItem(main_clas,odata["img"]);
-                make(odata["img"]);
-            })
         }
         function make(img){
-            if (db_data == null) {
-                delete objs[main_clas][id];
-                if(proj_from == "cloud"){
-                    save(()=>{
-                        goto("/proj/"+proj_name);
-                    },false);
-                }
-                else if (proj_from == "local"){
-                    save_local();
-                    load_proj_local();
-                }
-            }
-            else if (db_data != null){
-                obj.src = img;
-                obj.title = `${db_data["name"]}\n${db_data["description"]}\n${lang("width")}:${db_data["width"]}см ${lang("height")}:${db_data["height"]}см`;
-                // drag.transform = `translate(${drag.getAttribute("data-y")}px, ${drag.getAttribute("data-y")}px) scale(${db_data["width"] * 2} ${db_data["height"] * 2})`;
-                if(size){
-                    obj.style.width = `${db_data["width"] * 2}px`;
-                    obj.style.height = `${db_data["height"] * 2}px`;
-                }
+            obj.src = img;
+            obj.title = `${db_data["name"].replace("$"," ").split("/g")[0]}\n${db_data["description"]}\n${lang("width")}:${db_data["width"]}см ${lang("height")}:${db_data["height"]}см`;
+            // drag.transform = `translate(${drag.getAttribute("data-y")}px, ${drag.getAttribute("data-y")}px) scale(${db_data["width"] * 2} ${db_data["height"] * 2})`;
+            if(size){
+                obj.style.width = `${db_data["width"] * 2}px`;
+                obj.style.height = `${db_data["height"] * 2}px`;
             }
         }
     })
@@ -136,7 +139,7 @@ function load_proj_cloud(){
             console.log("bad");
             save(()=>{
                 goto("/proj/"+proj_name);
-            });
+            },false);
         }
     })
 }
@@ -174,9 +177,9 @@ function save(callback,with_pic = true){
         });
     }
     else{
-        make_save("none");
+        make_save();
     }
-    function make_save(src = "none"){
+    function make_save(src = "img/img_placeholder.webp"){
         $.post( "/save_proj", {proj:JSON.stringify(objs),name:proj_name,img:src})
         .done(function( res ) {
         if(res["out"] == "good"){
@@ -189,7 +192,8 @@ function save(callback,with_pic = true){
 }
 
 function load_objs(callback){
-    $.post( "/get_objs")
+    let select = document.getElementById("group_select");
+    $.post( "/get_objs",{gid:select.options[select.selectedIndex].getAttribute("gid")})
     .done(function( res ) {
         if(res["out"] == "good"){
             // console.log(res["body"]);
@@ -333,7 +337,6 @@ function drag_start() {
     Object.entries(zones).forEach(([key, zone]) => {
         let x = zone.getBoundingClientRect().left - document.getElementById("drags").getBoundingClientRect().left;
         let y = zone.getBoundingClientRect().top - document.getElementById("drags").getBoundingClientRect().top;
-        // console.log(x,y);
         create(`${zone.classList[0]} spawn drag`,x,y,`${zone.classList[0]}`,`none`);
     });
 }

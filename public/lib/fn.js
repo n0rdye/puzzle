@@ -90,6 +90,29 @@ function get_sid(){
     });
 }
 
+function load_groups(callback){
+    let select = document.getElementById("group_select");
+    // let name = select.options[select.selectedIndex].text;
+    $.post( "/get_groups")
+    .done(function( res ) {
+        if(res["out"] == "good"){
+            select.innerHTML = "";
+            res["body"].forEach(group => {
+                let group_div = document.createElement("option");
+                group_div.innerText = group["name"].replace("$"," ");
+                group_div.setAttribute("group_count",group["count"]);
+                group_div.setAttribute("gid",group["id"]);
+                group_div.id = `obj_group_${group["id"]}`;
+                select.append(group_div);
+                if(group["id"] == res["body"].at(-1)["id"]){
+                    if(callback)callback();
+                }
+            });
+        }
+        // callback(res);
+    });
+}
+
 // redirect
 function goto(url) {
     location.href = url;

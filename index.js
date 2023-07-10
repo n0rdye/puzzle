@@ -166,6 +166,18 @@ app.post("/get_obj", (req,res) => {
         func.log("router single object getting error - "+error);
     }
 })
+app.post("/get_groups", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        // func.log(inp["name"]);
+        func.sid(cook,res,()=>{
+            obj.load_groups(inp,cook,res);
+        })
+    } catch (error) {
+        func.log("router single object getting error - "+error);
+    }
+})
 /// admin
 app.get("/admin", (req,res) =>{
     try {
@@ -206,6 +218,28 @@ app.post("/new_obj", (req,res) => {
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             obj.new(inp,cook,res);
+        },true,true)
+    } catch (error) {
+        func.log("router object creating error - "+error);
+    }
+})
+app.post("/admin/new/group", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            obj.new_group(inp,cook,res);
+        },true,true)
+    } catch (error) {
+        func.log("router object creating error - "+error);
+    }
+})
+app.post("/admin/delete/group", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            obj.del_group(inp,cook,res);
         },true,true)
     } catch (error) {
         func.log("router object creating error - "+error);

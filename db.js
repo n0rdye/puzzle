@@ -1,6 +1,6 @@
 const mysql = require('mysql');
 const vars = require('./vars');
-const db_host = "db";
+const db_host = "localhost";
 
 const admin = mysql.createConnection({
     host: db_host,
@@ -68,6 +68,7 @@ module.exports.gav = (table,limit = "0",callback,prevs = false) => {
 module.exports.ggv = (table,ekey,key,value,callback,prevs = false) => {
     // console.log('SELECT * FROM `'+table+'` WHERE `'+key+'` = '+value);
     db(prevs).query(`SELECT ${ekey} FROM ${table} WHERE ${key} = ${value}`, (err, rows, fields) => {
+        // console.log(`SELECT ${ekey} FROM ${table} WHERE ${key} = ${value}`);
         if (err) {
             console.log("sql err");
             throw err;
@@ -78,8 +79,9 @@ module.exports.ggv = (table,ekey,key,value,callback,prevs = false) => {
 }
 
 // set value where
-module.exports.sv = (table,key,value,ekey,evalue,callback,prevs = false) => {
-    db(prevs).query(`UPDATE ${table} SET ${key} = '${value}' WHERE ${ekey} = '${evalue}'`, (err , rows) => {
+module.exports.sv = (table,key,value,ekey,evalue,callback,prevs = false,no_srt = false) => {
+    value = (no_srt)? value:`'${value}'`;
+    db(prevs).query(`UPDATE ${table} SET ${key} = ${value} WHERE ${ekey} = '${evalue}'`, (err , rows) => {
         // console.log("UPDATE `"+table+"` SET `"+key+"` = '"+value+"' WHERE `"+ekey+"` = '"+evalue+"'");
         if (err) {
             console.log("sql err");
@@ -90,13 +92,14 @@ module.exports.sv = (table,key,value,ekey,evalue,callback,prevs = false) => {
     })
 }
 // new record
-module.exports.nr = (table,keys,values,prevs = false) =>{
+module.exports.nr = (table,keys,values,prevs = false,callback) =>{
     // console.log('INSERT INTO `'+table+'`('+keys+') VALUES ('+values+')');
     db(prevs).query(`INSERT INTO ${table} (${keys}) VALUES (${values})`,(err,res) =>{
         if (err) {
             console.log("sql err");
             throw err;
         }else{
+            if(callback)callback();
             return true;
         }
     })

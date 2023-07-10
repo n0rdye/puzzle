@@ -120,8 +120,8 @@ module.exports.logs_file = (res)=>{
 }
 
 
-module.exports.get_uuid = (name = "") =>{
-    name = (name != "")? this.encrypt(name,"name"):"";
+module.exports.get_uuid = (name = "/") =>{
+    if (name != "/") name = this.encrypt(name,"name");
     let unid = uuid.v4() + '%%'+name+'#e'+(621);
     return unid;
 }
