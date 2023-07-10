@@ -42,27 +42,11 @@
         document.getElementById("objs_in_group").innerHTML = "";
         edit_load_objs((data)=>{
             data.forEach(value => {
-                console.log(value);
+                // console.log(value);
                 // // console.log($.cookie("cache"));
-                // console.log(localStorage.getItem(`${value["name"]}`));
-                if ($.cookie("cache") == "true"){
-                    if (localStorage.getItem(`${value["name"]}`) == null){
-                        edit_load_obj(value["name"],"`img`",(odata)=>{
-                            localStorage.setItem(value["name"],odata["img"]);
-                            make(odata["img"]);
-                        })
-                    }
-                    else{
-                        make(localStorage.getItem(value["name"]))
-                    }
-                }
-                else{
-                    $.cookie("cache","true",{path:"/;SameSite=Strict"})
-                    edit_load_obj(value["name"],"`img`",(odata)=>{
-                        localStorage.setItem(value["name"],odata["img"]);
+                edit_load_obj(value["name"],"`img`",(odata)=>{
                         make(odata["img"]);
-                    })
-                } 
+                })
                 function make(img){
                     let obj_list = document.getElementById("objs_in_group");
                     let obj =  document.createElement('div');
@@ -107,7 +91,6 @@
             img : document.querySelector('#img_prev').src
         }
         let changes = {}
-        localStorage.removeItem((cur_atts["name"]+"/g/"+select.options[select.selectedIndex].value).replace(" ","$"));
         attributes.forEach(element => {
             // console.log(cur_atts[element],menu.getAttribute(`obj_${element}`));
             if(element != attributes.at(-1)){
@@ -145,6 +128,9 @@
                             document.getElementById("obj_resp").innerHTML = ("name was not changed because its taken");
                         }
                     },1000)
+                    setTimeout(()=>{
+                        document.getElementById("obj_resp").innerHTML = "";
+                    },3000)
                 }
             });
         }

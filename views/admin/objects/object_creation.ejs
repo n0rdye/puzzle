@@ -49,14 +49,14 @@
                     <label for="obj_height"><%= lang("height") %> </label>
                     <div id="obj_height_value">100см</div>
                 </div>
-                <input style="width: 100%;" type="range" step="0.5" min="1" max="100" id="obj_height" value="100" oninput="obj_size_change('height')"> 
+                <input style="width: 100%;" type="range" step="1" min="1" max="100" id="obj_height" value="100" oninput="obj_size_change('height')"> 
             </div>
             <div>
                 <div style="display: flex;width: 100%;justify-content: space-between;">
                     <label for="obj_width"><%= lang("width") %></label>
                     <div id="obj_width_value">100см</div>
                 </div>
-                <input style="width: 100%;" type="range" step="0.5" min="1" max="100" id="obj_width" value="100" oninput="obj_size_change('width')"> 
+                <input style="width: 100%;" type="range" step="1" min="1" max="100" id="obj_width" value="100" oninput="obj_size_change('width')"> 
             </div>
         </div>
         <div>
@@ -162,6 +162,9 @@
                     setTimeout(()=>{
                         edit_get_objs();
                     },1000)
+                    setTimeout(()=>{
+                        document.getElementById("obj_resp").innerHTML = "";
+                    },3000)
                 }
             });
         }

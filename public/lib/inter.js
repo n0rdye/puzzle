@@ -2,6 +2,7 @@ window.dragMoveListener = dragMoveListener;
 let root = document.getElementById("drags");
 let objs = { height:"2",width:"4"};
 let objs_store = {};
+let objs_imgs = {};
 let proj_from = "cloud";
 
 function create(clas,x,y,body,id,size){
@@ -32,19 +33,19 @@ function create(clas,x,y,body,id,size){
         }
         else if (db_data != null){
             if ($.cookie("cache") == "true"){
-                if (localStorage.getItem(`${main_clas}`) == null){
+                if (objs_imgs[main_clas] == null){
                     load_obj(main_clas,"`img`",(odata)=>{
-                        localStorage.setItem(main_clas,odata["img"]);
+                        objs_imgs[main_clas] = odata["img"];
                         make(odata["img"]);
                     })
                 }
                 else{
-                    make(localStorage.getItem(main_clas))
+                    make(objs_imgs[main_clas])
                 }
             }
             else{
                 load_obj(main_clas,"`img`",(odata)=>{
-                    localStorage.setItem(main_clas,odata["img"]);
+                    objs_imgs[main_clas] = odata["img"];
                     make(odata["img"]);
                 })
             }
