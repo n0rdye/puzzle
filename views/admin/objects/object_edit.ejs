@@ -11,6 +11,7 @@
     img{
         width: 100%;
         height: 100%;
+        pointer-events: none;
     }
     #objs_in_group{
         display: flex;
@@ -22,10 +23,9 @@
 <div>
     <div id="objs_in_group"></div>
 </div>
-<div class="cmenu" id="object_menu">
-    <button>del object</button>
-    <button>change name</button>
-    <button>change size</button>
+<div class="cmenu" id="object_edit_menu">
+    <button  onclick="obj_del()">del object</button>
+    <button onclick="set_edit()">edit object</button>
 </div>
 
 <script>
@@ -33,11 +33,16 @@
         edit_get_objs();
     });
 
+    function set_edit(){
+        let menu = document.getElementById("object_edit_menu");
+        set_obj_edit_params(menu.getAttribute("obj_img"),menu.getAttribute("obj_name").split("/")[0],menu.getAttribute("obj_description"),menu.getAttribute("obj_height"),menu.getAttribute("obj_width"));
+    }
+
     function edit_get_objs(){
         document.getElementById("objs_in_group").innerHTML = "";
         edit_load_objs((data)=>{
             data.forEach(value => {
-                // console.log(value);
+                console.log(value);
                 // // console.log($.cookie("cache"));
                 // console.log(localStorage.getItem(`${value["name"]}`));
                 if ($.cookie("cache") == "true"){
@@ -59,15 +64,90 @@
                     })
                 } 
                 function make(img){
-                    let czones = document.getElementById("objs_in_group");
-                    let czone =  document.createElement('div');
-                    czone.classList.add(value["name"]);
-                    czone.classList.add("object");
-                    czone.innerHTML = `<img src="${img}">`
-                    czones.append(czone)
+                    let obj_list = document.getElementById("objs_in_group");
+                    let obj =  document.createElement('div');
+                    obj.id = "object_menu";
+                    obj.classList.add(value["name"]);
+                    obj.classList.add("object");
+                    obj.setAttribute("name",value["name"])
+                    obj.setAttribute("description",value["description"])
+                    obj.setAttribute("src",img)
+                    obj.setAttribute("height",value["height"])
+                    obj.setAttribute("width",value["width"])
+                    obj.setAttribute("obj_id",value["id"])
+                    obj.innerHTML = `<img src="${img}">`
+                    obj_list.append(obj)
                 }              
             });
         })
+    }
+
+    function obj_del(){
+        let select = document.getElementById("group_select");
+        let menu = document.getElementById("object_edit_menu");
+        if (confirm(`are you sure you want to delete object ${menu.getAttribute("obj_name").split("/")[0]}`)){
+            $.post( "/admin/obj/del", { id:menu.getAttribute(`obj_id`),gid:select.options[select.selectedIndex].getAttribute("gid"),name:menu.getAttribute("obj_name")})
+            .done(function( res ) {
+                if(res["out"] == "good"){
+                    edit_get_objs();
+                }
+            });
+        }
+    }
+
+    function save_edited_obj(){
+        let select = document.getElementById("group_select");
+        let menu = document.getElementById("object_edit_menu");
+        let attributes = ["name","description","img","height","width"];
+        let cur_atts = {
+            name : document.getElementById("nobj_name").value,
+            description : document.getElementById("nobj_description").value,
+            height : document.getElementById("obj_height").value,
+            width : document.getElementById("obj_width").value,
+            img : document.querySelector('#img_prev').src
+        }
+        let changes = {}
+        localStorage.removeItem((cur_atts["name"]+"/g/"+select.options[select.selectedIndex].value).replace(" ","$"));
+        attributes.forEach(element => {
+            // console.log(cur_atts[element],menu.getAttribute(`obj_${element}`));
+            if(element != attributes.at(-1)){
+                check_change(element);
+                // console.log(element);
+            }
+            else{
+                check_change(element);
+                // console.log(changes);
+                if(Object.keys(changes).length > 0){
+                    make_obj_save(changes);
+                }
+            }
+        });
+        function check_change(element){
+            if(element == "name" && cur_atts[element] != menu.getAttribute(`obj_${element}`).split("/")[0]){
+                changes[element] = cur_atts[element];
+            }
+            else if (element != "name" && cur_atts[element] != menu.getAttribute(`obj_${element}`)){
+                changes[element] = cur_atts[element];
+            }
+        }
+        function make_obj_save(){
+            if(changes["name"]) changes["name"] = (changes["name"]+"/g/"+select.options[select.selectedIndex].value).replace(" ","$");
+            document.getElementById("obj_resp").innerHTML = "saving object";
+            $.post( "/admin/obj/edit", { id:menu.getAttribute(`obj_id`),changes:JSON.stringify(changes),gid:select.options[select.selectedIndex].getAttribute("gid")})
+            .done(function( res ) {
+                // console.log(res);
+                if(res["out"] == "good"){
+                    document.getElementById("obj_resp").innerHTML = "object saved";
+                    setTimeout(()=>{
+                        edit_get_objs();
+                        set_obj_edit_params();
+                        if(res["name_err"]){
+                            document.getElementById("obj_resp").innerHTML = ("name was not changed because its taken");
+                        }
+                    },1000)
+                }
+            });
+        }
     }
 
     function edit_load_obj(name,key,callback){

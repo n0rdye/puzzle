@@ -212,12 +212,34 @@ app.get("/get_logs", (req,res) => {
     try{let cook = req.cookies;func.sid(cook,res,()=>{func.logs_file(res);})} 
     catch (error) {func.log("router logs download error - "+error);}
 })
-app.post("/new_obj", (req,res) => {
+app.post("/admin/obj/new", (req,res) => {
     try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             obj.new(inp,cook,res);
+        },true,true)
+    } catch (error) {
+        func.log("router object creating error - "+error);
+    }
+})
+app.post("/admin/obj/edit", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            obj.save(inp,cook,res);
+        },true,true)
+    } catch (error) {
+        func.log("router object creating error - "+error);
+    }
+})
+app.post("/admin/obj/del", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            obj.del(inp,cook,res);
         },true,true)
     } catch (error) {
         func.log("router object creating error - "+error);
@@ -300,11 +322,6 @@ app.post("/admin/users/del/user", (req,res) => {
         func.log("router object creating error - "+error);
     }
 })
-app.post("/admin/change_objs", (req,res) => {
-    try{let cook = req.cookies;func.sid(cook,res,()=>{func.logs_file(res);})} 
-    catch (error) {func.log("router logs download error - "+error);}
-})
-
 
 
 

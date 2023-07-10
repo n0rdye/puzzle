@@ -81,8 +81,8 @@ module.exports.ggv = (table,ekey,key,value,callback,prevs = false) => {
 // set value where
 module.exports.sv = (table,key,value,ekey,evalue,callback,prevs = false,no_srt = false) => {
     value = (no_srt)? value:`'${value}'`;
+    // console.log(`UPDATE ${table} SET ${key} = ${value} WHERE ${ekey} = '${evalue}'`);
     db(prevs).query(`UPDATE ${table} SET ${key} = ${value} WHERE ${ekey} = '${evalue}'`, (err , rows) => {
-        // console.log("UPDATE `"+table+"` SET `"+key+"` = '"+value+"' WHERE `"+ekey+"` = '"+evalue+"'");
         if (err) {
             console.log("sql err");
             throw err;
@@ -91,6 +91,31 @@ module.exports.sv = (table,key,value,ekey,evalue,callback,prevs = false,no_srt =
         }
     })
 }
+
+module.exports.uv = (table,keys,values,ekey,evalue,callback,prevs = false,no_srt = false) => {
+    values = values.split(".");
+    keys = keys.split(".");
+    let sets = '';
+    for (let i = 0; i < keys.length; i++) {
+        if(i != keys.length-1){
+            sets+=`${keys[i]} = ${values[i]},`;
+        }
+        else{
+            sets+=`${keys[i]} = ${values[i]}`;
+        }
+        
+    }
+    // console.log(`UPDATE ${table} SET ${sets} WHERE ${ekey} = '${evalue}'`);
+    db(prevs).query(`UPDATE ${table} SET ${sets} WHERE ${ekey} = '${evalue}'`, (err , rows) => {
+        if (err) {
+            console.log("sql err");
+            throw err;
+        }else{
+            if(callback)callback(rows);
+        }
+    })
+}
+
 // new record
 module.exports.nr = (table,keys,values,prevs = false,callback) =>{
     // console.log('INSERT INTO `'+table+'`('+keys+') VALUES ('+values+')');
