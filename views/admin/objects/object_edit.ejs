@@ -3,29 +3,44 @@
         background-color: #bfe4ff;
         border: dashed 4px transparent;
         border-radius: 4px;
-        height: 50px;
-        width: 50px;
+        height: 55px;
+        width: 55px;
         margin: 5px;
         margin-top: 0px;
+        margin-bottom: 20px;
     }
     img{
         width: 100%;
         height: 100%;
+        object-fit: contain;
         pointer-events: none;
     }
-    #objs_in_group{
+    #objs_in_group,#founded_objs_list{
         display: flex;
         flex-wrap: wrap;
+        padding: 0px;
+    }
+    #find_obj_btns{
+        /* display: flex; */
+        margin: auto 0px;
+        /* height: 25px; */
     }
 </style>
 
-<h1>object edit</h1>
+<div style="display: flex;justify-content: space-between;">
+    <h1>изменение объектов</h1>
+    <div id="find_obj_btns">
+        <button onclick="load_groups(()=>{edit_get_objs(true);});">найти по имени</button>
+        <button onclick="load_groups(()=>{edit_get_objs();});">очистить</button>
+    </div>
+</div>
 <div>
     <div id="objs_in_group"></div>
 </div>
+
 <div class="cmenu" id="object_edit_menu">
-    <button  onclick="obj_del()">del object</button>
-    <button onclick="set_edit()">edit object</button>
+    <button  onclick="obj_del()">удалить объект</button>
+    <button onclick="set_edit()">редактирование объекта</button>
 </div>
 
 <script>
@@ -35,42 +50,28 @@
 
     function set_edit(){
         let menu = document.getElementById("object_edit_menu");
-        set_obj_edit_params(menu.getAttribute("obj_img"),menu.getAttribute("obj_name").split("/")[0],menu.getAttribute("obj_description"),menu.getAttribute("obj_height"),menu.getAttribute("obj_width"));
+        set_obj_edit_params(menu.getAttribute("obj_img"),menu.getAttribute("obj_name").split("/")[0],menu.getAttribute("obj_description"),menu.getAttribute("obj_height"),menu.getAttribute("obj_width"),menu.getAttribute("obj_cost"),menu.getAttribute("obj_gid"));
     }
 
-    function edit_get_objs(){
+    function edit_get_objs(by_name){
         document.getElementById("objs_in_group").innerHTML = "";
+        set_obj_edit_params();
         edit_load_objs((data)=>{
             data.forEach(value => {
                 // console.log(value);
                 // // console.log($.cookie("cache"));
                 edit_load_obj(value["name"],"`img`",(odata)=>{
-                        make(odata["img"]);
-                })
-                function make(img){
-                    let obj_list = document.getElementById("objs_in_group");
-                    let obj =  document.createElement('div');
-                    obj.id = "object_menu";
-                    obj.classList.add(value["name"]);
-                    obj.classList.add("object");
-                    obj.setAttribute("name",value["name"])
-                    obj.setAttribute("description",value["description"])
-                    obj.setAttribute("src",img)
-                    obj.setAttribute("height",value["height"])
-                    obj.setAttribute("width",value["width"])
-                    obj.setAttribute("obj_id",value["id"])
-                    obj.innerHTML = `<img src="${img}">`
-                    obj_list.append(obj)
-                }              
+                    make_obj(odata["img"],value,"objs_in_group");
+                })           
             });
-        })
+        },by_name)
     }
 
     function obj_del(){
         let select = document.getElementById("group_select");
         let menu = document.getElementById("object_edit_menu");
-        if (confirm(`are you sure you want to delete object ${menu.getAttribute("obj_name").split("/")[0]}`)){
-            $.post( "/admin/obj/del", { id:menu.getAttribute(`obj_id`),gid:select.options[select.selectedIndex].getAttribute("gid"),name:menu.getAttribute("obj_name")})
+        if (confirm(`вы точно хотите удалить ${menu.getAttribute("obj_name").split("/")[0]}?`)){
+            $.post( "/admin/objects/delete", { id:menu.getAttribute(`obj_id`),gid:select.options[select.selectedIndex].getAttribute("gid"),name:menu.getAttribute("obj_name")})
             .done(function( res ) {
                 if(res["out"] == "good"){
                     edit_get_objs();
@@ -82,13 +83,14 @@
     function save_edited_obj(){
         let select = document.getElementById("group_select");
         let menu = document.getElementById("object_edit_menu");
-        let attributes = ["name","description","img","height","width"];
+        let attributes = ["name","description","img","height","width","cost"];
         let cur_atts = {
             name : document.getElementById("nobj_name").value,
             description : document.getElementById("nobj_description").value,
             height : document.getElementById("obj_height").value,
             width : document.getElementById("obj_width").value,
-            img : document.querySelector('#img_prev').src
+            img : document.querySelector('#img_prev').src,
+            cost : document.getElementById("obj_cost").value
         }
         let changes = {}
         attributes.forEach(element => {
@@ -102,6 +104,7 @@
                 // console.log(changes);
                 if(Object.keys(changes).length > 0){
                     make_obj_save(changes);
+                    // console.log(changes);
                 }
             }
         });
@@ -115,17 +118,17 @@
         }
         function make_obj_save(){
             if(changes["name"]) changes["name"] = (changes["name"]+"/g/"+select.options[select.selectedIndex].value).replace(" ","$");
-            document.getElementById("obj_resp").innerHTML = "saving object";
-            $.post( "/admin/obj/edit", { id:menu.getAttribute(`obj_id`),changes:JSON.stringify(changes),gid:select.options[select.selectedIndex].getAttribute("gid")})
+            document.getElementById("obj_resp").innerHTML = "сохранение товара";
+            $.post( "/admin/objects/edit", { id:menu.getAttribute(`obj_id`),changes:JSON.stringify(changes),gid:select.options[select.selectedIndex].getAttribute("gid")})
             .done(function( res ) {
                 // console.log(res);
                 if(res["out"] == "good"){
-                    document.getElementById("obj_resp").innerHTML = "object saved";
+                    document.getElementById("obj_resp").innerHTML = "товар сохранён";
                     setTimeout(()=>{
                         edit_get_objs();
                         set_obj_edit_params();
                         if(res["name_err"]){
-                            document.getElementById("obj_resp").innerHTML = ("name was not changed because its taken");
+                            document.getElementById("obj_resp").innerHTML = ("название товара не было изменино поскольку оно занято");
                         }
                     },1000)
                     setTimeout(()=>{
@@ -146,18 +149,56 @@
         });
     }
         
-    function edit_load_objs(callback){
+    function edit_load_objs(callback,by_name = false){
         let select = document.getElementById("group_select");
-        $.post( "/get_objs",{gid:select.options[select.selectedIndex].getAttribute("gid")})
-        .done(function( res ) {
-            if(res["out"] == "good"){
-                // console.log(res["body"]);
-                // res["body"].forEach(object => {
-                //     // objs_store[`${element["name"]}`] = {description:element["description"],height:element["height"],width:element["width"],id:element["id"],name:element["name"]}
-                //     let obj_main = document.createElement("div");
-                // });
-                callback(res["body"]);
-            }
-        });
+        if(!by_name){
+            $.post( "/get_objs",{gid:select.options[select.selectedIndex].getAttribute("gid")})
+            .done(function( res ) {
+                if(res["out"] == "good"){
+                    // console.log(res["body"]);
+                    // res["body"].forEach(object => {
+                    //     // objs_store[`${element["name"]}`] = {description:element["description"],height:element["height"],width:element["width"],id:element["id"],name:element["name"]}
+                    //     let obj_main = document.createElement("div");
+                    // });
+                    callback(res["body"]);
+                }
+            });
+        }
+        else{
+            let name = ask("название");
+            if(name != "")[
+                $.post( "/admin/objects/find", { name:name.replace(" ","$")})
+                .done(function( res ) {
+                    if(res["out"] == "good"){
+                        // console.log(res["body"]);
+                        callback(res["body"])
+                    }
+                })
+            ]
+        }
     }
+
+        function make_obj(img,value,list_id){
+            let obj_list = document.getElementById(list_id);
+            let obj =  document.createElement('div');
+            let name_text =  document.createElement('div');
+            let img_elm =  document.createElement('img');
+            obj.title = `название:${value["name"].split("/")[0].replace("$"," ")}\nцена:${value["cost"]}\nширена:${value["width"]}\nвысота${value["height"]}\nописание:${value["description"]}`;
+            obj.id = "object_menu";
+            obj.classList.add(value["name"]);
+            obj.classList.add("object");
+            obj.setAttribute("name",value["name"].split("/")[0].replace("$"," "))
+            obj.setAttribute("description",value["description"])
+            obj.setAttribute("src",img)
+            obj.setAttribute("height",value["height"])
+            obj.setAttribute("width",value["width"])
+            obj.setAttribute("obj_id",value["id"])
+            obj.setAttribute("cost",value["cost"])
+            obj.setAttribute("gid",value["gid"])
+            name_text.innerText = value["name"].split("/")[0].replace("$"," ");
+            img_elm.src = img;
+            obj.append(img_elm)
+            obj.append(name_text)
+            obj_list.append(obj)
+        }              
 </script>

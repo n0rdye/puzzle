@@ -7,22 +7,24 @@
     }
 </style>
 
-<h1 style="text-align: center;"><%= lang("hello admin") %></h1> <br>
+<!-- <h1 style="text-align: center;">привет админ</h1> <br> -->
     <section>
-        <%- include('./admin/objects/object_creation.ejs') %>
+        <h1 style="text-align: center;">объект</h1>
         <%- include('./admin/objects/object_groups.ejs') %>
+        <%- include('./admin/objects/object_creation.ejs') %>
         <%- include('./admin/objects/object_edit.ejs') %>
     </section>
 
     <section>
+        <h1 style="text-align: center;">пользователь</h1>
         <%- include('./admin/users/user_reg.ejs') %>
         <%- include('./admin/users/user_edit.ejs') %>
     </section>
 
     <section style="display: flex; justify-content: space-between;">
-        <h1><%= lang("logs") %></h1> <br>
+        <h1>логи</h1> <br>
         <div class="logs_div" style="margin: auto 0px;display: flex;">
-            <button onclick="goto('/get_logs');"><%= lang("download logs") %></button>
+            <button onclick="goto('/get_logs');">скачать логи</button>
         </div>
     </section>
 

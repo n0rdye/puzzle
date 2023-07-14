@@ -1,23 +1,23 @@
 <style>
-    .main_sec{
+    .user_reg_form{
         margin: auto;
         /* display: flex; */
         text-align: center;
     }
 </style>
-<h1><%= lang("user registration") %></h1>
-<div class="main_sec">
+<h1>регистрация пользователя</h1>
+<form action="#" class="user_reg_form">
     <div>
-        <input type="text" id="login" name="login" value="" placeholder="<%= lang("login") %>">
-        <input type="password" id="pass" name="pass" value="" placeholder="<%= lang("password") %>">
-        <button onclick='reg();'><%= lang("register") %></button>
+        <input type="text" id="login" name="login" value="" placeholder="логин">
+        <input type="password" id="pass" name="pass" value="" placeholder="пароль">
+        <input type="submit" onclick='reg();' value="зарегистрировать">
     </div>
     <div>
-        <label for="admin_check"><%= lang("admin") %></label>
+        <label for="admin_check">админ. привелегии</label>
         <input type="checkbox" name="admin" value='false' id="admin_check">
     </div>
     <div id="reg_response"></div>
-</div>
+</form>
 
 <script>
         function reg(){
@@ -27,18 +27,20 @@
             let admin = document.getElementById("admin_check").checked;
             // console.log(login,pass,admin);
             // console.log("cl reg");
-            $.post( "/admin/users/reg", { login:login,pass:pass,admin:admin })
-            .done(function( res ) {
-                // console.log("serv reg");
-                if(res["out"] == "good"){
-                    // console.log(res["body"]);
-                    document.getElementById("reg_response").innerHTML = `user ${login} successfully registered `;
-                    load_users_data(users_from);
+            if(login != ""&&pass!=""){
+                $.post( "/admin/users/new", { login:login,pass:pass,admin:admin })
+                .done(function( res ) {
+                    // console.log("serv reg");
+                    if(res["out"] == "good"){
+                        // console.log(res["body"]);
+                        document.getElementById("reg_response").innerHTML = `user ${login} successfully registered `;
+                        load_users_data(users_from);
 
-                }
-                else if (res["out"] == "bad"){
-                    document.getElementById("reg_response").innerHTML = "cannot register user "+login+" already in use";
-                }
-            });
+                    }
+                    else if (res["out"] == "bad"){
+                        document.getElementById("reg_response").innerHTML = "cannot register user "+login+" already in use";
+                    }
+                });
+            }
         }
 </script>

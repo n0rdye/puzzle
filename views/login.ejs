@@ -10,16 +10,18 @@
 </style>
 
 
-<div class="login-page">
-    <input name="login" type="text" id="login" required>
-    <label for="login">login</label>
-</div>
-<div class="pass-page">
-    <input name="pass" type="password" id="pass" value="" required>
-    <label for="pass">password</label>
-</div>
-
-<button type="button" id="log_btn" onclick="log(document.getElementById('login').value,document.getElementById('pass').value);">login</button>
+<form action="#" id="login_form">
+    <div class="login-page">
+        <input name="login" type="text" id="login">
+        <label for="login">логин</label>
+    </div>
+    <div class="pass-page">
+        <input name="pass" type="password" id="pass">
+        <label for="pass">пароль</label>
+    </div>
+    <input type="submit" id="log_btn" onclick="log()" value="login">
+</form>
+    
 <!-- <input type="submit" value=""  hidden> -->
 <div id="res"></div>
 
@@ -31,33 +33,27 @@
         const login = CryptoJS.AES.encrypt(document.getElementById('login').value,$.cookie("sid")).toString();
         const pass = CryptoJS.AES.encrypt(document.getElementById('pass').value,$.cookie("sid")).toString();
         const sid = $.cookie("sid");
-        $.post( "/back_login", { login:login,pass:pass,sid:sid })
-        .done(function( res ) {
-            if (res["out"] == "bad"){
-                console.log(res["err"]);
-                if (res["err"] == "user" || res["err"] == "pass"){
-                    document.querySelector("#res").innerHTML = "<p>wrong password or login</p>";
+        if(login!=""&&pass!=""){
+            $.post( "/back_login", { login:login,pass:pass,sid:sid })
+            .done(function( res ) {
+                if (res["out"] == "bad"){
+                    console.log(res["err"]);
+                    if (res["err"] == "user" || res["err"] == "pass"){
+                        document.querySelector("#res").innerHTML = "<p>wrong password or login</p>";
+                    }
                 }
-            }
-            else{
-                if(res["out"] == "goto"){
-                    // postForm(res["url"], res["args"]);
-                    goto(res["url"]);
+                else{
+                    if(res["out"] == "goto"){
+                        // postForm(res["url"], res["args"]);
+                        goto(res["url"]);
+                    }
+                    // if(res["out"] == "logged"){
+                    //     // postForm(res["url"], res["args"]);
+                    //     // document.querySelector("#res").innerHTML = `<p>user already logged in from sid - ${res["sid"]}</p> <br> <button onclick="$.cookie('sid','${res["sid"]}');clear_ck();">log him out</button>`;
+                    // }
                 }
-                // if(res["out"] == "logged"){
-                //     // postForm(res["url"], res["args"]);
-                //     // document.querySelector("#res").innerHTML = `<p>user already logged in from sid - ${res["sid"]}</p> <br> <button onclick="$.cookie('sid','${res["sid"]}');clear_ck();">log him out</button>`;
-                // }
-            }
-        });
+            });
+        }
     }
-    
-    var input = document.getElementById("pass");
-    input.addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        document.getElementById("log_btn").click();
-    }
-    }); 
 </script>
 <%- include('./static/end.ejs') %>

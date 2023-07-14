@@ -16,6 +16,13 @@
         position: absolute;
         margin: auto;
     }
+    #drags img{
+        object-fit: contain;
+    }
+
+    .zones{
+        margin-block: 10px;
+    }
 
     .wall {
         /* border: dashed 4px transparent; */
@@ -104,10 +111,10 @@
 
 
 <div id="project_menu" class="cmenu">
-    <button id='proj_csave_btn' onclick='save_proj()'><%= lang(`save to cloud`) %></button> <br>
-    <button id='proj_cload_btn' onclick='load_proj_cloud()'><%=lang('load from cloud')%></button> <br>
-    <button id='proj_lsave_btn' onclick='save_proj_local()'><%=lang('save to local') %></button> <br>
-    <button id='proj_lload_btn' onclick='load_proj_local()'><%=lang('load from local')%></button> <br>
+    <button id='proj_csave_btn' onclick='save_proj()'>сохранить в облако</button> <br>
+    <button id='proj_cload_btn' onclick='load_proj_cloud()'>загрузить из облака</button> <br>
+    <button id='proj_lsave_btn' onclick='save_proj_local()'>сохранить на локальное хранилище</button> <br>
+    <button id='proj_lload_btn' onclick='load_proj_local()'>загрузить из локальное хранилище</button> <br>
 </div>
 
     
@@ -117,27 +124,27 @@
     <div id="wall_input">
         <div id="obj_group">
             <div style="display: flex;justify-content: space-between;">
-                <div style="width: 50px;">object group</div>
+                <div style="width: 50px;">группа товаров</div>
                 <select name="" id="group_select" onchange="get_objs()"></select>
             </div>
         </div><br>
         <div>
             <div style="display: flex;width: 150px;justify-content: space-between;">
-                <label for="wall_height"><%= lang("height") %> </label>
+                <label for="wall_height">высота </label>
                 <div id="wall_height_value">0</div>
             </div>
             <input type="range" step="0.1" min="0" max="5" id="wall_height" value="2" oninput="wall_size_change('height')" onchange="resize_drags()"> 
         </div>
         <div>
             <div style="display: flex;width: 150px;justify-content: space-between;">
-                <label for="wall_width"><%= lang("width") %></label>
+                <label for="wall_width">ширина</label>
                 <div id="wall_width_value">0</div>
             </div>
             <input type="range" step="0.1" min="0" max="7" id="wall_width" value="4" oninput="wall_size_change('width')" onchange="resize_drags()"> 
         </div>
     </div>
     <div class="czones"></div>
-    <img class="trash" style="height: 100px; width: 100px;" src="/img/shadow-energy.gif" alt="<%= lang('black hole') %>">
+    <img class="trash" style="height: 100px; width: 100px;" src="/img/shadow-energy.gif" alt="чёрная дыра">
 </div>
 
 <div class="zones" style="position: relative;">
@@ -145,6 +152,7 @@
 <div class="wall dropzone" id="wall"></div>
 </div>
 
+<div style="display:flex; justify-content: space-around;">цена проекта: <div style="display: flex;"><div id="proj_cost"></div>&nbsp;руб.</div></div>
 
 <script src="/lib/inter.js"></script>
 <script>
@@ -170,38 +178,26 @@
     if($.cookie("cache") ==null)$.cookie("cache","true",{path:"/;SameSite=Strict"});
     // console.log(proj_name);
     let menu = document.getElementById("project_menu");
-    document.getElementById("top_panel_left").innerHTML = `<div id='proj_menu' class="menu_btn"><%= lang("project settings") %></div>`;
-    // menu.innerHTML += "<button id='proj_csave_btn' onclick='save_proj()'><%= lang(`save to cloud`) %></button> <br>";
-    // menu.innerHTML += "<button id='proj_cload_btn' onclick='load_proj_cloud()'><%=lang('load from cloud')%></button> <br>";
-    // menu.innerHTML += "<button id='proj_lsave_btn' onclick='save_proj_local()'><%=lang('save to local') %></button> <br>";
-    // menu.innerHTML += "<button id='proj_lload_btn' onclick='load_proj_local()'><%=lang('load from local')%></button> <br>";
-    if ($.cookie("cache") == "false") menu.innerHTML += "<div id='cache_switch' title='<%=lang('cache_title')%>'><button onclick='cache_change(true);'><%=lang('cache_off')%></button></div>";
-    else if ($.cookie("cache") == "true") menu.innerHTML += "<div id='cache_switch' title='<%=lang('cache_title')%>'><button onclick='cache_change(false);'><%=lang('cache_on')%></button></div>";
+    document.getElementById("top_panel_left").innerHTML = `<div id='proj_menu' class="menu_btn">настройки проекта</div>`;
     
 
-
-    function cache_change(to){
-        let cache_switch = document.getElementById("cache_switch");
-        if(to) {cache_switch.innerHTML = "<button onclick='cache_change(false);' title='<%=lang('cache_title')%>'><%=lang('cache_on')%></button></div>";$.cookie("cache","true",{path:"/;SameSite=Strict"});}
-        else if(!to) {cache_switch.innerHTML = "<button onclick='cache_change(true);' title='<%=lang('cache_title')%>'><%=lang('cache_off')%></button></div>";$.cookie("cache","false",{path:"/;SameSite=Strict"});}
-    }
     function save_proj(type){
-        document.getElementById('top_panel_center').innerHTML=` <%=lang("saving")%> ${proj_name}`;
+        document.getElementById('top_panel_center').innerHTML=`сохранение ${proj_name}`;
         save((res)=>{
-            document.getElementById('top_panel_center').innerHTML=`<%=lang("saved")%> ${proj_name} <%=lang("to cloud")%>`;
+            document.getElementById('top_panel_center').innerHTML=`сохранено ${proj_name} в облако`;
             setTimeout((res)=>{
-                document.getElementById("top_panel_center").innerText = `${proj_name} (<%=lang("cloud")%>)`;
+                document.getElementById("top_panel_center").innerText = `${proj_name} (облако)`;
 
             },3000)
         })
     }
 
     function save_proj_local(type){
-        document.getElementById('top_panel_center').innerHTML=` <%=lang("saving")%> ${proj_name}`;
+        document.getElementById('top_panel_center').innerHTML=`сохранение ${proj_name}`;
         save_local();
-        document.getElementById('top_panel_center').innerHTML=`<%=lang("saved")%> ${proj_name} <%=lang("to local")%>`;
+        document.getElementById('top_panel_center').innerHTML=`сохранено ${proj_name} в локальное хранилище`;
         setTimeout((res)=>{
-            document.getElementById("top_panel_center").innerText = `${proj_name} (<%=lang("local")%>)`;
+            document.getElementById("top_panel_center").innerText = `${proj_name} (локальное хранилище)`;
         },3000)
     }
     

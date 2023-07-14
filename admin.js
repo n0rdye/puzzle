@@ -88,7 +88,7 @@ module.exports.set_obj=(inp,cook,res)=>{
     }
 }
 
-module.exports.reg = (inp,cook,res)=>{
+module.exports.new_user = (inp,cook,res)=>{
     try {
         let uuid = func.get_uuid(inp["login"]);
         let admin = inp["admin"];
@@ -130,5 +130,20 @@ module.exports.reg = (inp,cook,res)=>{
         }
     } catch (error) {
         func.log("backend user registration error - "+error);
+    }
+}
+
+module.exports.find_user = (inp,cook,res)=>{
+    try {
+        db.fva("users","login",inp["login"],`${inp["from"]},${inp["load_interval"]}`,(data)=>{
+            if(data["length"] > 0){
+                res.send({body:data,out:"good"});
+            }
+            else{
+                res.send({out:"bad"});
+            }
+        },true)
+    } catch (error) {
+        func.log("backend single object loading err0r - "+error);
     }
 }

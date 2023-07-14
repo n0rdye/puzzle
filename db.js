@@ -1,6 +1,6 @@
 const mysql = require('mysql');
 const vars = require('./vars');
-const db_host = "db";
+const db_host = "localhost";
 
 const admin = mysql.createConnection({
     host: db_host,
@@ -39,7 +39,7 @@ module.exports.dl = (table,key,value,callback,prevs = false) => {
 
 // get values where 
 module.exports.gv = (table,key,value,callback,prevs = false) => {
-    // console.log('SELECT * FROM `'+table+'` WHERE `'+key+'` = '+value);
+    // console.log(`SELECT * FROM ${table} WHERE ${key} = ${value}`);
     db(prevs).query(`SELECT * FROM ${table} WHERE ${key} = ${value}`, (err, rows, fields) => {
         if (err) {
             console.log("sql err");
@@ -52,7 +52,7 @@ module.exports.gv = (table,key,value,callback,prevs = false) => {
 
 // get all from table 
 module.exports.gav = (table,limit = "0",callback,prevs = false) => {
-    // console.log('SELECT * FROM `'+table+'` WHERE `'+key+'` = '+value);
+    // console.log(`SELECT * FROM ${table} WHERE 1 ${limit}`);
     limit = (limit != "0")? `LIMIT ${limit}`:""; 
     db(prevs).query(`SELECT * FROM ${table} WHERE 1 ${limit}`, (err, rows, fields) => {
         if (err) {
@@ -83,6 +83,31 @@ module.exports.sv = (table,key,value,ekey,evalue,callback,prevs = false,no_srt =
     value = (no_srt)? value:`'${value}'`;
     // console.log(`UPDATE ${table} SET ${key} = ${value} WHERE ${ekey} = '${evalue}'`);
     db(prevs).query(`UPDATE ${table} SET ${key} = ${value} WHERE ${ekey} = '${evalue}'`, (err , rows) => {
+        if (err) {
+            console.log("sql err");
+            throw err;
+        }else{
+            if(callback)callback(rows);
+        }
+    })
+}
+
+module.exports.fv = (table,key,value,callback,prevs = false) => {
+    // console.log(`UPDATE ${table} SET ${key} = ${value} WHERE ${ekey} = '${evalue}'`);
+    db(prevs).query(`SELECT * FROM ${table} WHERE ${key} LIKE '%${value}%'`, (err , rows) => {
+        if (err) {
+            console.log("sql err");
+            throw err;
+        }else{
+            if(callback)callback(rows);
+        }
+    })
+}
+
+module.exports.fva = (table,key,value,limit = "0",callback,prevs = false) => {
+    // console.log(`UPDATE ${table} SET ${key} = ${value} WHERE ${ekey} = '${evalue}'`);
+    limit = (limit != "0")? `LIMIT ${limit}`:""; 
+    db(prevs).query(`SELECT * FROM ${table} WHERE ${key} LIKE '%${value}%' ${limit}`, (err , rows) => {
         if (err) {
             console.log("sql err");
             throw err;

@@ -67,7 +67,7 @@ function check_sid(redirect = true){
 }
 
 function logout(redirect = true) {
-    let dialog = confirm(`${lang("logout")}?`);
+    let dialog = confirm(`выйти?`);
     if(dialog){
         clear_ck(redirect);
     }

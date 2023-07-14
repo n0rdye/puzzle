@@ -11,6 +11,12 @@
     oncontextmenu = (e) => {
             e.preventDefault()
     }
+    $('form').on('submit', function(event) {
+            event.preventDefault();
+    });
+    // $('form').unbind('click').click(function (e) {
+    //     e.preventDefault(); //This could also be return false as I'm using jQuery.
+    // })
     $(window).focus(function(){
         if(document.title == "login"){
             // console.log(document.title);

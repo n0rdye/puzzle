@@ -32,27 +32,20 @@ function create(clas,x,y,body,id,size){
             }
         }
         else if (db_data != null){
-            if ($.cookie("cache") == "true"){
-                if (objs_imgs[main_clas] == null){
-                    load_obj(main_clas,"`img`",(odata)=>{
-                        objs_imgs[main_clas] = odata["img"];
-                        make(odata["img"]);
-                    })
-                }
-                else{
-                    make(objs_imgs[main_clas])
-                }
-            }
-            else{
+            if (objs_imgs[main_clas] == null){
                 load_obj(main_clas,"`img`",(odata)=>{
                     objs_imgs[main_clas] = odata["img"];
                     make(odata["img"]);
                 })
             }
+            else{
+                make(objs_imgs[main_clas])
+            }
         }
         function make(img){
             obj.src = img;
-            obj.title = `${db_data["name"].replace("$"," ").split("/g")[0]}\n${db_data["description"]}\n${lang("width")}:${db_data["width"]}см ${lang("height")}:${db_data["height"]}см`;
+            obj.title = `${db_data["name"].replace("$"," ").split("/g")[0]}\nцена:${db_data["cost"]}\n${db_data["description"]}\nширина:${db_data["width"]}см высота:${db_data["height"]}см`;
+            obj.setAttribute("cost",db_data["cost"])
             // drag.transform = `translate(${drag.getAttribute("data-y")}px, ${drag.getAttribute("data-y")}px) scale(${db_data["width"] * 2} ${db_data["height"] * 2})`;
             if(size){
                 obj.style.width = `${db_data["width"] * 2}px`;
@@ -68,6 +61,7 @@ function resize_drags(){
     document.getElementById('drags').setAttribute("data-x",document.getElementsByClassName("wall")[0].getBoundingClientRect().left.toString()+"px");
     document.getElementById('drags').style.left = document.getElementsByClassName("wall")[0].getBoundingClientRect().left.toString()+"px";
     document.getElementById('drags').style.width = document.getElementsByClassName("wall")[0].style.width;
+    document.getElementsByClassName("zones")[0].style.height = document.getElementsByClassName("wall")[0].style.height;
     drag_start();
 }
 
@@ -96,6 +90,23 @@ function wall_size_change(type,value){
     }            
 }
 
+function calc_total(){
+    let total=0;
+    Object.entries(objs).forEach(([key,value]) => {
+        if(key != "height"&&key!="width"&key!="total"){
+            // console.log(key,value);
+            // console.log(Object.keys(value).length);
+            // console.log(objs_store[key]);
+            if(objs_store[key] != null){
+                total += parseInt(parseInt(objs_store[key]["cost"]) * Object.keys(value).length);
+            }
+        }
+        // console.log(Object.keys(objs).at(-1));
+    });
+    // return total;
+    document.getElementById("proj_cost").innerText = total;
+}
+
 function load(objss){
     // objs = JSON.parse($.cookie("objs"));
     // console.log(objs);
@@ -120,12 +131,13 @@ function load(objss){
         }
     });
     resize_drags();
+    calc_total()
 }
 
 function load_proj_cloud(){
     proj_from = "cloud";
     document.getElementById("drags").innerHTML = "";
-    document.getElementById("top_panel_center").innerText = `${lang("loading")} ${proj_name} ${lang("from")} ${lang("cloud")}`;
+    document.getElementById("top_panel_center").innerText = `загрузка ${proj_name} из облака`;
     $.post( "/load_proj",{name:proj_name})
     .done(function( res ) {
         if(res["out"] == "good"){
@@ -134,7 +146,7 @@ function load_proj_cloud(){
             // console.log(JSON.parse(res["body"]));
             // $.cookie("objs",res["body"]);
             load(JSON.parse(res["body"]));
-            document.getElementById("top_panel_center").innerText = `${proj_name} (${lang("cloud")})`;
+            document.getElementById("top_panel_center").innerText = `${proj_name} (облако)`;
         }
         else if(res["out"] == "bad proj"){
             console.log("bad");
@@ -151,7 +163,7 @@ function load_proj_local(){
     if(localStorage.getItem(proj_name) == null){
         save_local()
     }
-    document.getElementById("top_panel_center").innerText = `${proj_name} (${lang("local")})`;
+    document.getElementById("top_panel_center").innerText = `${proj_name} (локальное хранилище)`;
     document.getElementById("drags").innerHTML = "";
     load(JSON.parse(localStorage.getItem(proj_name)));
 }
@@ -199,7 +211,7 @@ function load_objs(callback){
         if(res["out"] == "good"){
             // console.log(res["body"]);
             res["body"].forEach(element => {
-                objs_store[`${element["name"]}`] = {description:element["description"],height:element["height"],width:element["width"],id:element["id"],name:element["name"]}
+                objs_store[`${element["name"]}`] = {description:element["description"],height:element["height"],width:element["width"],id:element["id"],name:element["name"],cost:element["cost"]}
             });
             callback(res["body"]);
         }
@@ -254,22 +266,22 @@ interact('.trash').dropzone({
     accept: '.drag',
     overlap: 0.2,
 
-    ondragenter: function (event) {
-        var drag = event.relatedTarget;
-        var zone = event.target; 
-        console.log(drag.classList);
-        if(objs[drag.classList[0]] != null&&objs[drag.classList[0]][drag.id] != null) delete objs[drag.classList[0]][drag.id];
-        zone.classList.add('drop-target');
-        drag.classList.add('can-drop');
+    ondragenter: function (event) {var drag = event.relatedTarget;var zone = event.target; 
+
+        // console.log(drag.classList);
+        if(objs[drag.classList[0]] != null&&objs[drag.classList[0]][drag.id] != null) {
+            delete objs[drag.classList[0]][drag.id];
+        }
+        calc_total()
+
+        zone.classList.add('drop-target');drag.classList.add('can-drop');
         drag.remove();
     },
     ondragleave: function (event) {var drag = event.relatedTarget;var zone = event.target;zone.classList.remove('drop-target');drag.classList.remove('in_zone');drag.classList.remove('can-drop');},
-    ondrop: function (event) {
-        var drag = event.relatedTarget;
+    ondrop: function (event) {var drag = event.relatedTarget;
         // console.log(drag.id);
         // console.log(objs);
-        drag.classList.add('in_zone')
-        drag.classList.remove('can-drop')
+        drag.classList.add('in_zone');drag.classList.remove('can-drop');
     },
     ondropdeactivate: function (event) {var zone = event.target;zone.classList.remove('drop-active');zone.classList.remove('drop-target');}
 })
@@ -278,23 +290,25 @@ interact('.dropzone').dropzone({
     accept: '.drag',
     overlap: 0.5,
 
-    ondragenter: function (event) {
-        var drag = event.relatedTarget;
-        var zone = event.target;
+    ondragenter: function (event) {var drag = event.relatedTarget;var zone = event.target;
+
+        if (objs[drag.classList[0]] == null){ 
+            objs[drag.classList[0]] = {};
+        }
         if(drag.id == "none") drag.id = get_id(drag.classList[0]);
-        zone.classList.add('drop-target');
-        drag.classList.add('can-drop');
+        if (objs[drag.classList[0]][drag.id] == null){
+            objs[drag.classList[0]][drag.id] = {};
+            calc_total()
+        }
+
+        zone.classList.add('drop-target');drag.classList.add('can-drop');
     },
     ondragleave: function (event) {var drag = event.relatedTarget;var zone = event.target;zone.classList.remove('drop-target');drag.classList.remove('in_zone');drag.classList.remove('can-drop');},
-    ondrop: function (event) {
-        var drag = event.relatedTarget
-        // console.log(drag.classList[0]);
-        if (objs[drag.classList[0]] == null) objs[drag.classList[0]] = {};
+    ondrop: function (event) {var drag = event.relatedTarget
+        
         objs[drag.classList[0]][drag.id] = {y:drag.getAttribute('data-y'),x:drag.getAttribute('data-x'),body:drag.innerHTML};
-        // console.log(objs);
-        // $.cookie("objs",JSON.stringify(objs));
-        drag.classList.add('in_zone')
-        drag.classList.remove('can-drop')
+        
+        drag.classList.add('in_zone');drag.classList.remove('can-drop');
     },
     ondropdeactivate: function (event) {var zone = event.target;zone.classList.remove('drop-active');zone.classList.remove('drop-target');}
 })
@@ -303,14 +317,11 @@ interact('.createzone').dropzone({
     accept: '.spawn',
     overlap: 0.2,
 
-    ondragenter: function (event) {
-        var drag = event.relatedTarget;
-        var zone = event.target;zone.classList.add('drop-target');
-        drag.classList.add('can-drop');
+    ondragenter: function (event) {var drag = event.relatedTarget;var zone = event.target;
+        zone.classList.add('drop-target');drag.classList.add('can-drop');
     },
-    ondragleave: function (event) {
-        var drag = event.relatedTarget;
-        var zone = event.target;
+    ondragleave: function (event) {var drag = event.relatedTarget;var zone = event.target;
+
         if(drag.classList[1] == "spawn" && drag.classList[0] == zone.classList[0]){
             get_obj(drag.classList[0],(db_data)=>{
                 // drag.transform = `translate(${drag.getAttribute("data-y")}px, ${drag.getAttribute("data-y")}px) scale(${db_data["width"] * 2} ${db_data["height"] * 2})`;
@@ -321,12 +332,15 @@ interact('.createzone').dropzone({
             let x = zone.getBoundingClientRect().left - document.getElementById("drags").getBoundingClientRect().left;
             let y = zone.getBoundingClientRect().top - document.getElementById("drags").getBoundingClientRect().top;
             create(`${zone.classList[0]} spawn drag`,x,y,`${zone.classList[0]}`,`none`);
+
             drag.classList.remove('spawn');
         }
         zone.classList.remove('drop-target');
     },
-    ondrop: function (event) {var drag = event.relatedTargetdrag.classList.remove('in_zone');drag.classList.remove('can-drop');},
-    ondropdeactivate: function (event) {var zone = event.target;zone.classList.remove('drop-active');zone.classList.remove('drop-target');}
+    ondrop: function (event) {var drag = event.relatedTarget;
+        drag.classList.remove('in_zone');drag.classList.remove('can-drop');},
+    ondropdeactivate: function (event) {var zone = event.target;
+        zone.classList.remove('drop-active');zone.classList.remove('drop-target');}
 })
 
 function drag_start() {

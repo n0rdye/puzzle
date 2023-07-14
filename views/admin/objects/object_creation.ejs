@@ -16,56 +16,64 @@
         display: flex;
     }
     #img_prev{
+        object-fit: fill;
         height: 200px;
         width: 200px;
     }
 </style>
 
-<div style="display: flex;justify-content: space-between;">
-    <h1>object</h1>
-    <h1 id="object_edit_type">creation</h1>
-</div>
-<div class="nobj">
+<form action="#" class="nobj">
     <div>
         <div class="img_preview">
-            <label for="img_file"><%= lang("img max size") %></label><br>
+            <label for="img_file">макс. размер 2мб</label><br>
             <input type="file" id="img_file" onchange="previewFile()"  accept="image/*" value="" maxlength="1"><br>
 
         </div>
         <div style="width: 200px; height: 200px;">
-            <img src="" id="img_prev" height="100" alt="<%= lang('Image preview') %>">
+            <img src="" id="img_prev" height="100" alt="предпросмотр картинки">
         </div>
     </div>
-    <textarea id="nobj_description" cols="30" rows="5" placeholder="<%= lang("object description") %>"></textarea>
+    <textarea id="nobj_description" cols="30" rows="5" placeholder="описание товара"></textarea>
     <div>
+        <div id="object_edit_type" style="text-align: right;">creation</div>
         <div class="nobj_options">
-            <input type="text" id="nobj_name" placeholder="<%= lang("object name") %>">
-            <button onclick="create_obj()" id="obj_apply_btn"><%= lang("create object")%></button>
+            <input type="text" id="nobj_name" placeholder="название товара">
+            <input type="submit" onclick="create_obj()" id="obj_apply_btn" value="создать товар">
             <div id="obj_resp"></div>
         </div>
         <div id="obj_input">
             <div>
                 <div style="display: flex;width: 100%;justify-content: space-between;">
-                    <label for="obj_height"><%= lang("height") %> </label>
+                    <label for="obj_height">высота</label>
                     <div id="obj_height_value">100см</div>
                 </div>
                 <input style="width: 100%;" type="range" step="1" min="1" max="100" id="obj_height" value="100" oninput="obj_size_change('height')"> 
             </div>
             <div>
                 <div style="display: flex;width: 100%;justify-content: space-between;">
-                    <label for="obj_width"><%= lang("width") %></label>
+                    <label for="obj_width">ширина</label>
                     <div id="obj_width_value">100см</div>
                 </div>
                 <input style="width: 100%;" type="range" step="1" min="1" max="100" id="obj_width" value="100" oninput="obj_size_change('width')"> 
             </div>
         </div>
         <div>
-            <button onclick="set_obj_edit_params()">clear parameters</button>
+            <div style="display: flex;width: 100%;justify-content: space-between;">
+                <label for="obj_width">цена</label>
+                <div style="display: flex;">
+                    <input style="text-align: right;" id="obj_cost" type="text">
+                    <div>руб.</div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button onclick="set_obj_edit_params()" style="width: 100%;margin-block:10px;">очистить параметры</button>
         </div>
     </div>
-</div>
+</form>
 
 <script>
+    set_obj_edit_params();
     function obj_size_change(type){
         if(type == "height"){
             let img = document.getElementById('img_prev');
@@ -83,15 +91,17 @@
         }
     }
 
-    function set_obj_edit_params(img = "",name = "",description="",height = 100,width = 100){
+    function set_obj_edit_params(img = "",name = "",description="",height = 100,width = 100,cost = 0,gid = 0){
         if(img ==""&&name ==""&&description == ""){
-            document.getElementById("object_edit_type").innerText = "creation";
-            document.getElementById("obj_apply_btn").innerText = "create object";
+            document.getElementById("object_edit_type").innerText = "добавление";
+            document.getElementById("obj_apply_btn").value = "добавить товар";
             document.getElementById("obj_apply_btn").setAttribute("onclick","create_obj()");
         }else {
-            document.getElementById("object_edit_type").innerText = "edit";
-            document.getElementById("obj_apply_btn").innerText = "save edited object";
+            document.getElementById("object_edit_type").innerText = "редактирование";
+            document.getElementById("obj_apply_btn").value = "сохранить";
             document.getElementById("obj_apply_btn").setAttribute("onclick","save_edited_obj()");
+            document.getElementById("group_select").selectedIndex = document.getElementById("group_select").options[`obj_group_${gid}`].index;
+            console.log(gid);
         }
 
         let img_file = document.getElementById("img_file");
@@ -103,6 +113,7 @@
         let height_text = document.getElementById("obj_height_value");
         let width_slider = document.getElementById("obj_width");
         let width_text = document.getElementById("obj_width_value");
+        let cost_text = document.getElementById("obj_cost");
 
         name_div.value = name;
         img_file.value = null;
@@ -110,6 +121,7 @@
         img_prev.style.height = `${height*2}px`;
         img_prev.style.width = `${width*2}px`;
         description_div.value = description;
+        cost_text.value = cost;
 
         height_slider.value = height;
         width_slider.value = width;
@@ -133,15 +145,17 @@
         }
     }
 
-    function new_obj(name,img,height,width,description,callback){
+    function new_obj(cost,name,img,height,width,description,callback){
         let select = document.getElementById("group_select");
-        $.post( "/admin/obj/new", { name:name,img:img,desc:description,height:height,width:width,gid:select.options[select.selectedIndex].getAttribute("gid")})
-        .done(function( res ) {
-            // if(res["out"] == "good"){
-            //     console.log(res["body"]);
-            // }
-            callback(res);
-        });
+        if(name!=""){
+            $.post( "/admin/objects/new", { cost:cost,name,img:img,desc:description,height:height,width:width,gid:select.options[select.selectedIndex].getAttribute("gid")})
+            .done(function( res ) {
+                // if(res["out"] == "good"){
+                //     console.log(res["body"]);
+                // }
+                callback(res);
+            });
+        }
     }
 
     function create_obj(){
@@ -150,26 +164,29 @@
         let height = document.getElementById("obj_height").value;
         let width = document.getElementById("obj_width").value;
         var img = document.querySelector('#img_prev').src;
+        var cost =  document.getElementById("obj_cost").value;
         name = name.replace(" ","$");
-        if (img != "http://n0rsrv2:3002/admin"){
-            document.getElementById("obj_resp").innerHTML = "creating object";
-            new_obj(name,img,height,width,description,(res)=>{
-                if(res["out"] == "bad" && res["err"] == "name"){
-                    document.getElementById("obj_resp").innerHTML = "object already exist";
-                }
-                else if(res["out"] == "good"){
-                    document.getElementById("obj_resp").innerHTML = "object created";
-                    setTimeout(()=>{
-                        edit_get_objs();
-                    },1000)
-                    setTimeout(()=>{
-                        document.getElementById("obj_resp").innerHTML = "";
-                    },3000)
-                }
-            });
-        }
-        else{
-            document.getElementById("obj_resp").innerHTML = "image not selected";
+        if(name != ""){
+            if (img != "http://n0rsrv2:3002/admin"){
+                document.getElementById("obj_resp").innerHTML = "добавление товара";
+                new_obj(cost,name,img,height,width,description,(res)=>{
+                    if(res["out"] == "bad" && res["err"] == "name"){
+                        document.getElementById("obj_resp").innerHTML = "товар уже существует";
+                    }
+                    else if(res["out"] == "good"){
+                        document.getElementById("obj_resp").innerHTML = "товар добавлен";
+                        setTimeout(()=>{
+                            edit_get_objs();
+                        },1000)
+                        setTimeout(()=>{
+                            document.getElementById("obj_resp").innerHTML = "";
+                        },3000)
+                    }
+                });
+            }
+            else{
+                document.getElementById("obj_resp").innerHTML = "картинка не выбрана";
+            }
         }
     }
 </script>

@@ -45,11 +45,6 @@
         z-index: 100;
     }
 </style>
-<script>
-    "<%- include('./static/language.ejs') %>"
-    let language = JSON.parse('<%= lang_json() %>'.replaceAll("&#34;",'"'));
-    lang = (text)=>{return language["<%= cur_lang %>"][text]}
-</script>
 
 <header id="top_panel">
     <!-- <div id="user_name"></div> -->
@@ -70,15 +65,18 @@
         let right = document.getElementById("top_panel_right"); 
         let left = document.getElementById("top_panel_left"); 
         
-        if(document.title != "main") menu.innerHTML += `<button onclick="goto('/');"><%= lang("main page") %></button> <br>`;
+        if(document.title != "main") menu.innerHTML += `<button onclick="goto('/');">проекты</button> <br>`;
         right.innerHTML += `<div id="user_name" class="menu_btn">${res["login"]}</div>`;
         
         if (res["admin"] == true){
-            menu.innerHTML += `<button onclick='goto("/admin")'><%= lang("admin panel") %></button><br>`;
+            menu.innerHTML += `<button onclick='goto("/admin")'>админ. панель</button><br>`;
         }
-        menu.innerHTML += "<button onclick='logout();'><%= lang('logout') %></button><br>";
+        menu.innerHTML += "<button onclick='logout();'>выйти</button><br>";
     });
 
+    onscroll = (e)=>{
+        hide_menus();
+    }
     onclick = (e) => {
         // e.preventDefault()
         //   console.log(e);
@@ -96,7 +94,7 @@
             hide_menus();
             let menu = document.getElementById("user_menu");
             menu.style.display = 'block';
-            menu.style = `top:${e.target.getBoundingClientRect().top+30}px;left:${e.target.getBoundingClientRect().left}px`;
+            menu.style = `top:${e.target.getBoundingClientRect().top + 25}px;left:${e.target.getBoundingClientRect().left - 20}px`;
             // menu.onmouseleave = () => menu.style.display = 'none';
             // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
             // document.body.appendChild(menu)
@@ -104,7 +102,7 @@
             hide_menus();
             let menu = document.getElementById("project_menu");
             menu.style.display = 'block';
-            menu.style = `top:${e.target.getBoundingClientRect().top+30}px;left:${e.target.getBoundingClientRect().left}px`;
+            menu.style = `top:${e.target.getBoundingClientRect().top + 25}px;left:${e.target.getBoundingClientRect().left - 20}px`;
                 // menu.onmouseleave = () => menu.style.display = 'none';
                 // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
                 // document.body.appendChild(menu)
@@ -117,10 +115,10 @@
             menu.setAttribute("login_pass",document.getElementById(`pass_${e.target.classList[0]}`).innerText);
             menu.setAttribute("login_admin",document.getElementById(`admin_${e.target.classList[0]}`).innerText);
             menu.style.display = 'block';
-            menu.style = `top:${e.target.getBoundingClientRect().top+30}px;left:${e.target.getBoundingClientRect().left-40}px`;
+            menu.style = `top:${e.target.getBoundingClientRect().top + 25}px;left:${e.target.getBoundingClientRect().left - 20}px`;
             // menu.onmouseleave = () => menu.style.display = 'none';
             // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
-            // document.body.appendChild(menu)
+            // document.body.appendChild(menu)s
         
         }
         else if(e.target.id == "object_menu"){
@@ -133,8 +131,11 @@
             menu.setAttribute("obj_height",obj.getAttribute("height"));
             menu.setAttribute("obj_width",obj.getAttribute("width"));
             menu.setAttribute("obj_id",obj.getAttribute("obj_id"));
+            menu.setAttribute("obj_cost",obj.getAttribute("cost"))
+            menu.setAttribute("obj_gid",obj.getAttribute("gid"))
             menu.style.display = 'block';
-            menu.style = `top:${e.target.getBoundingClientRect().top+30}px;left:${e.target.getBoundingClientRect().left-40}px`;
+            // menu.style = `top:${e.target.getBoundingClientRect().top+27}px;left:${e.target.getBoundingClientRect().left-13}px`;
+            menu.style = `top:${e.target.getBoundingClientRect().top + 40}px;left:${e.target.getBoundingClientRect().left - 5}px`;
             // menu.onmouseleave = () => menu.style.display = 'none';
             // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
             // document.body.appendChild(menu)
