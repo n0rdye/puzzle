@@ -115,6 +115,7 @@
     <button id='proj_cload_btn' onclick='load_proj_cloud()'>загрузить из облака</button> <br>
     <button id='proj_lsave_btn' onclick='save_proj_local()'>сохранить на локальное хранилище</button> <br>
     <button id='proj_lload_btn' onclick='load_proj_local()'>загрузить из локальное хранилище</button> <br>
+    <button id='proj_del_btn' onclick='del_proj()'>удалить проект</button> <br>
 </div>
 
     
@@ -174,8 +175,19 @@
         })
     }
 
+    function del_proj(){
+        let del = confirm(`удалить проект ${proj_name}?`);
+        if(del == true){
+            $.post( "/proj/delete",{name:proj_name})
+            .done(function( res ) {
+                if(res["out"] == "good"){
+                    goto("/main")
+                }
+            })
+        }
+    }
+
     let proj_name = "<%= proj_name %>";
-    if($.cookie("cache") ==null)$.cookie("cache","true",{path:"/;SameSite=Strict"});
     // console.log(proj_name);
     let menu = document.getElementById("project_menu");
     document.getElementById("top_panel_left").innerHTML = `<div id='proj_menu' class="menu_btn">настройки проекта</div>`;

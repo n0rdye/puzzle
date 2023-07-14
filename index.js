@@ -131,6 +131,17 @@ app.post("/load_proj", (req,res) => {
         func.log("router project loading error - "+error);
     }
 })
+app.post("/proj/delete", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            proj.del(inp,cook,res);
+        })
+    } catch (error) {
+        func.log("router project loading error - "+error);
+    }
+})
 app.post("/get_projs", (req,res) => {
     try{
         let inp = req.body;

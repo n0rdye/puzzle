@@ -39,6 +39,22 @@ module.exports.loads = (inp,cook,res)=>{
     }
 }
 
+module.exports.del = (inp,cook,res)=>{
+    try {
+        db.ggv("users","`id`","uuid",`'${cook["uuid"]}'`,(udata)=>{ udata = udata[0];
+            db.gv("projects","name",`'${inp["name"]}'`,(pdata)=>{pdata=pdata[0]
+                // res.send({out:"good",body:pdata});
+                db.dl("projects","id",pdata["id"],()=>{
+                    res.send({out:"good"});
+                    func.log(`good boy ${udata["uuid"]} deleted project ${inp["name"]} from ${cook["sid"]}`);
+                })
+            })
+        })
+    } catch (error) {
+        func.log("backend projects delete err0r - " - error);
+    }
+}
+
 module.exports.save = (inp,cook,res)=>{
     try {
         db.gv("users","uuid",`'${cook["uuid"]}'`, (udata)=>{ udata = udata[0]
