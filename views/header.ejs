@@ -1,3 +1,4 @@
+<%- include('./load.ejs') %>
 <style>
     #proj_top_panel{
         display: flex;
@@ -7,27 +8,42 @@
         text-align: center;
         margin: auto;
     }
-    #top_panel_right{
-        /* float: right; */
-        justify-content: space-between;
-        display: flex;
-        cursor: pointer;
-        /* width: 20vw; */
-    }
     #top_panel_left{
         /* float: left; */
         justify-content: space-between;
+        /* width: 200px; */
         cursor: pointer;
+        width: 5vw;
+        display: flex;
+        /* width: 20vw; */
+    }
+    #top_panel_center{
+        /* float: left; */
+        justify-content: space-between;
+        cursor: pointer;
+        width: 58vw;
         display: flex;
         /* width: 20vw; */
     }
     #top_panel{
-        height: 20px;
+        height: 100px;
+        display: flex;
+        margin-bottom: 2vh;
+        margin-top: 1vh;
     }
     /* button{
         /* margin-inline: 5px; */
     /* } */
-
+    .tpanel{
+        margin: auto 0px;
+        /* width: 100%; */
+        height: 100%;
+    }
+    .tpanel button{
+        border: 0px;
+        background-color: transparent;
+        cursor: pointer;
+    }
 
     .menu_btn{
         background: ghostwhite;
@@ -44,35 +60,92 @@
         border: 1px black solid;
         z-index: 100;
     }
+    #top_panel_right_main{
+        /* float: right; */
+        justify-content:space-between;
+        float: right;
+        display: flex;
+        cursor: pointer;
+        width: 14vw;
+        /* width: 20vw; */
+        /* height: 60px; */
+    }
+    #top_panel_right_sec{
+        /* float: right; */
+        justify-content:space-between;
+        float: left;
+        display: flex;
+        cursor: pointer;
+        width: 14vw;
+        transform: translateY(100%);
+        /* width: 20vw; */
+        /* height: 60px; */
+    }
+    .top_panel_right img{
+        width: 3vw;
+        height: 3vh;
+    }
+    @media (max-width: 900px) {
+        #top_panel_right_main{
+            display: none;
+        }
+        #top_panel_right_sec{
+            display: flex;
+        }
+        #top_panel_center{
+            width: 70vw;
+        }
+    }
+    @media (min-width: 900px) {
+        #top_panel_right_main{
+            display: flex;
+        }
+        #top_panel_right_sec{
+            display: none;
+        }
+    }
 </style>
 
 <header id="top_panel">
     <!-- <div id="user_name"></div> -->
     <div id="proj_top_panel">
-        <div id="top_panel_left"></div>
-        <div id="top_panel_center"></div>
-        <div id="top_panel_right"></div>
+        <div id="top_panel_left" class="tpanel"></div>
+        <div id="top_panel_center" class="tpanel">
+            <button onclick="goto('/main')">Мои проекты</button>
+            <button onclick="goto('/tamp')">Шаблоны</button>
+            <button onclick="goto('/gallery')">Галерея</button>
+            <button onclick="goto('/faq')">FAQ</button>
+            <button onclick="goto('/help')">Связаться с поддержкой</button>
+
+        </div>
+        <div id="top_panel_right_main" class="tpanel top_panel_right">
+            <a href=""><img src="/img/vk.svg" alt=""></a>
+            <a href=""><img src="/img/youtube.svg" alt=""></a>
+            <a href=""><img src="/img/ok.svg" alt=""></a>
+            <a href=""><img src="/img/telegram.svg" alt=""></a>
+        </div>
     </div>        <!-- <div><button onclick="logout();">logout</button></div> -->
 </header>
 <div id="user_menu" class="cmenu"></div>
 
 
+
 <script>
-    get_from_uuid((res)=>{
-        let uname = document.getElementById("user_name"); 
-        let menu = document.getElementById("user_menu"); 
-        let header = document.getElementById("top_panel"); 
-        let right = document.getElementById("top_panel_right"); 
-        let left = document.getElementById("top_panel_left"); 
+    // get_from_uuid((res)=>{
+    //     let uname = document.getElementById("user_name"); 
+    //     let menu = document.getElementById("user_menu"); 
+    //     let header = document.getElementById("top_panel"); 
+    //     let right = document.getElementById("top_panel_right"); 
+    //     let left = document.getElementById("top_panel_left"); 
         
-        if(document.title != "main") menu.innerHTML += `<button onclick="goto('/');">проекты</button> <br>`;
-        right.innerHTML += `<div id="user_name" class="menu_btn">${res["login"]}</div>`;
+    //     if(document.title != "main") menu.innerHTML += `<button onclick="goto('/');">проекты</button> <br>`;
+    //     right.innerHTML += `<div id="user_name" class="menu_btn">${res["login"]}</div>`;
         
-        if (res["admin"] == true){
-            menu.innerHTML += `<button onclick='goto("/admin")'>админ. панель</button><br>`;
-        }
-        menu.innerHTML += "<button onclick='logout();'>выйти</button><br>";
-    });
+    //     if (res["admin"] == true){
+    //         menu.innerHTML += `<button onclick='goto("/admin")'>админ. панель</button><br>`;
+    //     }
+    //     menu.innerHTML += "<button onclick='logout();'>выйти</button><br>";
+    // });
 
     onscroll = (e)=>{
         hide_menus();
@@ -139,6 +212,18 @@
             // menu.onmouseleave = () => menu.style.display = 'none';
             // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
             // document.body.appendChild(menu)
+        
+        }
+        else if(e.target.id == "group_drop"){
+            // hide_menus();
+            // let menu = document.getElementById("object_edit_menu");
+            // let obj = e.target;
+            // menu.style.display = 'block';
+            // // menu.style = `top:${e.target.getBoundingClientRect().top+27}px;left:${e.target.getBoundingClientRect().left-13}px`;
+            // menu.style = `top:${e.target.getBoundingClientRect().top + 40}px;left:${e.target.getBoundingClientRect().left - 5}px`;
+            // // menu.onmouseleave = () => menu.style.display = 'none';
+            // // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
+            // // document.body.appendChild(menu)
         
         }
         else{

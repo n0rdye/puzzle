@@ -1,0 +1,224 @@
+<%- include('./static/start.ejs',{name:proj_name,async:true}) %>
+<%- include('./header.ejs') %>
+<script src="/lib/interact.js"></script>
+<script src="/lib/html2canvas.js"></script>
+<style>
+    .drag{
+        height: 50px;
+        width: 50px;
+        position: absolute;
+        text-align: center;
+        margin: auto;
+        z-index: 10;
+    }
+
+    #drags{
+        position: absolute;
+        margin: auto;
+    }
+    #drags img{
+        object-fit: contain;
+    }
+
+    .zones{
+        margin-block: 10px;
+    }
+
+    .wall {
+        /* border: dashed 4px transparent; */
+        border-radius: 4px;
+        transition: background-color 0.3s;
+        position: absolute;
+        inset: 0px;
+        margin: 5px auto;
+        width: 400px;
+        height: 200px;
+        background-color: #fff;
+        background-image: url("/img/bg1red.png");
+        background-size: 200px;
+        background-repeat: repeat;
+        background-position: bottom 0px left 0px;
+        border: 2px solid black;
+        /* overflow: visible; */
+        z-index: 2;
+    }
+
+    .createzone {
+        background-color: #bfe4ff;
+        border: dashed 4px transparent;
+        border-radius: 4px;
+        height: 22px;
+        width: 22px;
+        margin: 10px;
+        margin-top: 0px;
+        padding: 10px;
+        transition: background-color 0.3s;
+    }
+
+    .trash {
+        background-color: #bfe4ff;
+        border: dashed 4px transparent;
+        border-radius: 4px;
+        /* margin: 10px auto 30px; */
+        /* padding: 10px; */
+        height: 50px;
+        width: 50px;
+        transition: background-color 0.3s;
+        text-align: center;
+        /* z-index: -1; */
+    }
+    .czones{
+        display: flex;
+        margin: 0px auto;
+        /* justify-content: space-around; */
+        flex-wrap: wrap;
+        width: 75%;
+        /* height: 100px; */
+        /* overflow-x: auto; */
+    }
+
+    .drop-active {
+        border-color: #aaa;
+    }
+
+    /* .drop-target {
+        background-color: #29e;
+        border-color: #fff;
+        border-style: solid;
+    } */
+
+    #proj_top{
+        margin: auto;
+        width: 90%;
+        display: flex;
+        justify-content: space-around;
+    }
+    #proj_name{
+        background-color: #aaa;
+        border: 0px;
+        text-align: center;
+    }
+
+    .inputs{
+        display: flex;
+        width: 80vw;
+        margin: auto;
+        padding-block: 20px;
+        padding-bottom: 0px;
+        margin-top: 50px;
+    }
+</style>
+
+
+<div id="project_menu" class="cmenu">
+    <button id='proj_csave_btn' onclick='save_proj()'>сохранить в облако</button> <br>
+    <button id='proj_cload_btn' onclick='load_proj_cloud()'>загрузить из облака</button> <br>
+    <button id='proj_lsave_btn' onclick='save_proj_local()'>сохранить на локальное хранилище</button> <br>
+    <button id='proj_lload_btn' onclick='load_proj_local()'>загрузить из локальное хранилище</button> <br>
+    <button id='proj_del_btn' onclick='del_proj()'>удалить проект</button> <br>
+</div>
+
+    
+    <!-- <div class="dropzone"></div> -->
+
+<div class="inputs">
+    <div id="wall_input">
+        <div id="obj_group">
+            <div style="display: flex;justify-content: space-between;">
+                <div style="width: 50px;">группа товаров</div>
+                <select name="" id="group_select" onchange="get_objs()"></select>
+            </div>
+        </div><br>
+        <div>
+            <div style="display: flex;width: 150px;justify-content: space-between;">
+                <label for="wall_height">высота </label>
+                <div id="wall_height_value">0</div>
+            </div>
+            <input type="range" step="0.1" min="0" max="5" id="wall_height" value="2" oninput="wall_size_change('height')" onchange="resize_drags()"> 
+        </div>
+        <div>
+            <div style="display: flex;width: 150px;justify-content: space-between;">
+                <label for="wall_width">ширина</label>
+                <div id="wall_width_value">0</div>
+            </div>
+            <input type="range" step="0.1" min="0" max="7" id="wall_width" value="4" oninput="wall_size_change('width')" onchange="resize_drags()"> 
+        </div>
+    </div>
+    <div class="czones"></div>
+    <img class="trash" style="height: 100px; width: 100px;" src="/img/shadow-energy.gif" alt="чёрная дыра">
+</div>
+
+<div class="zones" style="position: relative;">
+    <div id="drags"></div>
+<div class="wall dropzone" id="wall"></div>
+</div>
+
+<div style="display:flex; justify-content: space-around;">цена проекта: <div style="display: flex;"><div id="proj_cost"></div>&nbsp;руб.</div></div>
+
+<script src="/lib/inter.js"></script>
+<script>
+    load_groups(()=>{
+        get_objs();
+        load_proj_cloud();
+    });
+    function get_objs(){
+        document.getElementsByClassName("czones")[0].innerHTML = "";
+        load_objs((data)=>{
+            data.forEach(value => {
+                let czones = document.getElementsByClassName("czones")[0];
+                let czone =  document.createElement('div');
+                czone.classList.add(value["name"]);
+                czone.classList.add("createzone");
+                czones.append(czone)    
+            });
+            drag_start()
+        })
+    }
+
+    function del_proj(){
+        let del = confirm(`удалить проект ${proj_name}?`);
+        if(del == true){
+            $.post( "/proj/delete",{name:proj_name})
+            .done(function( res ) {
+                if(res["out"] == "good"){
+                    goto("/main")
+                }
+            })
+        }
+    }
+
+    let proj_name = "<%= proj_name %>";
+    // console.log(proj_name);
+    // let menu = document.getElementById("project_menu");
+    // document.getElementById("top_panel_left").innerHTML = `<div id='proj_menu' class="menu_btn">настройки проекта</div>`;
+    
+
+    function save_proj(type){
+        // document.getElementById('top_panel_center').innerHTML=`сохранение ${proj_name}`;
+        save((res)=>{
+            // document.getElementById('top_panel_center').innerHTML=`сохранено ${proj_name} в облако`;
+            setTimeout((res)=>{
+                // document.getElementById("top_panel_center").innerText = `${proj_name} (облако)`;
+
+            },3000)
+        })
+    }
+
+    function save_proj_local(type){
+        // document.getElementById('top_panel_center').innerHTML=`сохранение ${proj_name}`;
+        save_local();
+        // document.getElementById('top_panel_center').innerHTML=`сохранено ${proj_name} в локальное хранилище`;
+        setTimeout((res)=>{
+            // document.getElementById("top_panel_center").innerText = `${proj_name} (локальное хранилище)`;
+        },3000)
+    }
+    
+    // drag_start();
+    // console.log(px_ratio);
+    $(window).resize(function(){isZooming();});
+
+    function isZooming(){
+        resize_drags();
+    }
+</script>
+<%- include('./static/end.ejs') %>

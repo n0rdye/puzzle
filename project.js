@@ -1,5 +1,6 @@
 const db = require('./db');
 const func = require('./func');
+const moment = require("moment");
 const vars = require('./vars');
 
 module.exports.load = (inp,cook,res)=>{
@@ -70,8 +71,10 @@ module.exports.save = (inp,cook,res)=>{
                 if(projin == null){
                     // func.log("proj not in");
                     // func.log(pname,udata["id"],proj);
+                    var date = moment().format('YYYY-MM-DD');
+                    var time = moment().format('hh:mm:ss');
                     func.log(`good boy ${udata["uuid"]} created project ${inp["name"]} from ${cook["sid"]}`);
-                    db.nr("projects","`uid`,`name`,`body`,`img`",`'${udata["id"]}','${inp["name"]}','${inp["proj"]}','${inp["img"]}'`);
+                    db.nr("projects","`uid`,`name`,`body`,`img`,creation_date",`'${udata["id"]}','${inp["name"]}','${inp["proj"]}','${inp["img"]}','${date+"T"+time}'`);
                     res.send({out:"good"});
                 } else if (projin != null){
                     db.sv("projects","body",inp["proj"],"id",projin["id"],()=>{});

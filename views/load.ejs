@@ -1,0 +1,67 @@
+<style>
+    #load_div{
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        position: absolute;
+        z-index: 10000;
+        background-color: white;
+        pointer-events: none;
+        transition: background-color 1s;
+    }
+    #load_logo{
+        width: 12vw;
+        /* height: 12vh; */
+        /* margin: auto; */  
+        position:absolute;
+        top:30.5%;
+        left:50%;
+        -ms-transform: translateX(-50%) translateY(-50%);
+        -webkit-transform: translate(-50%,-50%);
+        transform: translate(-50%,-50%);
+        pointer-events: none;
+        transition-duration: 800ms;
+    }
+</style>
+
+<div id="load_div">
+    <img id="load_logo" src="/img/Умничка лого с обводкой-02 1.png" alt="">
+</div>
+
+<script>
+    let loaded_pos={
+        x:"10%",
+        // y:"6%",
+        // x: "55px",
+        y: "45px",
+        w:"8vw",
+        h:"8vh"
+    }
+    let loading_pos={
+        x:"50%",
+        y:"30.5%",
+        w:"12vw",
+        h:"12vh"
+    }
+    // document.getElementById("load_logo").style.transform = `translate(${center.x}px,${center.y}px)`
+    function loaded(){
+        let logo = document.getElementById("load_logo");
+        let load_div = document.getElementById("load_div");
+        load_div.style.backgroundColor = "transparent";
+        // load_div.style.transition = "background-color 1s"
+        // logo.style.transform = `translate(0px,0px)`;
+        logo.style.left = loaded_pos.x;
+        logo.style.top = loaded_pos.y;
+        logo.style.width = loaded_pos.w
+    }
+    function loading(){
+        let logo = document.getElementById("load_logo");
+        let load_div = document.getElementById("load_div");
+        load_div.style.backgroundColor = "white";
+        // load_div.style.transition = "background-color 1s"
+        // logo.style.transform = `translate(-50%,-50%)`;
+        logo.style.left = loading_pos.x;
+        logo.style.top = loading_pos.y;
+        logo.style.width = loading_pos.w
+    }
+</script>

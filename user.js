@@ -61,7 +61,7 @@ module.exports.clear_sid = (inp,cook,res)=>{
         if(inp["sid"] != null){
             // res.send({out:"good"});
             db.dl("sids","sid",`'${inp["sid"]}'`,() =>{
-                func.log("good boy "+inp["uuid"] + " logged out from "+inp["sid"]);
+                // func.log("good boy "+inp["uuid"] + " logged out from "+inp["sid"]);
             });
             // db.ggv("sids","id","sid",`'${cook["sid"]}'`,(sids)=>{
             //     Object.entries(sids).forEach(([key,value])=>{

@@ -1,3 +1,11 @@
+<% if (typeof soc !== 'undefined') {%>
+    <div id="top_panel_right_sec" class="tpanel top_panel_right">
+        <a href=""><img src="/img/vk.svg" alt=""></a>
+        <a href=""><img src="/img/youtube.svg" alt=""></a>
+        <a href=""><img src="/img/ok.svg" alt=""></a>
+        <a href=""><img src="/img/telegram.svg" alt=""></a>
+    </div>
+<%}%>
 </body>
 </html>
 <script>
@@ -15,6 +23,7 @@
     //     e.preventDefault(); //This could also be return false as I'm using jQuery.
     // })
     $(window).focus(function(){
+        console.log(document.title);
         if(document.title == "login"){
             // console.log(document.title);
             log_by_sid();
@@ -23,4 +32,5 @@
             // console.log("check");
         }    
     });
+    
 </script>

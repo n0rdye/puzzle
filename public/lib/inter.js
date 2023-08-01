@@ -65,25 +65,25 @@ function resize_drags(){
     drag_start();
 }
 
-function wall_size_change(type,value){
+function wall_size_change(type,value = null){
     let wall = document.getElementsByClassName("wall")[0];
     let scroll;
     if(type != null && type == "width") {
-        if (value == null) scroll = document.getElementById("wall_width").value;
-        else scroll = value;
+        if (value == null) scroll = parseFloat(document.getElementById("wall_width").value);
+        else if (value != null) scroll = value;
         // document.getElementById("wall_width_value").innerHTML = (Math.ceil((parseFloat(scroll)+0.1)*10)/ 10);
-        document.getElementById("wall_width_value").innerHTML = `${scroll}м`;
+        // document.getElementById("wall_width_value").innerHTML = `${scroll}м`;
 
         // console.log(scroll);
         wall.style.width = `${scroll * 200}px`;
         objs["width"] = scroll;
     }
     if(type != null && type == "height") {
-        if (value == null) scroll = document.getElementById("wall_height").value;
-        else scroll = value;        
+        if (value == null) scroll = parseFloat(document.getElementById("wall_height").value);
+        else if (value != null) scroll = value;
         // document.getElementById("wall_height_value").innerHTML = (Math.ceil((parseFloat(scroll)+0.1)*10)/ 10);
-        document.getElementById("wall_height_value").innerHTML = `${scroll}м`;
-        
+        // document.getElementById("wall_height_value").innerHTML = `${scroll}м`;
+
         // console.log(scroll);
         wall.style.height = `${scroll * 200}px`;
         objs["height"] = scroll;
@@ -129,6 +129,10 @@ function load(objss){
             wall_size_change(keys,values);
             // document.getElementById("drags").style.left = $(".dropzone")[0].getBoundingClientRect().x;
         }
+
+        if (keys == Object.keys(objs).at(-1)){
+            loaded();
+        }
     });
     resize_drags();
     calc_total()
@@ -137,7 +141,7 @@ function load(objss){
 function load_proj_cloud(){
     proj_from = "cloud";
     document.getElementById("drags").innerHTML = "";
-    document.getElementById("top_panel_center").innerText = `загрузка ${proj_name} из облака`;
+    // document.getElementById("top_panel_center").innerText = `загрузка ${proj_name} из облака`;
     $.post( "/load_proj",{name:proj_name})
     .done(function( res ) {
         if(res["out"] == "good"){
@@ -146,7 +150,7 @@ function load_proj_cloud(){
             // console.log(JSON.parse(res["body"]));
             // $.cookie("objs",res["body"]);
             load(JSON.parse(res["body"]));
-            document.getElementById("top_panel_center").innerText = `${proj_name} (облако)`;
+            // document.getElementById("top_panel_center").innerText = `${proj_name} (облако)`;
         }
         else if(res["out"] == "bad proj"){
             console.log("bad");
@@ -163,7 +167,7 @@ function load_proj_local(){
     if(localStorage.getItem(proj_name) == null){
         save_local()
     }
-    document.getElementById("top_panel_center").innerText = `${proj_name} (локальное хранилище)`;
+    // document.getElementById("top_panel_center").innerText = `${proj_name} (локальное хранилище)`;
     document.getElementById("drags").innerHTML = "";
     load(JSON.parse(localStorage.getItem(proj_name)));
 }
@@ -204,9 +208,10 @@ function save(callback,with_pic = true){
     }
 }
 
-function load_objs(callback){
-    let select = document.getElementById("group_select");
-    $.post( "/get_objs",{gid:select.options[select.selectedIndex].getAttribute("gid")})
+function load_objs(callback,group){
+    // let select = document.getElementById("group_select");
+    console.log(group);
+    $.post( "/get_objs",{gid:group})
     .done(function( res ) {
         if(res["out"] == "good"){
             // console.log(res["body"]);
@@ -237,12 +242,6 @@ function load_obj(name,key,callback){
             callback(res["body"]);
         }
     });
-}
-
-function set_pos(obj,x,y){
-    obj.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-    obj.setAttribute('data-x', x)
-    obj.setAttribute('data-y', y)
 }
 
 function dragMoveListener (event) {

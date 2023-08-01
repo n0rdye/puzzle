@@ -201,6 +201,9 @@ app.get("/admin", (req,res) =>{
         func.log("router admin page error - "+error);
     }
 });
+app.get("/home", (req,res) =>{
+    res.render('home');
+});
 // app.get("/admin/edit/:edit" , (req,res) =>{
 //     try {
 //         let inp = req.body;

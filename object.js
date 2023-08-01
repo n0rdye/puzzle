@@ -4,7 +4,10 @@ const vars = require('./vars');
 
 module.exports.loads = (inp,cook,res)=>{
     try {
-        db.ggv("objects","`name`,`id`,`height`,`width`,`description`,`cost`,`gid`","gid",`${inp["gid"]}`,(odata)=>{
+        let gin
+        if (typeof inp["gid"] == 'undefined' || inp["gid"] == null) gin = "1 OR 1=1"
+        else gin = inp["gid"]
+        db.ggv("objects","`name`,`id`,`height`,`width`,`description`,`cost`,`gid`","gid",`${gin}`,(odata)=>{
             // func.log(odata);
             res.send({out:"good",body:odata});
         })

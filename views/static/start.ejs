@@ -23,13 +23,35 @@
         }
     </script>
     <style>
+        :root{
+            --login-inp-w:30vw;
+            --login-inp-h: 7.8vh;
+            --main-font-size: 1.5vw;
+        }
         .main{
-            width: 80vw;
+            width: 90vw;
             margin: auto;
             padding-block: 20px;
         }
         html{
             background-color:aliceblue;
+            padding: 0px;
+            margin: 0px;
+        }
+        body{
+            padding: 0px;
+            margin: 0px;
+        }
+        *{
+            font: "Circe Rounded";
+            font-size: var(--main-font-size);
+            font-weight:100;
+            color: #3C3C3C;
+        }
+        @media (max-width: 900px) {
+            :root{
+                --main-font-size: 12px;
+            }
         }
     </style>
 </head>

@@ -1,56 +1,47 @@
 <%- include('./static/start.ejs',{name:'main',async: true}) %>
 <%- include('./header.ejs') %>
 <style>
-    .drag{
-        height: 50px;
-        width: 50px;
-        position: absolute;
-        text-align: center;
+    .p_img{
+        /* pointer-events: none; */
+        height: 200px;
+        border-radius: 10px;
+        width: 290px;
+        box-shadow: 0px 4px 4px 0px #00000040;
     }
-
-    .dropzone {
-        background-color: #bfe4ff;
-        border: dashed 4px transparent;
-        border-radius: 4px;
-        height: 140px;
-        margin: 10px auto 30px;
-        padding: 10px;
-        width: 80%;
-        transition: background-color 0.3s;
+    .proj, .new_proj{
+        border: 0px;
+        background-color: transparent;
     }
-
-    .trash {
-        background-color: #bfe4ff;
-        border: dashed 4px transparent;
-        border-radius: 4px;
-        margin: 10px auto 30px;
-        padding: 10px;
-        height: 50px;
-        width: 50px;
-        transition: background-color 0.3s;
-        z-index: -1;
+    .p_left{
+        display: block;
     }
-
-    .drop-active {
-        border-color: #aaa;
+    .p_left div{
+        font-size: calc(var(--main-font-size)/2);
     }
-
-    .drop-target {
-        background-color: #29e;
-        border-color: #fff;
-        border-style: solid;
+    .p_right{
+        display: flex;
+        margin-top:15px;
+        justify-content: space-between;
+        width: 130px;
     }
-    img{
-        pointer-events: none;
+    .p_props{
+        display: flex;
+        justify-content: space-between;
+    }
+    .main h1{
+        /* font-size: --main-font-size; */
+        font-weight: 100;
+        margin: 0px;
+        padding: 0px;
+        margin-top: 10px;
     }
 </style>
-
-
 <!-- <script src="/lib/interact.min.js"></script> -->
 
 <section class="main">
-    <button onclick="new_proj()">создать новый проект</button>
-    <div id="projs_div"></div>
+    <div id="projs_div">
+        <button onclick="new_proj()" class="new_proj"><img class="p_img" src="img/new_proj.png" alt=""><h1>Новый проект</h1></button>
+    </div>
 </section>
 
 <!-- <script src="/lib/inter.js"></script> -->
@@ -67,16 +58,58 @@
     }
     function new_proj(){
         let name = ask("please enter project name");
+        let objs = { height:"2",width:"4"};
         if(name != null && name!= "" && name!=" " && typeof name != "undefined" && name!="undefined"){
-            goto(`/proj/${name}`);
+            $.post( "/save_proj", {proj:JSON.stringify(objs),name:name,img:"img/img_placeholder.webp"})
+            .done(function( res ) {
+            if(res["out"] == "good"){
+                    // console.log(scr)
+                    // console.log("good");
+                    // if(callback) callback(res);
+                    goto(`/proj/${name}`);
+                }
+            })
         }
     }
     load_projs((projs)=>{
-        projs.forEach(proj => {
-            // console.log(proj);
+        console.log(projs);
+        if(projs.length == 0){
+            setTimeout(loaded(),1000)
+        }
+        else{
+            projs.forEach(proj => {
+            console.log(proj);
             let div = document.getElementById("projs_div");
-            div.innerHTML += `<button id='proj_${proj["name"]}' class='proj' onclick="goto('/proj/${proj["name"]}')">${proj["name"]}<br><img height="200" width="290" src='${proj["img"]}' alt='${proj["name"]}'></img></button>`;
+            div.innerHTML += `<button id='proj_${proj["name"]}' class='proj'>
+                <img src='${proj["img"]}' alt='${proj["name"]}' class="p_img" onclick="goto('/proj/${proj["name"]}')">
+                <div class="p_props">
+                    <div class="p_left"  style="text-align:left">
+                        <h1>${proj["name"]}</h1>
+                        <div>${proj["creation_date"].split("T")[0]}</div>
+                    </div>
+                    <div class="p_right">
+                        <img src="/img/icon/edit.svg" style="width:24px;height:24px" onclick="del_proj('${proj["name"]}')">
+                        <img src="/img/icon/copy.svg" style="width:24px;height:24px" onclick="del_proj('${proj["name"]}')">
+                        <img src="/img/icon/download.svg" style="width:24px;height:24px" onclick="del_proj('${proj["name"]}')">
+                        <img src="/img/icon/trash.svg" style="width:24px;height:24px" onclick="del_proj('${proj["name"]}')">
+                    </div>    
+                </div>
+                </button>`;
+            setTimeout(loaded(),1000)
         });
+        }
     });
+
+    function del_proj(proj_name){
+        let del = confirm(`удалить проект ${proj_name}?`);
+        if(del == true){
+            $.post( "/proj/delete",{name:proj_name})
+            .done(function( res ) {
+                if(res["out"] == "good"){
+                    goto("/main")
+                }
+            })
+        }
+    }
 </script>
-<%- include('./static/end.ejs') %>
+<%- include('./static/end.ejs',{soc:true}) %>

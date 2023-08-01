@@ -1,34 +1,145 @@
 <%- include('./static/start.ejs',{name:'login',async: true}) %>
+<%- include('./load.ejs') %>
 <style>
-    * {
+    body{
+        /* width: 1920px;
+        height: 1080px; */
+        padding: 0%;
+        margin: 0%;
+        background-image: url("/img/background/photo_2023-06-06_08-53-47\ 1.png");
+        background-repeat: no-repeat;
+            background-position: center;
+        background-size: cover;
+    }
+    #login_form{
+        margin: auto;
+        background-color: rgba(255, 255, 255, 0.5);
+        /* width: 680px;
+        height: 450px; */
+        width: 52vw;
+        /* height: 550px; */
+        height: 55vh;
+        border-radius: 1.5vw;
+        box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(2vh);
+    }
+    #inputs{
+        margin: auto;
+        /* width: calc(var(--login-inp-w)+20); */
+        /* background-color: aliceblue; */
+    }
+    #login_form div{
+        margin: auto;
+        margin-block: 2vh;
+        
+    }
+    input{
         text-align: center;
     }
-    iframe{
-        border: 0px;
-        display: none;
+    section{
+        display: flex;
+        justify-content: space-around;
+        width: 100vw;
+        height: 100vh;
     }
+    .login-inp input{
+        /* padding-block: 20px;
+        padding-inline: 40px; */
+        height: var(--login-inp-h);
+        width: calc(var(--login-inp-w));
+        border: 0.1vh solid #505050;
+        margin: auto;
+        border-radius: 1.2vh;
+    }
+    .login-inp{
+        height: var(--login-inp-h);
+        width: calc(var(--login-inp-w)*1.03);
+        /* margin: auto; */
+    }
+    .pass-inp input{
+        /* padding-block: 5px;
+        padding-inline: 20px; */
+        height: var(--login-inp-h);
+        width: var(--login-inp-w);
+        border: 0.1vh solid #505050;
+        border-radius: 1.2vh;
+    }
+    .pass-inp{
+        height: var(--login-inp-h);
+        width: calc(var(--login-inp-w)*1.03);
+    }
+    .login-btn input{
+        height: var(--login-inp-h);
+        width: calc(var(--login-inp-w)/2);
+        border: 0.1vh;
+        box-shadow: 0px 4px 4px 0px #00000040;
+        border-radius: 1.2vh;
+    }
+    .login-btn{
+        height: var(--login-inp-h);
+        width: calc(var(--login-inp-w)/2);
+    }
+    #logo{
+        margin: auto;
+        /* width: 216px;
+        height: 144.27px; */
+        width: 12vw;
+        height: 12vh;
+        display: flex;
+        justify-content: space-around;
+    }
+    #helps button{
+        background-color: transparent;
+        border: 0px;
+    }
+    #helps{
+        display: flex;
+        justify-content: space-evenly;
+        padding-top: 2.4vh;
+    }
+    @media (max-width: 900px) {
+        #helps{
+            display: grid;
+        }
+    }
+    /* #logo img{
+        width: 50%;
+    } */
 </style>
 
+<!-- <img id="logo_img_sec" style="width: 12vw; height: 12vh;" src="/img/Умничка лого с обводкой-02 1.png" alt=""> -->
 
-<form action="#" id="login_form">
-    <div class="login-page">
-        <input name="login" type="text" id="login">
-        <label for="login">логин</label>
-    </div>
-    <div class="pass-page">
-        <input name="pass" type="password" id="pass">
-        <label for="pass">пароль</label>
-    </div>
-    <input type="submit" id="log_btn" onclick="log()" value="login">
-</form>
+<section>
+    <form action="#" id="login_form">
+        <div id="logo"></div>
+        <div id="inputs">
+            <div class="login-inp">
+                <input name="login" type="text" id="login" placeholder="Логин">
+            </div>
+            <div class="pass-inp">
+                <input name="pass" type="password" id="pass" placeholder="Пароль">
+            </div>
+            <div class="login-btn" style="display: flex;justify-content: space-around;">
+                <input type="submit" id="log_btn" onclick="log()" value="Войти">
+            </div>
+        </div>
+        <div id="helps"><button>Восстановить пароль</button><button>Запросить доступ</button></div>
+    </form>
+</section>
     
 <!-- <input type="submit" value=""  hidden> -->
 <div id="res"></div>
 
 <script>
+    loaded_pos.y = "30.5%";
+    loaded_pos.x = "50%";
+    loaded_pos.w = "12vw";
+    loaded();
     // console.log($.cookie("uuid"));
     // log_by_sid();
-
+    // let logo = document.getElementById("logo_img");
+    // logo.style.transform = 'translate(-40vw,-20vh)';
+    // logo.style.position = "absolute"
     function log(){
         const login = CryptoJS.AES.encrypt(document.getElementById('login').value,$.cookie("sid")).toString();
         const pass = CryptoJS.AES.encrypt(document.getElementById('pass').value,$.cookie("sid")).toString();
@@ -39,12 +150,13 @@
                 if (res["out"] == "bad"){
                     console.log(res["err"]);
                     if (res["err"] == "user" || res["err"] == "pass"){
-                        document.querySelector("#res").innerHTML = "<p>wrong password or login</p>";
+                        alert("wrong password or login")
                     }
                 }
                 else{
                     if(res["out"] == "goto"){
                         // postForm(res["url"], res["args"]);
+                        loading();
                         goto(res["url"]);
                     }
                     // if(res["out"] == "logged"){

@@ -10,6 +10,12 @@ function get_from_uuid(callback){
     });
 }
 
+function set_pos(obj,x,y){
+    obj.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+    obj.setAttribute('data-x', x)
+    obj.setAttribute('data-y', y)
+}
+
 function log_by_sid() {
     // const uuid = $.cookie("uuid");
     // const sid = $.cookie("sid");
@@ -18,17 +24,17 @@ function log_by_sid() {
         // get_sid(location.hostname);
         get_sid();
     }
-    // else if ($.cookie('sid') != null && $.cookie('uuid') != null){
-    // $.post( "/sid_log")
-    // .done(function( res ) {
-    //     console.log("ping");
-    //     if(res["out"] == "good"){
-    //         goto(res["url"]);
-    //     }
-    //     else if (res["out"] == "bad"){
-    //         clear_ck(false);
-    //     }
-    // })}
+    else if ($.cookie('sid') != null && $.cookie('uuid') != null){
+    $.post( "/sid_log")
+    .done(function( res ) {
+        // console.log("ping");
+        if(res["out"] == "good"){
+            goto(res["url"]);
+        }
+        else if (res["out"] == "bad"){
+            clear_ck(false);
+        }
+    })}
 }
 
 function clear_ck(redirect = true){
@@ -115,7 +121,10 @@ function load_groups(callback){
 
 // redirect
 function goto(url) {
-    location.href = url;
+    loading();
+    setTimeout(()=>{
+        location.href = url;
+    },1000)
 }
 
 function postForm(path, params, method) {
