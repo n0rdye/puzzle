@@ -53,6 +53,7 @@
         logo.style.left = loaded_pos.x;
         logo.style.top = loaded_pos.y;
         logo.style.width = loaded_pos.w
+        load_div.style.height = `${document.getElementsByTagName("body")[0].scrollHeight}px`;
     }
     function loading(){
         let logo = document.getElementById("load_logo");
@@ -63,5 +64,6 @@
         logo.style.left = loading_pos.x;
         logo.style.top = loading_pos.y;
         logo.style.width = loading_pos.w
+        load_div.style.height = `${document.getElementsByTagName("body")[0].scrollHeight}px`;
     }
 </script>

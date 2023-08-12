@@ -14,6 +14,13 @@
         Object.entries(menus).forEach(([key,menu]) => {
             menu.style.display = "none";
         });
+        let menu_screen = document.getElementById("top_div");
+        menu_screen.style.display = "none";
+    }
+    function open_menu(){
+        let menu_screen = document.getElementById("top_div");
+        menu_screen.style.display = "block";
+        menu_screen.style.height = `${document.getElementsByTagName("body")[0].scrollHeight}px`;
     }
     hide_menus();
     $('form').on('submit', function(event) {

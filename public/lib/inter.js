@@ -52,6 +52,7 @@ function create(clas,x,y,body,id,size){
                 obj.style.height = `${db_data["height"] * 2}px`;
             }
         }
+        calc_total();
     })
     root.append(obj);
     set_pos(obj,x,y);
@@ -90,21 +91,35 @@ function wall_size_change(type,value = null){
     }            
 }
 
-function calc_total(){
+function calc_total(start = false){
+    document.getElementById("cost_list").innerHTML = ""
+    if (start) {
+        document.getElementById("proj_cost").setAttribute("value",`стоимость: ${objs["total"]} руб.`);
+        return;
+    }
     let total=0;
     Object.entries(objs).forEach(([key,value]) => {
+        // console.log(key);
         if(key != "height"&&key!="width"&key!="total"){
-            // console.log(key,value);
             // console.log(Object.keys(value).length);
             // console.log(objs_store[key]);
             if(objs_store[key] != null){
+                // console.log(key,value); 
                 total += parseInt(parseInt(objs_store[key]["cost"]) * Object.keys(value).length);
+                let obj_cost_div = document.createElement("li");
+                obj_cost_div.innerHTML =
+                `<div style="display:flex;"> <div id='obj_cost_name'>${key.split("/g/")[0].replace("$"," ")}</div>`+
+                `<div id='obj_cost_count'>&nbsp${Object.keys(value).length}x</div> </div>`+
+                `<div id='obj_cost'>${parseInt(parseInt(objs_store[key]["cost"]) * Object.keys(value).length)}</div>`;
+                document.getElementById("cost_list").append(obj_cost_div);
             }
         }
         // console.log(Object.keys(objs).at(-1));
     });
     // return total;
-    document.getElementById("proj_cost").innerText = total;
+
+    objs["total"] = total;
+    document.getElementById("proj_cost").setAttribute("value",`стоимость: ${total} руб.`);
 }
 
 function load(objss){
@@ -135,7 +150,6 @@ function load(objss){
         }
     });
     resize_drags();
-    calc_total()
 }
 
 function load_proj_cloud(){

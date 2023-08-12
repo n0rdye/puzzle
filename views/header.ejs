@@ -49,16 +49,19 @@
         background: ghostwhite;
         cursor: pointer;
         border: 1px black dashed;
-        padding: 5px;
+        padding: 2px;
+        width: 220px;
     }
     .cmenu{
-        position: fixed;
+        position: absolute;
         display: grid;
         background: ghostwhite;
         color: black;
         cursor: pointer;
         border: 1px black solid;
-        z-index: 100;
+        border-top: 0px;
+        z-index: 500;
+        /* width: 218px; */
     }
     #top_panel_right_main{
         /* float: right; */
@@ -129,25 +132,30 @@
 <div id="user_menu" class="cmenu"></div>
 
 
+<div id="top_div" style="background-color: rgba(red, green, blue, 0.5); width: 100%;height: 100%;position: absolute;inset: 0px;z-index: 300; display: none;" onclick="hide_menus()"></div>
 
 <script>
-    // get_from_uuid((res)=>{
-    //     let uname = document.getElementById("user_name"); 
-    //     let menu = document.getElementById("user_menu"); 
-    //     let header = document.getElementById("top_panel"); 
-    //     let right = document.getElementById("top_panel_right"); 
-    //     let left = document.getElementById("top_panel_left"); 
+    get_from_uuid((res)=>{
+        // let uname = document.getElementById("user_name"); 
+        // let menu = document.getElementById("user_menu"); 
+        // let header = document.getElementById("top_panel"); 
+        // let right = document.getElementById("top_panel_right"); 
+        // let left = document.getElementById("top_panel_left"); 
         
-    //     if(document.title != "main") menu.innerHTML += `<button onclick="goto('/');">проекты</button> <br>`;
-    //     right.innerHTML += `<div id="user_name" class="menu_btn">${res["login"]}</div>`;
+        // if(document.title != "main") menu.innerHTML += `<button onclick="goto('/');">проекты</button> <br>`;
+        // right.innerHTML += `<div id="user_name" class="menu_btn">${res["login"]}</div>`;
         
-    //     if (res["admin"] == true){
-    //         menu.innerHTML += `<button onclick='goto("/admin")'>админ. панель</button><br>`;
-    //     }
-    //     menu.innerHTML += "<button onclick='logout();'>выйти</button><br>";
-    // });
+        let menu = document.getElementById("top_panel_center");
+        if (res["admin"] == true){
+            menu.innerHTML += `<button onclick='goto("/admin")'>админ. панель</button><br>`;
+        }
+        // menu.innerHTML += "<button onclick='logout();'>выйти</button><br>";
+    });
 
     onscroll = (e)=>{
+        hide_menus();
+    }
+    onresize = (e)=>{
         hide_menus();
     }
     onclick = (e) => {
@@ -214,7 +222,13 @@
             // document.body.appendChild(menu)
         
         }
+        else if(e.target.id == "proj_cost"){
+            document.getElementById("cost_list").style = `margin-top:3vw;left:${e.target.getBoundingClientRect().left}px`;
+            console.log("cost_list");
+        }
         else if(e.target.id == "group_drop"){
+            document.getElementById("group").style = `margin-top:2vw;left:${e.target.getBoundingClientRect().left}px;width: 14vw;padding: 7.5px;`;
+            console.log("group");
             // hide_menus();
             // let menu = document.getElementById("object_edit_menu");
             // let obj = e.target;
@@ -226,8 +240,8 @@
             // // document.body.appendChild(menu)
         
         }
-        else{
-            hide_menus();
-        }
+        // else{
+        //     hide_menus();
+        // }
     }
 </script>

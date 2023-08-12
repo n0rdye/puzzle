@@ -112,7 +112,6 @@
         position: absolute;
         padding: 0px;
         margin: 0px;
-        width: 200px;
     }
 </style>
 
@@ -142,6 +141,27 @@
             <label for="wall_color" style="margin: auto;">цвет стены</label>
             <input type="color" id="wall_color" style="width: 50px;" value="#000000" onchange="wall_color_change()"> 
         </div>
+        <div style="display: flex;width: 15vw;justify-content: space-between; background-color: #aaa;">
+            <input type="button" id="proj_cost" class="menu_btn" value="Расчет стоимости" onclick="cost_drop();open_menu();" style="width: 100%;"> 
+            <style>
+                #cost_list li{
+                    display: flex;
+                    justify-content: space-between;
+                    width: 14vw;
+                }
+                #cost_list{
+                    list-style-type: none;
+                    padding-left: 0px;
+                    margin-top: 59px;
+                    position: absolute;
+                    width: 14vw;
+                    padding: 0.45vw;
+                }
+            </style>
+            <ul id="cost_list" class="cmenu">
+            </ul>
+            <!-- <div style="display: flex;"><div id="proj_cost"></div>&nbsp;руб.</div> -->
+        </div>
         <!-- <div style="display: flex;width: 150px;justify-content: space-between;">
             <label style="margin: auto;">Расчёт стоимости</label>
         </div> -->
@@ -154,14 +174,9 @@
     <div class="wall dropzone" id="wall"></div>
 </div>
 
-<div style="display:flex; justify-content: space-around;"><div style="display: flex;"><div id="proj_cost"></div>&nbsp;руб.</div></div>
+<div style="display:flex; justify-content: space-around;"></div>
 
 <div class="inputs" style="display: flex;justify-content: space-between;">
-    <div id="obj_group" style="display: flex;justify-content: space-between; width: 30vw;">
-        <!-- <button name="" id="group_drop" >Помехи на стене</button> -->
-        <button name="" id="group_drop" onclick="group_drop()">Оборудование</button>
-        <ul id="group" class="cmenu"></ul>
-    </div>
     <div style="display: flex;justify-content: space-between; width: 20vw;">
         <div>copy</div>
         <div>back</div>
@@ -173,6 +188,14 @@
         <div>load</div>
     </div>
 </div>
+<div class="inputs" style="display: flex;justify-content: space-between;margin-top: 0px;">
+    <div id="obj_group" style="display: flex;justify-content:space-evenly; width: 100vw;">
+        <!-- <button name="" id="group_drop" >Помехи на стене</button> -->
+        <button name="" id="group_drop" class="menu_btn" onclick="group_drop();open_menu();" style="width: 15vw;padding: 2px;">Оборудование</button>
+        <button name="" id="group_drop" class="menu_btn" onclick="group_drop();open_menu();" style="width: 15vw;padding: 2px;">помехи</button>
+        <ul id="group" class="cmenu"></ul>
+    </div>
+</div>
 <div class="czones" style="height: 500px;"></div>
 
 
@@ -182,9 +205,9 @@
 
     function group_drop(){
         let e = document.getElementById("group_drop")
-        // document.getElementById("group").style = `top:${e.getBoundingClientRect().top+40}px;left:${e.getBoundingClientRect().left - 5}px`;
         setTimeout(()=>{
             document.getElementById("group").style.display = "block";
+            // document.getElementById("group").style.left = document.getElementById("group_drop").getBoundingClientRect().left;
             let childs = document.getElementById("group").getElementsByTagName("input");
             let i = 0;
             Object.entries(childs).forEach(([key,value]) => {
@@ -200,6 +223,28 @@
                 }
             });
         },1)
+    }
+    
+    function cost_drop(id){
+        // let e = document.getElementById("cost")
+        // setTimeout(()=>{
+        //     document.getElementById("group").style.display = "block";
+        //     // document.getElementById("group").style.left = document.getElementById("group_drop").getBoundingClientRect().left;
+        //     let childs = document.getElementById("group").getElementsByTagName("input");
+        //     let i = 0;
+        //     Object.entries(childs).forEach(([key,value]) => {
+        //         console.log(key,value);
+        //         if(value.checked == true){
+        //             get_objs(value)
+        //             i++;
+        //         }
+        //         if (i==0){
+        //             document.getElementsByClassName("czones")[0].innerHTML = "";
+        //             drag_start()
+        //             // e.removeChild(e.getElementsByClassName(value))
+        //         }
+        //     });
+        // },1)
     }
 
     function wall_color_change(){
