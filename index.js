@@ -106,7 +106,7 @@ app.post("/get_cr_uuid", (req,res) => {
     }
 })
 /// project
-app.get("/proj/:name" , (req,res) =>{
+app.get("/proj/load/:name" , (req,res) =>{
     res.render('project',{proj_name:req.params["name"]});
 })
 app.post("/save_proj", (req,res) => {
@@ -137,6 +137,17 @@ app.post("/proj/delete", (req,res) => {
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             proj.del(inp,cook,res);
+        })
+    } catch (error) {
+        func.log("router project loading error - "+error);
+    }
+})
+app.post("/proj/download", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            proj.download(inp,cook,res);
         })
     } catch (error) {
         func.log("router project loading error - "+error);
@@ -189,13 +200,69 @@ app.post("/get_groups", (req,res) => {
         func.log("router single object getting error - "+error);
     }
 })
+app.post("/object/parts/get", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        // func.log(inp["name"]);
+        func.sid(cook,res,()=>{
+            obj.load_parts(inp,cook,res);
+        })
+    } catch (error) {
+        func.log("router single object getting error - "+error);
+    }
+})
+app.post("/object/group/get", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        // func.log(inp["name"]);
+        func.sid(cook,res,()=>{
+            obj.load_group(inp,cook,res);
+        })
+    } catch (error) {
+        func.log("router single object getting error - "+error);
+    }
+})
 /// admin
 app.get("/admin", (req,res) =>{
     try {
         let inp = req.body;
         let cook = req.cookies;
-        func.sid(cook,res,()=>{
+        func.sid(cook,res,(rights)=>{
             res.render('admin');
+        },true,true)
+    } catch (error) {
+        func.log("router admin page error - "+error);
+    }
+});
+app.get("/admin/objects", (req,res) =>{
+    try {
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,(rights)=>{
+            if (rights == 1 || rights == 3){
+                res.render('admin/objects');
+            }
+            else{
+                res.redirect('/admin');
+            }
+        },true,true)
+    } catch (error) {
+        func.log("router admin page error - "+error);
+    }
+});
+app.get("/admin/users", (req,res) =>{
+    try {
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,(rights)=>{
+            if (rights == 2 || rights == 3){
+                res.render('admin/users');
+            }
+            else{
+                res.redirect('/admin');
+            }
         },true,true)
     } catch (error) {
         func.log("router admin page error - "+error);

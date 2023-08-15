@@ -30,8 +30,8 @@
 <div style="display: flex;justify-content: space-between;">
     <h1>изменение объектов</h1>
     <div id="find_obj_btns">
-        <button onclick="load_groups(()=>{edit_get_objs(true);});">найти по имени</button>
-        <button onclick="load_groups(()=>{edit_get_objs();});">очистить</button>
+        <button onclick="edit_get_objs(true)">найти по имени</button>
+        <button onclick='document.getElementById("objs_in_group").innerHTML = "";'>очистить</button>
     </div>
 </div>
 <div>
@@ -44,9 +44,9 @@
 </div>
 
 <script>
-    load_groups(()=>{
-        edit_get_objs();
-    });
+    // load_groups(()=>{
+    //     edit_get_objs();
+    // });
 
     function set_edit(){
         let menu = document.getElementById("object_edit_menu");
@@ -67,11 +67,18 @@
         },by_name)
     }
 
+    function gids_change(){
+        let last = gids.at(-1)
+        gids = [last];
+        edit_get_objs();
+        hide_menus();
+    }
+
     function obj_del(){
-        let select = document.getElementById("group_select");
+        // let select = document.getElementById("group_select");
         let menu = document.getElementById("object_edit_menu");
         if (confirm(`вы точно хотите удалить ${menu.getAttribute("obj_name").split("/")[0]}?`)){
-            $.post( "/admin/objects/delete", { id:menu.getAttribute(`obj_id`),gid:select.options[select.selectedIndex].getAttribute("gid"),name:menu.getAttribute("obj_name")})
+            $.post( "/admin/objects/delete", { id:menu.getAttribute(`obj_id`),})
             .done(function( res ) {
                 if(res["out"] == "good"){
                     edit_get_objs();
@@ -81,7 +88,7 @@
     }
 
     function save_edited_obj(){
-        let select = document.getElementById("group_select");
+        let gid = gids[0];
         let menu = document.getElementById("object_edit_menu");
         let attributes = ["name","description","img","height","width","cost"];
         let cur_atts = {
@@ -117,25 +124,27 @@
             }
         }
         function make_obj_save(){
-            if(changes["name"]) changes["name"] = (changes["name"]+"/g/"+select.options[select.selectedIndex].value).replace(" ","$");
-            document.getElementById("obj_resp").innerHTML = "сохранение товара";
-            $.post( "/admin/objects/edit", { id:menu.getAttribute(`obj_id`),changes:JSON.stringify(changes),gid:select.options[select.selectedIndex].getAttribute("gid")})
-            .done(function( res ) {
-                // console.log(res);
-                if(res["out"] == "good"){
-                    document.getElementById("obj_resp").innerHTML = "товар сохранён";
-                    setTimeout(()=>{
-                        edit_get_objs();
-                        set_obj_edit_params();
-                        if(res["name_err"]){
-                            document.getElementById("obj_resp").innerHTML = ("название товара не было изменино поскольку оно занято");
-                        }
-                    },1000)
-                    setTimeout(()=>{
-                        document.getElementById("obj_resp").innerHTML = "";
-                    },3000)
-                }
-            });
+            load_group(gid,(group_db)=>{
+                if(changes["name"]) changes["name"] = (changes["name"]+"/g/"+group_db["name"].replace(" ","$"));
+                document.getElementById("obj_resp").innerHTML = "сохранение товара";
+                $.post( "/admin/objects/edit", { id:menu.getAttribute(`obj_id`),changes:JSON.stringify(changes),gid:gid})
+                .done(function( res ) {
+                    // console.log(res);
+                    if(res["out"] == "good"){
+                        document.getElementById("obj_resp").innerHTML = "товар сохранён";
+                        setTimeout(()=>{
+                            edit_get_objs();
+                            set_obj_edit_params();
+                            if(res["name_err"]){
+                                document.getElementById("obj_resp").innerHTML = ("название товара не было изменино поскольку оно занято");
+                            }
+                        },1000)
+                        setTimeout(()=>{
+                            document.getElementById("obj_resp").innerHTML = "";
+                        },3000)
+                    }
+                });
+            })
         }
     }
 
@@ -150,18 +159,20 @@
     }
         
     function edit_load_objs(callback,by_name = false){
-        let select = document.getElementById("group_select");
+        // let select = document.getElementById("group_select");
         if(!by_name){
-            $.post( "/get_objs",{gid:select.options[select.selectedIndex].getAttribute("gid")})
-            .done(function( res ) {
-                if(res["out"] == "good"){
-                    // console.log(res["body"]);
-                    // res["body"].forEach(object => {
-                    //     // objs_store[`${element["name"]}`] = {description:element["description"],height:element["height"],width:element["width"],id:element["id"],name:element["name"]}
-                    //     let obj_main = document.createElement("div");
-                    // });
-                    callback(res["body"]);
-                }
+            gids.forEach(gid => {
+                $.post( "/get_objs",{gid:gid})
+                .done(function( res ) {
+                    if(res["out"] == "good"){
+                        // console.log(res["body"]);
+                        // res["body"].forEach(object => {
+                        //     // objs_store[`${element["name"]}`] = {description:element["description"],height:element["height"],width:element["width"],id:element["id"],name:element["name"]}
+                        //     let obj_main = document.createElement("div");
+                        // });
+                        callback(res["body"]);
+                    }
+                });
             });
         }
         else{
@@ -200,5 +211,7 @@
             obj.append(img_elm)
             obj.append(name_text)
             obj_list.append(obj)
+
+            console.log("obj");
         }              
 </script>

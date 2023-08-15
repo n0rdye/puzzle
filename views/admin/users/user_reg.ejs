@@ -14,12 +14,64 @@
     </div>
     <div>
         <label for="admin_check">админ. привелегии</label>
-        <input type="checkbox" name="admin" value='false' id="admin_check">
+        <input type="checkbox" name="admin" value='false' id="admin_check" onchange="admin_ch()">
+        <div id="right_checks" style="display: none;justify-content: space-evenly;">
+            <div>
+                <input type="checkbox" name="admin" value='false' id="admin_user_check" onchange="right_calc()">
+                <label for="admin_user_check">право на изменение обьектов</label>
+            </div>
+            <div>
+                <input type="checkbox" name="admin" value='false' id="admin_obj_check" onchange="right_calc()">
+                <label for="admin_obj_check">право на изменение пользователей</label>
+            </div>
+        </div>
     </div>
     <div id="reg_response"></div>
 </form>
 
 <script>
+    let rights = 0;
+
+    clear_checks();
+    function clear_checks(){
+        let check = document.getElementById("admin_check");
+        let obj_right = document.getElementById("admin_obj_check");
+        let user_right = document.getElementById("admin_user_check");
+        let checks = [check,obj_right,user_right];
+        checks.forEach(ch => {
+            ch.checked = false;
+            rights = 0;
+        });
+    }
+
+        function admin_ch(){
+            let check = document.getElementById("admin_check").checked;
+            let right_checks = document.getElementById("right_checks");
+            let obj_right = document.getElementById("admin_obj_check");
+            let user_right = document.getElementById("admin_user_check");
+            if (check){
+                right_checks.style.display = "flex";
+            }
+            else{
+                right_checks.style.display = "none";
+                clear_checks();
+            }
+        }
+
+        function right_calc(){
+            let obj_right = document.getElementById("admin_obj_check").checked;
+            let user_right = document.getElementById("admin_user_check").checked;
+            if(obj_right & user_right){
+                rights = 3;
+            }
+            else if(obj_right){
+                rights = 1;
+            }
+            else if(user_right){
+                rights = 2;
+            }
+        }
+
         function reg(){
             console.log("reg");
             let login = document.getElementById("login").value;
@@ -28,7 +80,7 @@
             // console.log(login,pass,admin);
             // console.log("cl reg");
             if(login != ""&&pass!=""){
-                $.post( "/admin/users/new", { login:login,pass:pass,admin:admin })
+                $.post( "/admin/users/new", { login:login,pass:pass,admin:admin,rights:rights })
                 .done(function( res ) {
                     // console.log("serv reg");
                     if(res["out"] == "good"){

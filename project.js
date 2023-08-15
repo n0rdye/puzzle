@@ -40,17 +40,28 @@ module.exports.loads = (inp,cook,res)=>{
     }
 }
 
+module.exports.download = (inp,cook,res)=>{
+    try {
+        db.ggv("projects","`body`","id",`'${inp["id"]}'`,(proj)=>{ proj = proj[0];
+            res.send(JSON.stringify(proj));
+        })
+    } catch (error) {
+        func.log("backend projects loading err0r - " - error);
+    }
+}
+
 module.exports.del = (inp,cook,res)=>{
     try {
-        db.ggv("users","`id`","uuid",`'${cook["uuid"]}'`,(udata)=>{ udata = udata[0];
-            db.gv("projects","name",`'${inp["name"]}'`,(pdata)=>{pdata=pdata[0]
-                // res.send({out:"good",body:pdata});
-                db.dl("projects","id",pdata["id"],()=>{
-                    res.send({out:"good"});
-                    func.log(`good boy ${udata["uuid"]} deleted project ${inp["name"]} from ${cook["sid"]}`);
-                })
+        db.gv("projects","name",`'${inp["name"]}'`,(pdata)=>{pdata=pdata[0]
+            // res.send({out:"good",body:pdata});
+            db.dl("projects","id",pdata["id"],()=>{
+                res.send({out:"good"});
+                func.log(`good boy ${cook["uuid"]} deleted project ${inp["name"]} from ${cook["sid"]}`);
             })
         })
+        // db.ggv("users","`name`,`id`","uuid",`'${cook["uuid"]}'`,(udata)=>{ udata = udata[0];
+        //     console.log(udata);
+        // })
     } catch (error) {
         func.log("backend projects delete err0r - " - error);
     }

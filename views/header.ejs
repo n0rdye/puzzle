@@ -13,7 +13,7 @@
         justify-content: space-between;
         /* width: 200px; */
         cursor: pointer;
-        width: 5vw;
+        width: 9vw;
         display: flex;
         /* width: 20vw; */
     }
@@ -26,7 +26,7 @@
         /* width: 20vw; */
     }
     #top_panel{
-        height: 100px;
+        height: 10vh;
         display: flex;
         margin-bottom: 2vh;
         margin-top: 1vh;
@@ -48,9 +48,11 @@
     .menu_btn{
         background: ghostwhite;
         cursor: pointer;
-        border: 1px black dashed;
+        border: 1px gray solid;
         padding: 2px;
         width: 220px;
+        border-radius: 0.5vw;
+        min-height: 2.5vw;
     }
     .cmenu{
         position: absolute;
@@ -58,7 +60,10 @@
         background: ghostwhite;
         color: black;
         cursor: pointer;
-        border: 1px black solid;
+        border: 1px gray solid;
+        border-radius: 0.5vw;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 0px;
         border-top: 0px;
         z-index: 500;
         /* width: 218px; */
@@ -85,8 +90,8 @@
         /* height: 60px; */
     }
     .top_panel_right img{
-        width: 3vw;
-        height: 3vh;
+        width: 2.5vw;
+        /* height: 3vh; */
     }
     @media (max-width: 900px) {
         #top_panel_right_main{
@@ -132,7 +137,7 @@
 <div id="user_menu" class="cmenu"></div>
 
 
-<div id="top_div" style="background-color: rgba(red, green, blue, 0.5); width: 100%;height: 100%;position: absolute;inset: 0px;z-index: 300; display: none;" onclick="hide_menus()"></div>
+<div id="top_div" style="background-color: transparent; width: 100%;height: 100%;position: absolute;inset: 0px;z-index: 300;" onclick="hide_menus()"></div>
 
 <script>
     get_from_uuid((res)=>{
@@ -179,14 +184,16 @@
             // menu.onmouseleave = () => menu.style.display = 'none';
             // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
             // document.body.appendChild(menu)
+            open_menu();
         }else if(e.target.id == "proj_menu"){
             hide_menus();
             let menu = document.getElementById("project_menu");
             menu.style.display = 'block';
             menu.style = `top:${e.target.getBoundingClientRect().top + 25}px;left:${e.target.getBoundingClientRect().left - 20}px`;
-                // menu.onmouseleave = () => menu.style.display = 'none';
-                // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
-                // document.body.appendChild(menu)
+            // menu.onmouseleave = () => menu.style.display = 'none';
+            // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
+            // document.body.appendChild(menu)
+            open_menu();
         }
         else if(e.target.id == "user_buttons"){
             hide_menus();
@@ -196,10 +203,11 @@
             menu.setAttribute("login_pass",document.getElementById(`pass_${e.target.classList[0]}`).innerText);
             menu.setAttribute("login_admin",document.getElementById(`admin_${e.target.classList[0]}`).innerText);
             menu.style.display = 'block';
-            menu.style = `top:${e.target.getBoundingClientRect().top + 25}px;left:${e.target.getBoundingClientRect().left - 20}px`;
+            menu.style = `top:${e.target.getBoundingClientRect().top + 20}px;left:${e.target.getBoundingClientRect().left - 8}px`;
             // menu.onmouseleave = () => menu.style.display = 'none';
             // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
-            // document.body.appendChild(menu)s
+            // document.body.appendChild(menu)
+            open_menu();
         
         }
         else if(e.target.id == "object_menu"){
@@ -220,15 +228,36 @@
             // menu.onmouseleave = () => menu.style.display = 'none';
             // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
             // document.body.appendChild(menu)
+            open_menu();
         
         }
         else if(e.target.id == "proj_cost"){
-            document.getElementById("cost_list").style = `margin-top:3vw;left:${e.target.getBoundingClientRect().left}px`;
+            hide_menus();
+            document.getElementById("cost_list").style = `margin-top:2.5vw;left:${e.target.getBoundingClientRect().left}px`;
             console.log("cost_list");
+            open_menu();
         }
-        else if(e.target.id == "group_drop"){
-            document.getElementById("group").style = `margin-top:2vw;left:${e.target.getBoundingClientRect().left}px;width: 14vw;padding: 7.5px;`;
+        else if(`${e.target.id}`.split("-")[0] == "group_drop"){
+            hide_menus();
+            document.getElementById("group").innerHTML = "";
+
+            // console.log(e.target.getAttribute("groups").split(","));
+            document.getElementById("group").style = `margin-top:2.5vw;left:${e.target.getBoundingClientRect().left}px;width: 14vw;padding: 0.45vw;display:block;`;
             console.log("group");
+            open_menu();
+
+            if (document.URL == "https://puzzle.n0r.su/admin/objects"){
+                load_groups(()=>{},e.target.getAttribute("groups").split(","),true)
+                let groups = document.getElementById("group");
+                let new_grp_btn = document.createElement("button");
+                new_grp_btn.setAttribute("onclick",`create_new_group(${e.target.getAttribute("pid")})`);
+                new_grp_btn.innerText = "доб. группу";
+                new_grp_btn.style.width = "14vw";
+                groups.append(new_grp_btn)
+            }
+            else{
+                load_groups(()=>{},e.target.getAttribute("groups").split(","))
+            }
             // hide_menus();
             // let menu = document.getElementById("object_edit_menu");
             // let obj = e.target;

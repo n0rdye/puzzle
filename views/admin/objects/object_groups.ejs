@@ -1,49 +1,113 @@
 
 <style>
     #obj_group button,#obj_group select{
-        height: 50px;
+        /* height: 5vh; */
         margin: auto 0px;
-        
+    }
+    .obj_group{
+        display: flex;
     }
 </style>
 <div id="obj_group">
     <div style="display: flex;justify-content: space-between;">
         <h1>группы товаров</h1>
-        <select name="" id="group_select" onchange="edit_get_objs();"></select>
-        <div style="display: flex;justify-content: space-between;width: 350px;">
-            <button onclick="create_new_group()">создать группу</button>
-            <button onclick="delete_group()">удалить группу</button>
+        <style>
+            .group_drop{
+                width: 15vw;
+                padding: 2px;
+                min-width: 15vw;
+            }
+            .group_drop *{
+                pointer-events: none;
+                overflow: auto;
+            }
+            .group_drop img{
+                width: 1vw;
+                height: 0.5vw;
+            }
+        </style>
+
+        <div id="obj_parts" style="display: flex;justify-content: space-between; overflow: scroll;min-width: 50vw;">
         </div>
+        <style>
+            .group_inp{
+                height: 1vw;
+                width: 1vw;
+                border: 0px;
+                border-radius: 0.4vw;
+                overflow: auto;
+            }
+        </style>
+        <ul id="group" class="cmenu"></ul>
+        <!-- <select name="" id="group_select" onchange="edit_get_objs();"></select>
+        <select name="" id="part_select"></select> -->
     </div>
 </div>
 
 <script>
-    load_groups();
-    function delete_group() {
+    // load_groups();
+    function delete_group(gid,pid) {
         let select = document.getElementById("group_select");
-        let group_id = select.options[select.selectedIndex].getAttribute("gid");
-        if(confirm(`вы уверены вы хотите удалить группу ${select.options[select.selectedIndex].text}`) == true){
-            $.post( "/admin/groups/delete", { gid:group_id})
+        if(confirm(`вы уверены вы хотите удалить группу ${document.getElementById("obj_group_"+gid).innerText}`) == true){
+            $.post( "/admin/groups/delete", { gid:gid,pid:pid})
             .done(function( res ) {
                 if(res["out"] == "good"){
                     // console.log(res["body"]);
-                    load_groups();
+                    // load_groups();
                     edit_get_objs();
+                    hide_menus();
+                    alert(`группа удалена`)
                 }
             });
         }
     }
-    function create_new_group() {
+    function create_new_group(pid) {
         let group_name = ask("название группы");
         if(group_name != ""){
-            $.post( "/admin/groups/new", { name:group_name.replace(" ","$")})
+            $.post( "/admin/groups/new", { name:group_name.replace(" ","$"),pid:pid})
             .done(function( res ) {
                 if(res["out"] == "good"){
                     // console.log(res["body"]);
-                    load_groups();
+                    // load_groups();
                     edit_get_objs();
+                    hide_menus();
+                    setTimeout(()=>{
+                        parts_load();
+                        alert(`группа ${group_name.replace(" ","$")} создана`)
+                    },200)
                 }
             });
         }
     }
+
+    function parts_load(){
+        load_parts((db)=>{
+            let parts = document.getElementById("obj_parts");
+            parts.innerHTML = "";
+            Object.values(db).forEach((value)=>{
+                let part = document.createElement("button")
+                let part_text = document.createElement("div")
+                let part_drop = document.createElement("img")
+                
+                part_drop.src = "/img/drop.png";
+                part_drop.alt = "\/";
+
+                part_text.innerText = `${value["name"]}`;
+
+                part.id = `group_drop-${value["id"]}`;
+                part.classList.add("menu_btn")
+                part.classList.add("group_drop")
+                part.setAttribute("groups",`${value["groups"]}`)
+                part.setAttribute("pid",`${value["id"]}`)
+
+                part.append(part_text);
+                part.append(part_drop);
+
+                parts.append(part);
+                console.log(value);
+            })
+        })
+    }
+    parts_load();
+
 </script>

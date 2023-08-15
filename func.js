@@ -36,9 +36,9 @@ module.exports.sid = (cook,res,callback,auto = true,admin_check = false)=>{
                         if (udata != null && udata["id"] == sdata["uid"] && uuid == udata["uuid"]){
                             if (!admin_check) callback(true);
                             else if (admin_check && udata["admin"] != false){
-                                db.ggv("admins","`login`,`uid` ","uid",`'${udata["id"]}'`,(adata)=>{ adata = adata[0]
+                                db.gv("admins","uid",`'${udata["id"]}'`,(adata)=>{ adata = adata[0]
                                     if(adata != null){
-                                        callback(true);                                    
+                                        callback(adata["rights"],true);                                    
                                     }
                                     else{
                                         db.sv("users","admin","0","id",udata["id"],()=>{},true);

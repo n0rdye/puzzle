@@ -1,3 +1,5 @@
+let gids = [];
+
 function get_from_uuid(callback){
     const uid = $.cookie("uuid");
     const sid = $.cookie("sid");
@@ -96,26 +98,97 @@ function get_sid(){
     });
 }
 
-function load_groups(callback){
-    let select = document.getElementById("group_select");
+function load_groups(callback,groups,admin = false){
+    let select = document.getElementById("group");
     // let name = select.options[select.selectedIndex].text;
-    $.post( "/get_groups")
+    groups.forEach(gid => {
+        $.post("/object/group/get",{gid:gid})
+        .done(function( res ) {
+            if(res["out"] == "good"){
+                console.log(res["body"]);
+                let group = res["body"]
+                    let group_div = document.createElement("div");
+                    group_div.classList.add(`obj_group`);
+                    
+                    let group_label = document.createElement("label");
+                    group_label.innerText = group["name"].replace("$"," ");
+                    group_label.setAttribute("for",`obj_group_${group["id"]}`)
+    
+                    let group_inp = document.createElement("input");
+                    group_inp.setAttribute("type","checkbox");
+                    group_inp.setAttribute("onchange",`group_check(${group["id"]})`)
+                    // group_inp.innerText = group["name"].replace("$"," ");
+                    group_inp.setAttribute("group_count",group["count"]);
+                    group_inp.setAttribute("gid",group["id"]);
+                    group_inp.id = `obj_group_${group["id"]}`;
+                    group_inp.setAttribute("pid",`${group["pid"]}`);
+
+                    if (gids.includes(group["id"])){
+                        group_inp.setAttribute("checked","true");
+                    }
+
+                    // console.log(document.url);
+                    if(admin){
+                        let group_del_btn = document.createElement("button");
+                        group_del_btn.setAttribute("onclick",`delete_group(${group["id"]},${group["pid"]})`)
+                        group_del_btn.innerText = "удалить";
+                        group_del_btn.style = "font-size: 1vw;width: 70px;";
+                        group_div.append(group_del_btn)
+                    }
+
+                    group_div.append(group_inp);
+                    group_div.append(group_label);
+                    select.append(group_div)
+            }
+            // callback(res);
+        });
+        if(gid == gids.at(-1)){
+            if(callback)callback();
+        }
+    });
+}
+
+function group_check(gid){
+    let gid_el = document.getElementById(`obj_group_${gid}`);
+    if(gid_el.checked){
+        gids[gids.indexOf(gids.at(-1))+1] = gid;
+    }
+    else if (!gid_el.checked){
+        gids.splice(gids.indexOf(gid),1);
+    }
+    // if (!gids.includes(gid)){
+    //     gids[gids.indexOf(gids.at(-1))+1] = gid;
+    // }
+    // else{
+    //     gids.pop(gid);
+    // }
+
+    console.log(gids);
+    if (typeof gids_change != 'undefined'){
+        gids_change();
+    }
+}
+
+function load_parts(callback){
+    let parts_div = document.getElementById("part_select");
+    $.post( "/object/parts/get", {})
     .done(function( res ) {
         if(res["out"] == "good"){
-            select.innerHTML = "";
-            res["body"].forEach(group => {
-                let group_div = document.createElement("option");
-                group_div.innerText = group["name"].replace("$"," ");
-                group_div.setAttribute("group_count",group["count"]);
-                group_div.setAttribute("gid",group["id"]);
-                group_div.id = `obj_group_${group["id"]}`;
-                select.append(group_div);
-                if(group["id"] == res["body"].at(-1)["id"]){
-                    if(callback)callback();
-                }
-            });
+            // console.log(res["body"]);
+            callback(res["body"]);
         }
-        // callback(res);
+    });
+}
+function load_group(gid,callback){
+    $.post( "/object/group/get", {gid:gid})
+    .done(function( res ) {
+        if(res["out"] == "good"){
+            // console.log(res["body"]);
+            callback(res["body"]);
+            // Object.values(res["body"]).forEach(part => {
+            //     console.log(part);
+            // });
+        }
     });
 }
 
@@ -148,3 +221,26 @@ function postForm(path, params, method) {
     document.body.appendChild(form);
     form.submit();
 }
+
+function downloadTextFile(text, name) {
+    const a = document.createElement('a');
+    const type = name.split(".").pop();
+    a.href = URL.createObjectURL( new Blob([text], { type:`text/${type === "txt" ? "plain" : type}` }) );
+    a.download = name;
+    a.click();
+}
+
+var openFile = function(event,callback) {
+    var input = event.target;
+    console.log(input.files[0]);
+  
+    var reader = new FileReader();
+    reader.onload = function() {
+      var text = reader.result;
+    //   var node = document.getElementById('import_file');
+    //   node.innerText = text;
+      console.log(reader.result.substring(0, 200));
+      callback(text)
+    };
+    reader.readAsText(input.files[0]);
+};

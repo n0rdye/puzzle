@@ -1,0 +1,21 @@
+<%- include('../static/start.ejs',{name:"admin/users",async: true}) %>
+<%- include('../header.ejs') %>
+<style>
+    section{
+        width: 80vw;
+        margin: auto;
+    }
+</style>
+
+<section>
+    <h1 style="text-align: center;">пользователь</h1>
+    <%- include('../admin/users/user_reg.ejs') %>
+    <%- include('../admin/users/user_edit.ejs') %>
+</section>
+
+<%- include('../static/end.ejs') %>
+<script>
+    setTimeout(()=>{
+        loaded()
+    },1000);
+</script>

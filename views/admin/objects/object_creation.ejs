@@ -61,7 +61,7 @@
             <div style="display: flex;width: 100%;justify-content: space-between;">
                 <label for="obj_width">цена</label>
                 <div style="display: flex;">
-                    <input style="text-align: right;" id="obj_cost" type="text">
+                    <input style="text-align: right;" id="obj_cost" type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '0').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');" >
                     <div>руб.</div>
                 </div>
             </div>
@@ -100,7 +100,8 @@
             document.getElementById("object_edit_type").innerText = "редактирование";
             document.getElementById("obj_apply_btn").value = "сохранить";
             document.getElementById("obj_apply_btn").setAttribute("onclick","save_edited_obj()");
-            document.getElementById("group_select").selectedIndex = document.getElementById("group_select").options[`obj_group_${gid}`].index;
+            // document.getElementById("group_select").selectedIndex = document.getElementById("group_select").options[`obj_group_${gid}`].index;
+            gids = [parseInt(gid)]
             console.log(gid);
         }
 
@@ -130,7 +131,7 @@
     }
 
     function previewFile() {
-        var preview = document.querySelector('img');
+        var preview = document.querySelector('#img_prev');
         var file    = document.querySelector('input[type=file]').files[0];
         var reader  = new FileReader();
 
@@ -146,9 +147,9 @@
     }
 
     function new_obj(cost,name,img,height,width,description,callback){
-        let select = document.getElementById("group_select");
+        let gid = gids[0];
         if(name!=""){
-            $.post( "/admin/objects/new", { cost:cost,name,img:img,desc:description,height:height,width:width,gid:select.options[select.selectedIndex].getAttribute("gid")})
+            $.post( "/admin/objects/new", { cost:cost,name:name,img:img,desc:description,height:height,width:width,gid:gid})
             .done(function( res ) {
                 // if(res["out"] == "good"){
                 //     console.log(res["body"]);

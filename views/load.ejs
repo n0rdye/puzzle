@@ -1,12 +1,14 @@
+<script>
+    // document.getElementById("load_div").style.height = `${document.getElementsByTagName("body")[0].scrollHeight}px`;
+</script>
 <style>
     #load_div{
         width: 100vw;
-        height: 100vh;
+        height: 99vh;
         display: flex;
         position: absolute;
         z-index: 10000;
         background-color: white;
-        pointer-events: none;
         transition: background-color 1s;
     }
     #load_logo{
@@ -19,21 +21,38 @@
         -ms-transform: translateX(-50%) translateY(-50%);
         -webkit-transform: translate(-50%,-50%);
         transform: translate(-50%,-50%);
-        pointer-events: none;
+        pointer-events: all;
         transition-duration: 800ms;
+        cursor: pointer;
+    }
+    #load_help{
+        width: 12vw;
+        justify-content: space-between;
+        position:absolute;
+        top:50%;
+        left:50%;
+        -ms-transform: translateX(-50%) translateY(-50%);
+        -webkit-transform: translate(-50%,-50%);
+        transform: translate(-50%,-50%);
+        display: none;
+        text-align: center;
+        pointer-events: all;
     }
 </style>
 
+
 <div id="load_div">
-    <img id="load_logo" src="/img/Умничка лого с обводкой-02 1.png" alt="">
+    <img id="load_logo" src="/img/Умничка лого с обводкой-02 1.png" onclick="goto('/')" alt="">
+    <div id="load_help"><a href="">reload</a><br><a href="/main">go to main page</a></div>
 </div>
 
 <script>
+    let page_state = "";
     let loaded_pos={
         x:"10%",
         // y:"6%",
         // x: "55px",
-        y: "45px",
+        y: "4vh",
         w:"8vw",
         h:"8vh"
     }
@@ -48,22 +67,34 @@
         let logo = document.getElementById("load_logo");
         let load_div = document.getElementById("load_div");
         load_div.style.backgroundColor = "transparent";
+        load_div.style.pointerEvents = "none";
+        document.getElementById("load_help").style.display = "none";
         // load_div.style.transition = "background-color 1s"
         // logo.style.transform = `translate(0px,0px)`;
+        document.getElementsByTagName("body")[0].style.overflow = "auto";
         logo.style.left = loaded_pos.x;
         logo.style.top = loaded_pos.y;
         logo.style.width = loaded_pos.w
-        load_div.style.height = `${document.getElementsByTagName("body")[0].scrollHeight}px`;
+        // load_div.style.height = `${document.getElementsByTagName("body")[0].scrollHeight}px`;
+        page_state = "loaded";
     }
     function loading(){
         let logo = document.getElementById("load_logo");
         let load_div = document.getElementById("load_div");
         load_div.style.backgroundColor = "white";
+        document.getElementsByTagName("body")[0].style.overflow = "hidden";
+        load_div.style.pointerEvents = "all";
         // load_div.style.transition = "background-color 1s"
         // logo.style.transform = `translate(-50%,-50%)`;
         logo.style.left = loading_pos.x;
         logo.style.top = loading_pos.y;
         logo.style.width = loading_pos.w
-        load_div.style.height = `${document.getElementsByTagName("body")[0].scrollHeight}px`;
+        // load_div.style.height = `${document.getElementsByTagName("body")[0].scrollHeight}px`;
+        page_state = "loading";
     }
+    setTimeout(()=>{
+        if(page_state != "loaded"){
+            document.getElementById("load_help").style.display = "block";
+        }
+    },2000)
 </script>

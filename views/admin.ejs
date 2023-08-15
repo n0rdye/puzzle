@@ -8,17 +8,10 @@
 </style>
 
 <!-- <h1 style="text-align: center;">привет админ</h1> <br> -->
-    <section>
-        <h1 style="text-align: center;">объект</h1>
-        <%- include('./admin/objects/object_groups.ejs') %>
-        <%- include('./admin/objects/object_creation.ejs') %>
-        <%- include('./admin/objects/object_edit.ejs') %>
-    </section>
 
-    <section>
-        <h1 style="text-align: center;">пользователь</h1>
-        <%- include('./admin/users/user_reg.ejs') %>
-        <%- include('./admin/users/user_edit.ejs') %>
+    <section class="admin_edits" style="display: flex; justify-content: space-evenly;">
+        <button onclick="goto('/admin/objects')">панель управления объектами</button>
+        <button onclick="goto('/admin/users')">панель управления пользователями</button>
     </section>
 
     <section style="display: flex; justify-content: space-between;">

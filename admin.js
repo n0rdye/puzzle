@@ -94,6 +94,7 @@ module.exports.new_user = (inp,cook,res)=>{
         let admin = inp["admin"];
         let pass = inp["pass"];
         let login = inp["login"];
+        let rights = inp["rights"];
         check_db();
         function check_db() {
             db.ggv("users","id","login",`'${inp["login"]}'`, (ldata)=>{ldata = ldata[0]
@@ -103,7 +104,7 @@ module.exports.new_user = (inp,cook,res)=>{
                     if(udata==null && ldata==null){
                         good_reg();
                         // func.log("/reg_user good reg");
-                        func.log(`good boy ${uuid} registered user ${login} with uuid = ${uuid} admin = ${admin}`);
+                        func.log(`good boy ${inp["uuid"]} registered user ${login} with uuid = ${uuid} admin = ${admin}`);
     
                     }
                     else if(udata!=null){
@@ -112,7 +113,7 @@ module.exports.new_user = (inp,cook,res)=>{
                         // res.send({out:"bad", body:"uuid"});
                     }
                     else if (ldata != null){
-                        func.log(`bad boy ${uuid} tried to register user ${login} with uuid = ${uuid} admin = ${admin} but login in use`);
+                        func.log(`bad boy ${inp["uuid"]} tried to register user ${login} with uuid = ${uuid} admin = ${admin} but login in use`);
                         res.send({out:"bad", body:"login"});
                         return;
                     }
@@ -121,9 +122,10 @@ module.exports.new_user = (inp,cook,res)=>{
         }
         function good_reg(){
             db.nr("users",'`login`,`pass`,`uuid`,`admin`',`'${login}','${pass}','${uuid}',${admin}`,true);
-            if (admin){
+            if (admin == "true"){
+                console.log("admin");
                 db.ggv("users","`id`","uuid",`'${uuid}'`,(udata)=>{ udata = udata[0]
-                    db.nr("admins",'`login`,`uid`',`'${login}',${udata["id"]}`,true);
+                    db.nr("admins",'`login`,`uid`,`rights`',`'${login}',${udata["id"]},${rights}`,true);
                 },true)
             }
             res.send({out:"good", body:{uuid:uuid,login:login,admin:admin}});

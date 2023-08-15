@@ -66,7 +66,7 @@
                     // console.log(scr)
                     // console.log("good");
                     // if(callback) callback(res);
-                    goto(`/proj/${name}`);
+                    goto(`/proj/load/${name}`);
                 }
             })
         }
@@ -81,16 +81,16 @@
             console.log(proj);
             let div = document.getElementById("projs_div");
             div.innerHTML += `<button id='proj_${proj["name"]}' class='proj'>
-                <img src='${proj["img"]}' alt='${proj["name"]}' class="p_img" onclick="goto('/proj/${proj["name"]}')">
+                <img src='${proj["img"]}' alt='${proj["name"]}' class="p_img" onclick="goto('/proj/load/${proj["name"]}')">
                 <div class="p_props">
                     <div class="p_left"  style="text-align:left">
                         <h1>${proj["name"]}</h1>
                         <div>${proj["creation_date"].split("T")[0]}</div>
                     </div>
                     <div class="p_right">
-                        <img src="/img/icon/edit.svg" style="width:24px;height:24px" onclick="del_proj('${proj["name"]}')">
-                        <img src="/img/icon/copy.svg" style="width:24px;height:24px" onclick="del_proj('${proj["name"]}')">
-                        <img src="/img/icon/download.svg" style="width:24px;height:24px" onclick="del_proj('${proj["name"]}')">
+                        <img src="/img/icon/edit.svg" style="width:24px;height:24px" onclick="">
+                        <img src="/img/icon/copy.svg" style="width:24px;height:24px" onclick="">
+                        <img src="/img/icon/download.svg" style="width:24px;height:24px" onclick="download_proj('${proj["id"]}','${proj["name"]}')">
                         <img src="/img/icon/trash.svg" style="width:24px;height:24px" onclick="del_proj('${proj["name"]}')">
                     </div>    
                 </div>
@@ -99,6 +99,13 @@
         });
         }
     });
+
+    function download_proj(id,name){
+        $.post( "/proj/download",{id:id})
+        .done(function( res ) {
+            downloadTextFile(res,`${name}.json`)
+        })
+    }
 
     function del_proj(proj_name){
         let del = confirm(`удалить проект ${proj_name}?`);

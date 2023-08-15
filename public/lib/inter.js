@@ -1,9 +1,13 @@
 window.dragMoveListener = dragMoveListener;
 let root = document.getElementById("drags");
-let objs = { height:"2",width:"4"};
+let objs = { height:"2",width:"4",color:"#FFFFFF"};
 let objs_store = {};
 let objs_imgs = {};
 let proj_from = "cloud";
+let cur_obj;
+let objs_back = [];
+let objs_forw = [];
+let proj_state = "loading";
 
 function create(clas,x,y,body,id,size){
     let main_clas = clas.split(" ")[0];
@@ -20,16 +24,17 @@ function create(clas,x,y,body,id,size){
         // db_data.forEach(db_data => {
         // });
         if (db_data == null) {
-            delete objs[main_clas][id];
-            if(proj_from == "cloud"){
-                save(()=>{
-                    goto("/proj/"+proj_name);
-                },false);
-            }
-            else if (proj_from == "local"){
-                save_local();
-                load_proj_local();
-            }
+            delete objs[main_clas];
+            reload();
+            // if(proj_from == "cloud"){
+            //     // save(()=>{
+            //     //     // goto("/proj/load/"+proj_name);
+            //     // },false);
+            // }
+            // else if (proj_from == "local"){
+            //     save_local();
+            //     load_proj_local();
+            // }
         }
         else if (db_data != null){
             if (objs_imgs[main_clas] == null){
@@ -54,6 +59,7 @@ function create(clas,x,y,body,id,size){
         }
         calc_total();
     })
+    obj.setAttribute("onclick",`cur_obj = "${id}"`);
     root.append(obj);
     set_pos(obj,x,y);
 }
@@ -67,6 +73,8 @@ function resize_drags(){
 }
 
 function wall_size_change(type,value = null){
+   if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
+
     let wall = document.getElementsByClassName("wall")[0];
     let scroll;
     if(type != null && type == "width") {
@@ -94,7 +102,7 @@ function wall_size_change(type,value = null){
 function calc_total(start = false){
     document.getElementById("cost_list").innerHTML = ""
     if (start) {
-        document.getElementById("proj_cost").setAttribute("value",`стоимость: ${objs["total"]} руб.`);
+        document.getElementById("proj_cost_text").innerText = `стоимость: ${objs["total"]} руб.`;
         return;
     }
     let total=0;
@@ -119,16 +127,17 @@ function calc_total(start = false){
     // return total;
 
     objs["total"] = total;
-    document.getElementById("proj_cost").setAttribute("value",`стоимость: ${total} руб.`);
+    document.getElementById("proj_cost_text").innerText = `стоимость: ${total} руб.`;
 }
 
 function load(objss){
+    proj_state = "loading";
     // objs = JSON.parse($.cookie("objs"));
     // console.log(objs);
     objs = objss;
     Object.entries(objs).forEach(([keys, values]) => {
-        // console.log(keys,values);
-        if (keys != "width" && keys != "height"){
+        console.log(keys,values);
+        if (keys != "width" && keys != "height" && keys != "color"){
             Object.entries(values).forEach(([key, value]) => {
                 if(key != "class"){
                     // console.log(key,keys);
@@ -145,11 +154,22 @@ function load(objss){
             // document.getElementById("drags").style.left = $(".dropzone")[0].getBoundingClientRect().x;
         }
 
+        if (keys == "color"){
+            document.getElementById("wall").style.backgroundColor = values;
+        }
         if (keys == Object.keys(objs).at(-1)){
             loaded();
+            proj_state = "loaded";
         }
     });
     resize_drags();
+}
+function reload(save = false){
+    // objs = JSON.parse($.cookie("objs"));
+    // console.log(objs);
+    document.getElementById("drags").innerHTML = "";
+    load(objs);
+    if(save){save(()=>{},false)}
 }
 
 function load_proj_cloud(){
@@ -169,7 +189,7 @@ function load_proj_cloud(){
         else if(res["out"] == "bad proj"){
             console.log("bad");
             save(()=>{
-                goto("/proj/"+proj_name);
+                goto("/proj/load/"+proj_name);
             },false);
         }
     })
@@ -264,40 +284,40 @@ function dragMoveListener (event) {
     var y = (parseFloat(drag.getAttribute('data-y')) || 0) + event.dy
     set_pos(drag,x,y);
 }
-        let dragzone = document.getElementsByClassName('wall')[0];
+    let dragzone = document.getElementsByClassName('wall')[0];
 interact('.drag').draggable({
     inertia: true,
     modifiers: [
-    interact.modifiers.restrictRect({restriction: dragzone,endOnly: true}),
+    interact.modifiers.restrictRect({restriction: dragzone,endOnly: true,elementRect:{ left: 0.15, right: 0.85, top: 0, bottom: 1 }}),
     interact.modifiers.snap({targets: [interact.snappers.grid({ x: 2, y: 2 })],range: Infinity,relativePoints: [ { x: 0, y: 0 } ]}),
     ],
     autoScroll: true,
     listeners: {move: dragMoveListener, end (event) {}}
 })
 
-interact('.trash').dropzone({
-    accept: '.drag',
-    overlap: 0.2,
+// interact('.trash').dropzone({
+//     accept: '.drag',
+//     overlap: 0.2,
 
-    ondragenter: function (event) {var drag = event.relatedTarget;var zone = event.target; 
+//     ondragenter: function (event) {var drag = event.relatedTarget;var zone = event.target; 
 
-        // console.log(drag.classList);
-        if(objs[drag.classList[0]] != null&&objs[drag.classList[0]][drag.id] != null) {
-            delete objs[drag.classList[0]][drag.id];
-        }
-        calc_total()
+//         // console.log(drag.classList);
+//         if(objs[drag.classList[0]] != null&&objs[drag.classList[0]][drag.id] != null) {
+//             delete objs[drag.classList[0]][drag.id];
+//         }
+//         calc_total()
 
-        zone.classList.add('drop-target');drag.classList.add('can-drop');
-        drag.remove();
-    },
-    ondragleave: function (event) {var drag = event.relatedTarget;var zone = event.target;zone.classList.remove('drop-target');drag.classList.remove('in_zone');drag.classList.remove('can-drop');},
-    ondrop: function (event) {var drag = event.relatedTarget;
-        // console.log(drag.id);
-        // console.log(objs);
-        drag.classList.add('in_zone');drag.classList.remove('can-drop');
-    },
-    ondropdeactivate: function (event) {var zone = event.target;zone.classList.remove('drop-active');zone.classList.remove('drop-target');}
-})
+//         zone.classList.add('drop-target');drag.classList.add('can-drop');
+//         drag.remove();
+//     },
+//     ondragleave: function (event) {var drag = event.relatedTarget;var zone = event.target;zone.classList.remove('drop-target');drag.classList.remove('in_zone');drag.classList.remove('can-drop');},
+//     ondrop: function (event) {var drag = event.relatedTarget;
+//         // console.log(drag.id);
+//         // console.log(objs);
+//         drag.classList.add('in_zone');drag.classList.remove('can-drop');
+//     },
+//     ondropdeactivate: function (event) {var zone = event.target;zone.classList.remove('drop-active');zone.classList.remove('drop-target');}
+// })
 
 interact('.dropzone').dropzone({
     accept: '.drag',
@@ -313,15 +333,17 @@ interact('.dropzone').dropzone({
             objs[drag.classList[0]][drag.id] = {};
             calc_total()
         }
-
+        drag.setAttribute("onclick",`cur_obj = "${drag.id}"`);
         zone.classList.add('drop-target');drag.classList.add('can-drop');
     },
     ondragleave: function (event) {var drag = event.relatedTarget;var zone = event.target;zone.classList.remove('drop-target');drag.classList.remove('in_zone');drag.classList.remove('can-drop');},
     ondrop: function (event) {var drag = event.relatedTarget
         
+       if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
         objs[drag.classList[0]][drag.id] = {y:drag.getAttribute('data-y'),x:drag.getAttribute('data-x'),body:drag.innerHTML};
-        
         drag.classList.add('in_zone');drag.classList.remove('can-drop');
+        // console.log(objs["KeyBoard/g/не$основное"]["KeyBoard/g/не$основное_1"]);
+        
     },
     ondropdeactivate: function (event) {var zone = event.target;zone.classList.remove('drop-active');zone.classList.remove('drop-target');}
 })
@@ -345,7 +367,7 @@ interact('.createzone').dropzone({
             let x = zone.getBoundingClientRect().left - document.getElementById("drags").getBoundingClientRect().left;
             let y = zone.getBoundingClientRect().top - document.getElementById("drags").getBoundingClientRect().top;
             create(`${zone.classList[0]} spawn drag`,x,y,`${zone.classList[0]}`,`none`);
-
+           if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
             drag.classList.remove('spawn');
         }
         zone.classList.remove('drop-target');
