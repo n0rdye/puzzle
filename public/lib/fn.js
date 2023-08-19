@@ -111,16 +111,18 @@ function load_groups(callback,groups,admin = false){
                     group_div.classList.add(`obj_group`);
                     
                     let group_label = document.createElement("label");
-                    group_label.innerText = group["name"].replace("$"," ");
+                    group_label.innerText = group["name"].replaceAll("$"," ");
                     group_label.setAttribute("for",`obj_group_${group["id"]}`)
     
                     let group_inp = document.createElement("input");
                     group_inp.setAttribute("type","checkbox");
                     group_inp.setAttribute("onchange",`group_check(${group["id"]})`)
-                    // group_inp.innerText = group["name"].replace("$"," ");
+                    // group_inp.innerText = group["name"].replaceAll("$"," ");
                     group_inp.setAttribute("group_count",group["count"]);
+                    console.log(group["count"]);
                     group_inp.setAttribute("gid",group["id"]);
                     group_inp.id = `obj_group_${group["id"]}`;
+                    group_inp.setAttribute("group_name",`${group["name"].replaceAll("$"," ")}`);
                     group_inp.setAttribute("pid",`${group["pid"]}`);
 
                     if (gids.includes(group["id"])){
@@ -149,6 +151,10 @@ function load_groups(callback,groups,admin = false){
 }
 
 function group_check(gid){
+    if (typeof gids[0] == 'undefined'){
+        gids = []
+    }
+    
     let gid_el = document.getElementById(`obj_group_${gid}`);
     if(gid_el.checked){
         gids[gids.indexOf(gids.at(-1))+1] = gid;

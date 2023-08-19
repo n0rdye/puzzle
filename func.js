@@ -56,18 +56,21 @@ module.exports.sid = (cook,res,callback,auto = true,admin_check = false)=>{
                             }
                         }
                         else{
-                            if(auto) res.send({out:"bad",err:"wrong"});
+                            // if(auto) res.send({out:"bad",err:"wrong"}); 
+                            if(auto) res.redirect("/");
                             else if(!auto) callback(false);
                         }
                     });
                 }
                 else{
-                    if(auto) res.send({out:"bad",err:"expired"});
+                    // if(auto) res.send({out:"bad",err:"expired"});
+                    if(auto) res.redirect("/");
                     else if(!auto) callback(false);
                 }
             });
         }else{
-            if(auto) res.send({out:"bad",err:"nocr"});
+            // if(auto) res.send({out:"bad",err:"nocr"});
+            if(auto) res.redirect("/");
             else if(!auto) callback(false);
         }
     } catch (error) {

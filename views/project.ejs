@@ -10,13 +10,14 @@
         text-align: center;
         margin: auto;
         z-index: 10;
+        touch-action: none;
     }
 
     #drags{
         position: absolute;
         margin: auto;
     }
-    #drags img{
+    .spawn{
         object-fit: contain;
     }
 
@@ -304,10 +305,6 @@
        catch{alert("объкт не выбран")}
     }
 
-    function gids_change(){
-        group_drop();
-    }
-
     function group_drop(){
         let e = document.getElementById("group_drop")
         setTimeout(()=>{
@@ -340,12 +337,14 @@
             part_drop.src = "/img/drop.png";
             part_drop.alt = "\/";
 
-            part_text.innerText = `${value["name"]}`;
+            part_text.innerText = `${value["name"].replaceAll("$", " ")}`;
 
             part.id = `group_drop-${value["id"]}`;
             part.classList.add("menu_btn")
             part.classList.add("group_drop")
             part.setAttribute("groups",`${value["groups"]}`)
+            part.setAttribute("count",`${value["count"]}`)
+            part.setAttribute("pid",`${value["id"]}`)
 
             part.append(part_text);
             part.append(part_drop);

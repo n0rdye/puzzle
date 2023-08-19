@@ -23,19 +23,29 @@
 </style>
 
 <form action="#" class="nobj">
-    <div>
+    <style>
+        #img_prev_div:hover{
+            border: 1px solid black;
+            border-radius: 0.5vw;
+            cursor: pointer;
+        }
+    </style>
+    <div id="img_file_div" >
         <div class="img_preview">
             <label for="img_file">макс. размер 2мб</label><br>
-            <input type="file" id="img_file" onchange="previewFile()"  accept="image/*" value="" maxlength="1"><br>
-
+            <input hidden type="file" id="img_file" onchange="previewFile()"  accept="image/*" value="" maxlength="1"><br>
         </div>
-        <div style="width: 200px; height: 200px;">
-            <img src="" id="img_prev" height="100" alt="предпросмотр картинки">
+        <div id="img_prev_div" style="width: 200px; height: 200px;" onclick="document.getElementById('img_file').click();">
+            <img src="" id="img_prev" height="100" alt="выбрать изображение">
+        </div>
+        <div>
+            <input type="checkbox" id="obj_color_check">
+            <label for="obj_color_check">можно менять цвет</label>
         </div>
     </div>
     <textarea id="nobj_description" cols="30" rows="5" placeholder="описание товара"></textarea>
     <div>
-        <div id="object_edit_type" style="text-align: right;">creation</div>
+        <div id="object_edit_type" style="display: flex;justify-content: space-between;"><div>creation</div></div>
         <div class="nobj_options">
             <input type="text" id="nobj_name" placeholder="название товара">
             <input type="submit" onclick="create_obj()" id="obj_apply_btn" value="создать товар">
@@ -91,15 +101,19 @@
         }
     }
 
-    function set_obj_edit_params(img = "",name = "",description="",height = 100,width = 100,cost = 0,gid = 0){
+    function set_obj_edit_params(img = "",name = "",description="",height = 100,width = 100,cost = 0,gid = 0, id = null){
         if(img ==""&&name ==""&&description == ""){
             document.getElementById("object_edit_type").innerText = "добавление";
             document.getElementById("obj_apply_btn").value = "добавить товар";
             document.getElementById("obj_apply_btn").setAttribute("onclick","create_obj()");
         }else {
             document.getElementById("object_edit_type").innerText = "редактирование";
+            let del_btn = document.createElement("button");
+            del_btn.setAttribute("onclick",`obj_del(${id})`);
+            del_btn.innerText = "удалить объект";
+            document.getElementById("object_edit_type").append(del_btn);
             document.getElementById("obj_apply_btn").value = "сохранить";
-            document.getElementById("obj_apply_btn").setAttribute("onclick","save_edited_obj()");
+            document.getElementById("obj_apply_btn").setAttribute("onclick",`save_edited_obj(${id})`);
             // document.getElementById("group_select").selectedIndex = document.getElementById("group_select").options[`obj_group_${gid}`].index;
             gids = [parseInt(gid)]
             console.log(gid);
@@ -148,14 +162,21 @@
 
     function new_obj(cost,name,img,height,width,description,callback){
         let gid = gids[0];
-        if(name!=""){
-            $.post( "/admin/objects/new", { cost:cost,name:name,img:img,desc:description,height:height,width:width,gid:gid})
-            .done(function( res ) {
-                // if(res["out"] == "good"){
-                //     console.log(res["body"]);
-                // }
-                callback(res);
-            });
+        if(gid != null){
+            if(name!=""){
+                $.post( "/admin/objects/new", { cost:cost,name:name,img:img,desc:description,height:height,width:width,gid:gid})
+                .done(function( res ) {
+                    // if(res["out"] == "good"){
+                    //     console.log(res["body"]);
+                    // }
+                    callback(res);
+                });
+            }
+        }
+        else{
+            alert("группа не выбранна")
+            let res = {out:"bad"}
+            callback(res);
         }
     }
 
@@ -166,7 +187,7 @@
         let width = document.getElementById("obj_width").value;
         var img = document.querySelector('#img_prev').src;
         var cost =  document.getElementById("obj_cost").value;
-        name = name.replace(" ","$");
+        name = name.replaceAll(" ","$");
         if(name != ""){
             if (img != "http://n0rsrv2:3002/admin"){
                 document.getElementById("obj_resp").innerHTML = "добавление товара";
@@ -174,15 +195,18 @@
                     if(res["out"] == "bad" && res["err"] == "name"){
                         document.getElementById("obj_resp").innerHTML = "товар уже существует";
                     }
+                    else if (res["out"] == "bad" ){
+                        document.getElementById("obj_resp").innerHTML = "ошибка при добавлении товара";
+                    }
                     else if(res["out"] == "good"){
                         document.getElementById("obj_resp").innerHTML = "товар добавлен";
                         setTimeout(()=>{
                             edit_get_objs();
                         },1000)
-                        setTimeout(()=>{
-                            document.getElementById("obj_resp").innerHTML = "";
-                        },3000)
                     }
+                    setTimeout(()=>{
+                        document.getElementById("obj_resp").innerHTML = "";
+                    },3000)
                 });
             }
             else{

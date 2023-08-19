@@ -112,6 +112,13 @@
             display: none;
         }
     }
+
+    #top_panel_center button{
+        border-radius: 0.5vw;
+    }
+    #top_panel_center :hover{
+        border: 1px solid black;
+    }
 </style>
 
 <header id="top_panel">
@@ -119,11 +126,11 @@
     <div id="proj_top_panel">
         <div id="top_panel_left" class="tpanel"></div>
         <div id="top_panel_center" class="tpanel">
-            <button onclick="goto('/main')">Мои проекты</button>
-            <button onclick="goto('/tamp')">Шаблоны</button>
-            <button onclick="goto('/gallery')">Галерея</button>
-            <button onclick="goto('/faq')">FAQ</button>
-            <button onclick="goto('/help')">Связаться с поддержкой</button>
+            <button id="page_btn_main" onclick="goto('/main')">Мои проекты</button>
+            <button id="page_btn_tamp" onclick="goto('/tamp')">Шаблоны</button>
+            <button id="page_btn_gallery" onclick="goto('/gallery')">Галерея</button>
+            <button id="page_btn_faq" onclick="goto('/faq')">FAQ</button>
+            <button id="page_btn_help" onclick="goto('/help')">Связаться с поддержкой</button>
 
         </div>
         <div id="top_panel_right_main" class="tpanel top_panel_right">
@@ -152,14 +159,27 @@
         
         let menu = document.getElementById("top_panel_center");
         if (res["admin"] == true){
-            menu.innerHTML += `<button onclick='goto("/admin")'>админ. панель</button><br>`;
+            menu.innerHTML += `<button id="page_btn_admin" onclick='goto("/admin")'>Админ. панель</button><br>`;
         }
         // menu.innerHTML += "<button onclick='logout();'>выйти</button><br>";
+        document.URL.split("puzzle.n0r.su/").at(-1)
+        switch (document.URL.split("puzzle.n0r.su/").at(-1)) {
+            case ("main"):
+                document.getElementById("page_btn_main").style.border = "1px solid black";
+                break; 
+            case ("admin"):document.getElementById("page_btn_admin").style.border = "1px solid black";break;
+            case ("admin/objects"):document.getElementById("page_btn_admin").style.border = "1px solid black";break;
+            case ("admin/users"):document.getElementById("page_btn_admin").style.border = "1px solid black";break;
+            default:
+                break;
+        }
     });
 
-    onscroll = (e)=>{
-        hide_menus();
-    }
+    console.log("asd");
+
+    // onscroll = (e)=>{
+    //     hide_menus();
+    // }
     onresize = (e)=>{
         hide_menus();
     }
@@ -210,27 +230,27 @@
             open_menu();
         
         }
-        else if(e.target.id == "object_menu"){
-            hide_menus();
-            let menu = document.getElementById("object_edit_menu");
-            let obj = e.target;
-            menu.setAttribute("obj_img",obj.getAttribute("src"));
-            menu.setAttribute("obj_name",obj.getAttribute("name"));
-            menu.setAttribute("obj_description",obj.getAttribute("description"));
-            menu.setAttribute("obj_height",obj.getAttribute("height"));
-            menu.setAttribute("obj_width",obj.getAttribute("width"));
-            menu.setAttribute("obj_id",obj.getAttribute("obj_id"));
-            menu.setAttribute("obj_cost",obj.getAttribute("cost"))
-            menu.setAttribute("obj_gid",obj.getAttribute("gid"))
-            menu.style.display = 'block';
-            // menu.style = `top:${e.target.getBoundingClientRect().top+27}px;left:${e.target.getBoundingClientRect().left-13}px`;
-            menu.style = `top:${e.target.getBoundingClientRect().top + 40}px;left:${e.target.getBoundingClientRect().left - 5}px`;
-            // menu.onmouseleave = () => menu.style.display = 'none';
-            // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
-            // document.body.appendChild(menu)
-            open_menu();
+        // else if(e.target.id == "object_menu"){
+        //     hide_menus();
+        //     let menu = document.getElementById("object_edit_menu");
+        //     let obj = e.target;
+        //     menu.setAttribute("obj_img",obj.getAttribute("src"));
+        //     menu.setAttribute("obj_name",obj.getAttribute("name"));
+        //     menu.setAttribute("obj_description",obj.getAttribute("description"));
+        //     menu.setAttribute("obj_height",obj.getAttribute("height"));
+        //     menu.setAttribute("obj_width",obj.getAttribute("width"));
+        //     menu.setAttribute("obj_id",obj.getAttribute("obj_id"));
+        //     menu.setAttribute("obj_cost",obj.getAttribute("cost"))
+        //     menu.setAttribute("obj_gid",obj.getAttribute("gid"))
+        //     menu.style.display = 'block';
+        //     // menu.style = `top:${e.target.getBoundingClientRect().top+27}px;left:${e.target.getBoundingClientRect().left-13}px`;
+        //     menu.style = `top:${e.target.getBoundingClientRect().top + 40}px;left:${e.target.getBoundingClientRect().left - 5}px`;
+        //     // menu.onmouseleave = () => menu.style.display = 'none';
+        //     // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
+        //     // document.body.appendChild(menu)
+        //     open_menu();
         
-        }
+        // }
         else if(e.target.id == "proj_cost"){
             hide_menus();
             document.getElementById("cost_list").style = `margin-top:2.5vw;left:${e.target.getBoundingClientRect().left}px`;
@@ -242,12 +262,12 @@
             document.getElementById("group").innerHTML = "";
 
             // console.log(e.target.getAttribute("groups").split(","));
-            document.getElementById("group").style = `margin-top:2.5vw;left:${e.target.getBoundingClientRect().left}px;width: 14vw;padding: 0.45vw;display:block;`;
+            document.getElementById("group").style = `margin-top:2.9vw;left:${e.target.getBoundingClientRect().left}px;width: 14vw;padding: 0.45vw;display:block;padding-bottom: 0.7vw;`;
             console.log("group");
             open_menu();
 
             if (document.URL == "https://puzzle.n0r.su/admin/objects"){
-                load_groups(()=>{},e.target.getAttribute("groups").split(","),true)
+                if(e.target.getAttribute("count") != 0)load_groups(()=>{},e.target.getAttribute("groups").split(","),true)
                 let groups = document.getElementById("group");
                 let new_grp_btn = document.createElement("button");
                 new_grp_btn.setAttribute("onclick",`create_new_group(${e.target.getAttribute("pid")})`);
@@ -256,7 +276,7 @@
                 groups.append(new_grp_btn)
             }
             else{
-                load_groups(()=>{},e.target.getAttribute("groups").split(","))
+                if(e.target.getAttribute("count") != 0)load_groups(()=>{},e.target.getAttribute("groups").split(","))
             }
             // hide_menus();
             // let menu = document.getElementById("object_edit_menu");

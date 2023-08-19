@@ -7,7 +7,7 @@ module.exports.loads = (inp,cook,res)=>{
         let gin
         if (typeof inp["gid"] == 'undefined' || inp["gid"] == null) gin = "1 OR 1=1"
         else gin = inp["gid"]
-        db.ggv("objects","`name`,`id`,`height`,`width`,`description`,`cost`,`gid`","gid",`${gin}`,(odata)=>{
+        db.ggv("objects","`name`,`id`,`height`,`width`,`description`,`cost`,`gid`,`colors`","gid",`${gin}`,(odata)=>{
             // func.log(odata);
             res.send({out:"good",body:odata});
         })
@@ -140,13 +140,15 @@ module.exports.new_group = (inp,cook,res)=>{
                 db.nr("object_groups","`name`,`count`,`pid`",`'${inp["name"]}','0',${inp["pid"]}`,true,()=>{
                     db.glv("object_groups","id",(new_group)=>{ new_group = new_group[0];
                         db.gv("object_partition","id",`${inp["pid"]}`,(part_db)=>{part_db = part_db[0];
-                            if (part_db["groups"].split(",").lenght<2){
-                                db.sv("object_partition","`groups`",`${part_db["groups"]}`,"id",`${inp["pid"]}`,()=>{},true)
+                            // console.log(part_db);
+                            if (part_db["count"] == 0){
+                                db.sv("object_partition","`groups`",`${new_group["id"]}`,"id",`${inp["pid"]}`,()=>{},true)
                             }
                             else{
                                 db.sv("object_partition","`groups`",`${part_db["groups"]},${new_group["id"]}`,"id",`${inp["pid"]}`,()=>{},true)
                             }
                             res.send({out:"good"});
+                            db.sv("object_partition","count",`(count + 1)`,"id",`${inp["pid"]}`,()=>{},true,true)
                             func.log(`admin group created ${new_group["name"]}`);
                         })
                     })
@@ -182,6 +184,7 @@ module.exports.del_group = (inp,cook,res)=>{
                 db.sv("object_partition","`groups`",`${new_groups}`,"`id`",`${inp["pid"]}`,()=>{
                     db.dl("object_groups",`id`,`'${inp["gid"]}'`,()=>{
                         func.log(`admin group deleted ${gname}`);
+                        db.sv("object_partition","count",`(count - 1)`,"id",`${inp["pid"]}`,()=>{},true,true)
                         res.send({out:"good"});
                     },true);
                 },true)
@@ -222,7 +225,7 @@ module.exports.new_part = (inp,cook,res)=>{
                 res.send({out:"bad"});
             }
             else if (gdata == null){
-                db.nr("object_partition","`name`,`count`",`'${inp["name"]}','0'`,true,()=>{
+                db.nr("object_partition","`name`,`count`,`groups`",`'${inp["name"]}','0',''`,true,()=>{
                     res.send({out:"good"});
                 })
             }

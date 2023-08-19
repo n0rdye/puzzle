@@ -8,6 +8,7 @@ let cur_obj;
 let objs_back = [];
 let objs_forw = [];
 let proj_state = "loading";
+let cm_mod = 2;
 
 function create(clas,x,y,body,id,size){
     let main_clas = clas.split(" ")[0];
@@ -49,19 +50,35 @@ function create(clas,x,y,body,id,size){
         }
         function make(img){
             obj.src = img;
-            obj.title = `${db_data["name"].replace("$"," ").split("/g")[0]}\nцена:${db_data["cost"]}\n${db_data["description"]}\nширина:${db_data["width"]}см высота:${db_data["height"]}см`;
+            obj.title = `${db_data["name"].replaceAll("$"," ").split("/g")[0]}\nцена:${db_data["cost"]}\n${db_data["description"]}\nширина:${db_data["width"]}см высота:${db_data["height"]}см`;
             obj.setAttribute("cost",db_data["cost"])
-            // drag.transform = `translate(${drag.getAttribute("data-y")}px, ${drag.getAttribute("data-y")}px) scale(${db_data["width"] * 2} ${db_data["height"] * 2})`;
+            // drag.transform = `translate(${drag.getAttribute("data-y")}px, ${drag.getAttribute("data-y")}px) scale(${db_data["width"] * cm_mod} ${db_data["height"] * cm_mod})`;
             if(size){
-                obj.style.width = `${db_data["width"] * 2}px`;
-                obj.style.height = `${db_data["height"] * 2}px`;
+                obj.style.width = `${db_data["width"] * cm_mod}px`;
+                obj.style.height = `${db_data["height"] * cm_mod}px`;
             }
         }
         calc_total();
     })
-    obj.setAttribute("onclick",`cur_obj = "${id}"`);
+    obj.setAttribute("onclick",`obj_click("${id}")`);
     root.append(obj);
     set_pos(obj,x,y);
+}
+
+function obj_click(id){
+    if (cur_obj != id){
+        cur_obj = id;
+        let drags = document.getElementsByClassName("drag");
+        Object.values(drags).forEach(element => {
+            // console.log(element.id,cur_obj);
+            if (element.id != cur_obj){
+                element.style.border = "0px";
+            }
+            else{
+                element.style.border = "1px black solid";
+            }
+        });
+    }
 }
 
 function resize_drags(){
@@ -84,7 +101,7 @@ function wall_size_change(type,value = null){
         // document.getElementById("wall_width_value").innerHTML = `${scroll}м`;
 
         // console.log(scroll);
-        wall.style.width = `${scroll * 200}px`;
+        wall.style.width = `${(scroll * 100) * cm_mod}px`;
         objs["width"] = scroll;
     }
     if(type != null && type == "height") {
@@ -94,7 +111,7 @@ function wall_size_change(type,value = null){
         // document.getElementById("wall_height_value").innerHTML = `${scroll}м`;
 
         // console.log(scroll);
-        wall.style.height = `${scroll * 200}px`;
+        wall.style.height = `${(scroll * 100) * cm_mod}px`;
         objs["height"] = scroll;
     }            
 }
@@ -116,7 +133,7 @@ function calc_total(start = false){
                 total += parseInt(parseInt(objs_store[key]["cost"]) * Object.keys(value).length);
                 let obj_cost_div = document.createElement("li");
                 obj_cost_div.innerHTML =
-                `<div style="display:flex;"> <div id='obj_cost_name'>${key.split("/g/")[0].replace("$"," ")}</div>`+
+                `<div style="display:flex;"> <div id='obj_cost_name'>${key.split("/g/")[0].replaceAll("$"," ")}</div>`+
                 `<div id='obj_cost_count'>&nbsp${Object.keys(value).length}x</div> </div>`+
                 `<div id='obj_cost'>${parseInt(parseInt(objs_store[key]["cost"]) * Object.keys(value).length)}</div>`;
                 document.getElementById("cost_list").append(obj_cost_div);
@@ -280,6 +297,7 @@ function load_obj(name,key,callback){
 
 function dragMoveListener (event) {
     var drag = event.target
+    obj_click(drag.id)
     var x = (parseFloat(drag.getAttribute('data-x')) || 0) + event.dx
     var y = (parseFloat(drag.getAttribute('data-y')) || 0) + event.dy
     set_pos(drag,x,y);
@@ -289,7 +307,7 @@ interact('.drag').draggable({
     inertia: true,
     modifiers: [
     interact.modifiers.restrictRect({restriction: dragzone,endOnly: true,elementRect:{ left: 0.15, right: 0.85, top: 0, bottom: 1 }}),
-    interact.modifiers.snap({targets: [interact.snappers.grid({ x: 2, y: 2 })],range: Infinity,relativePoints: [ { x: 0, y: 0 } ]}),
+    interact.modifiers.snap({targets: [interact.snappers.grid({ x: cm_mod, y: cm_mod })],range: Infinity,relativePoints: [ { x: 0, y: 0 } ]}),
     ],
     autoScroll: true,
     listeners: {move: dragMoveListener, end (event) {}}
@@ -333,7 +351,6 @@ interact('.dropzone').dropzone({
             objs[drag.classList[0]][drag.id] = {};
             calc_total()
         }
-        drag.setAttribute("onclick",`cur_obj = "${drag.id}"`);
         zone.classList.add('drop-target');drag.classList.add('can-drop');
     },
     ondragleave: function (event) {var drag = event.relatedTarget;var zone = event.target;zone.classList.remove('drop-target');drag.classList.remove('in_zone');drag.classList.remove('can-drop');},
@@ -359,9 +376,9 @@ interact('.createzone').dropzone({
 
         if(drag.classList[1] == "spawn" && drag.classList[0] == zone.classList[0]){
             get_obj(drag.classList[0],(db_data)=>{
-                // drag.transform = `translate(${drag.getAttribute("data-y")}px, ${drag.getAttribute("data-y")}px) scale(${db_data["width"] * 2} ${db_data["height"] * 2})`;
-                drag.style.width = `${db_data["width"] * 2}px`;
-                drag.style.height = `${db_data["height"] * 2}px`;
+                // drag.transform = `translate(${drag.getAttribute("data-y")}px, ${drag.getAttribute("data-y")}px) scale(${db_data["width"] * cm_mod} ${db_data["height"] * cm_mod})`;
+                drag.style.width = `${db_data["width"] * cm_mod}px`;
+                drag.style.height = `${db_data["height"] * cm_mod}px`;
                 // console.log(db_data);
             })
             let x = zone.getBoundingClientRect().left - document.getElementById("drags").getBoundingClientRect().left;

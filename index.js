@@ -54,104 +54,83 @@ app.get('/', (req, res) => {
 app.get("/login" , (req,res) =>{
     res.render('login');
 })
-app.get("/main", (req,res) =>{
-    res.render('main');
+app.get("/main", (req,res) =>{try{
+        let inp = req.body;
+        let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            res.render('main');
+        })
+    } catch (error) {func.log("router getting user information by uuid error - "+error);}
 });
-app.post('/back_login', (req, res) => {
-    try {
+app.post('/back_login', (req, res) => {try {
         let inp = req.body;
         let cook = req.cookies;
         user.login(inp,cook,res);
-    } catch (error) {
-        func.log("router login error - "+error);
-    }
+    } catch (error) {func.log("router login error - "+error);}
 });
-app.post("/sid_log",(req,res) =>{
-    try{
+app.post("/sid_log",(req,res) =>{try{
         let inp = req.body;
         let cook = req.cookies;
         user.sid_log(inp,cook,res,req);
-    } catch (error) {
-        func.log("router sid logging in error - "+error);
-    }
+    } catch (error) {func.log("router sid logging in error - "+error);}
 })
-app.post("/get_sid" , (req,res) =>{
-    try{
+app.post("/get_sid" , (req,res) =>{try{
         let inp = req.body;
         let sid = func.get_uuid();
         res.cookie("sid",sid,{maxAge:(vars.week),path:"/;SameSite=Strict"});
         res.send({out:"good"});
-    } catch (error) {
-        func.log("router sid getting error - "+error);
-    }
+    } catch (error) {func.log("router sid getting error - "+error);}
 });
-app.post("/clear_sid" , (req,res) =>{
-    try{
+app.post("/clear_sid" , (req,res) =>{try{
         let inp = req.body;
         let cook = req.cookies;
         user.clear_sid(inp,cook,res);
-    } catch (error) {
-        func.log("router sid clearing error - "+error);
-    }
+    } catch (error) {func.log("router sid clearing error - "+error);}
 });
-app.post("/get_cr_uuid", (req,res) => {
-    try{
+app.post("/get_cr_uuid", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             user.get_cr(inp,cook,res);
         })
-    } catch (error) {
-        func.log("router getting user information by uuid error - "+error);
-    }
+    } catch (error) {func.log("router getting user information by uuid error - "+error);}
 })
+
 /// project
 app.get("/proj/load/:name" , (req,res) =>{
     res.render('project',{proj_name:req.params["name"]});
 })
-app.post("/save_proj", (req,res) => {
-    try{
+app.post("/save_proj", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             proj.save(inp,cook,res);
         })
-    } catch (error) {
-        func.log("router project saving error - "+error);
-    }
+    } catch (error) {func.log("router project saving error - "+error);}
 })
-app.post("/load_proj", (req,res) => {
-    try{
+app.post("/load_proj", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             proj.load(inp,cook,res);
         })
-    } catch (error) {
-        func.log("router project loading error - "+error);
-    }
+    } catch (error) {func.log("router project loading error - "+error);}
 })
-app.post("/proj/delete", (req,res) => {
-    try{
+app.post("/proj/delete", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             proj.del(inp,cook,res);
         })
-    } catch (error) {
-        func.log("router project loading error - "+error);
-    }
+    } catch (error) {func.log("router project loading error - "+error);}
 })
-app.post("/proj/download", (req,res) => {
-    try{
+app.post("/proj/download", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             proj.download(inp,cook,res);
         })
-    } catch (error) {
-        func.log("router project loading error - "+error);
-    }
+    } catch (error) {func.log("router project loading error - "+error);}
 })
 app.post("/get_projs", (req,res) => {
     try{
@@ -160,9 +139,7 @@ app.post("/get_projs", (req,res) => {
         func.sid(cook,res,()=>{
             proj.loads(inp,cook,res);
         })
-    } catch (error) {
-        func.log("router user projects getting error - "+error);
-    }
+    } catch (error) {func.log("router user projects getting error - "+error);}
 })
 app.post("/get_objs", (req,res) => {
     try{
@@ -172,247 +149,168 @@ app.post("/get_objs", (req,res) => {
         func.sid(cook,res,()=>{
             obj.loads(inp,cook,res);
         })
-    } catch (error) {
-        func.log("router objects getting error - "+error);
-    }
+    } catch (error) {func.log("router objects getting error - "+error);}
 })
-app.post("/get_obj", (req,res) => {
-    try{
+app.post("/get_obj", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         // func.log(inp["name"]);
         func.sid(cook,res,()=>{
             obj.load(inp,cook,res);
         })
-    } catch (error) {
-        func.log("router single object getting error - "+error);
-    }
+    } catch (error) {func.log("router single object getting error - "+error);}
 })
-app.post("/get_groups", (req,res) => {
-    try{
+app.post("/get_groups", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         // func.log(inp["name"]);
         func.sid(cook,res,()=>{
             obj.load_groups(inp,cook,res);
         })
-    } catch (error) {
-        func.log("router single object getting error - "+error);
-    }
+    } catch (error) {func.log("router single object getting error - "+error);}
 })
-app.post("/object/parts/get", (req,res) => {
-    try{
+app.post("/object/parts/get", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         // func.log(inp["name"]);
         func.sid(cook,res,()=>{
             obj.load_parts(inp,cook,res);
         })
-    } catch (error) {
-        func.log("router single object getting error - "+error);
-    }
+    } catch (error) {func.log("router single object getting error - "+error);}
 })
-app.post("/object/group/get", (req,res) => {
-    try{
+app.post("/object/group/get", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         // func.log(inp["name"]);
         func.sid(cook,res,()=>{
             obj.load_group(inp,cook,res);
         })
-    } catch (error) {
-        func.log("router single object getting error - "+error);
-    }
+    } catch (error) {func.log("router single object getting error - "+error);}
 })
+
+
 /// admin
-app.get("/admin", (req,res) =>{
-    try {
+app.get("/admin", (req,res) =>{try {
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,(rights)=>{
             res.render('admin');
         },true,true)
-    } catch (error) {
-        func.log("router admin page error - "+error);
-    }
+    } catch (error) {func.log("router admin page error - "+error);}
 });
-app.get("/admin/objects", (req,res) =>{
-    try {
-        let inp = req.body;
-        let cook = req.cookies;
-        func.sid(cook,res,(rights)=>{
-            if (rights == 1 || rights == 3){
-                res.render('admin/objects');
-            }
-            else{
-                res.redirect('/admin');
-            }
-        },true,true)
-    } catch (error) {
-        func.log("router admin page error - "+error);
-    }
+app.get("/admin/:type", (req,res) =>{try {
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,(rights)=>{
+        if ((req.params["type"] == "objects") && (rights == 1 || rights == 3)){
+            res.render('admin/objects');
+        }
+        else if ((req.params["type"] == "users") && (rights == 2 || rights == 3)){
+            res.render('admin/users');
+        }
+        else{res.redirect('/admin');}
+    },true,true)
+} catch (error) {func.log("router admin page error - "+error);}
 });
-app.get("/admin/users", (req,res) =>{
-    try {
-        let inp = req.body;
-        let cook = req.cookies;
-        func.sid(cook,res,(rights)=>{
-            if (rights == 2 || rights == 3){
-                res.render('admin/users');
-            }
-            else{
-                res.redirect('/admin');
-            }
-        },true,true)
-    } catch (error) {
-        func.log("router admin page error - "+error);
-    }
-});
-app.get("/home", (req,res) =>{
-    res.render('home');
-});
-// app.get("/admin/edit/:edit" , (req,res) =>{
-//     try {
-//         let inp = req.body;
-//         let cook = req.cookies;
-//         func.sid(cook,res,()=>{
-//             switch (req.params["edit"]) {
-//                 case "users":
-//                     res.render('admin/user_edit');break;
-//                 case "projects":
-//                     res.render('admin/project_edit');break;        
-//                 case "objects":
-//                     res.render('admin/object_edit');break;
-//             }
-//         },true,true)
-//     } catch (error) {
-//         func.log("router admin edit page error - "+error);
-//     }
-// })
 app.get("/get_logs", (req,res) => {
     try{let cook = req.cookies;func.sid(cook,res,()=>{func.logs_file(res);})} 
     catch (error) {func.log("router logs download error - "+error);}
 })
-app.post("/admin/objects/new", (req,res) => {
-    try{
+app.post("/admin/objects/new", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             obj.new(inp,cook,res);
         },true,true)
-    } catch (error) {
-        func.log("router object creating error - "+error);
-    }
+    } catch (error) {func.log("router object creating error - "+error);}
 })
-app.post("/admin/objects/edit", (req,res) => {
-    try{
+app.post("/admin/objects/edit", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             obj.save(inp,cook,res);
         },true,true)
-    } catch (error) {
-        func.log("router object creating error - "+error);
-    }
+    } catch (error) {func.log("router object creating error - "+error);}
 })
-app.post("/admin/objects/delete", (req,res) => {
-    try{
+app.post("/admin/objects/delete", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             obj.del(inp,cook,res);
         },true,true)
-    } catch (error) {
-        func.log("router object creating error - "+error);
-    }
+    } catch (error) {func.log("router object creating error - "+error);}
 })
-app.post("/admin/objects/find", (req,res) => {
-    try{
+app.post("/admin/objects/find", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             obj.find(inp,cook,res);
         },true,true)
-    } catch (error) {
-        func.log("router object creating error - "+error);
-    }
+    } catch (error) {func.log("router object creating error - "+error);}
 })
-app.post("/admin/groups/new", (req,res) => {
-    try{
+app.post("/admin/groups/new", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             obj.new_group(inp,cook,res);
         },true,true)
-    } catch (error) {
-        func.log("router object creating error - "+error);
-    }
+    } catch (error) {func.log("router object creating error - "+error);}
 })
-app.post("/admin/groups/delete", (req,res) => {
-    try{
+app.post("/admin/parts/new", (req,res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        obj.new_part(inp,cook,res);
+    },true,true)
+} catch (error) {func.log("router object creating error - "+error);}
+})
+app.post("/admin/groups/delete", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             obj.del_group(inp,cook,res);
         },true,true)
-    } catch (error) {
-        func.log("router object creating error - "+error);
-    }
+    } catch (error) {func.log("router object creating error - "+error);}
 })
-app.post("/admin/users/get", (req,res) => {
-    try{
+app.post("/admin/users/get", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             admin.get_users(inp,cook,res);
         },true,true)
-    } catch (error) {
-        func.log("router object creating error - "+error);
-    }
+    } catch (error) {func.log("router object creating error - "+error);}
 })
-app.post('/admin/users/new', (req, res) => {
-    try{
+app.post('/admin/users/new', (req, res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             admin.new_user(inp,cook,res);
         },true,true)
-    } catch (error) {
-        func.log("router registration error - "+error);
-    }
+    } catch (error) {func.log("router registration error - "+error);}
 })
-app.post("/admin/users/edit", (req,res) => {
-    try{
+app.post("/admin/users/edit", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             admin.edit_user(inp,cook,res);
         },true,true)
-    } catch (error) {
-        func.log("router object creating error - "+error);
-    }
+    } catch (error) {func.log("router object creating error - "+error);}
 })
-app.post("/admin/users/delete", (req,res) => {
-    try{
+app.post("/admin/users/delete", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             admin.del_user(inp,cook,res);
         },true,true)
-    } catch (error) {
-        func.log("router object creating error - "+error);
-    }
+    } catch (error) {func.log("router object creating error - "+error);}
 })
-app.post("/admin/users/find", (req,res) => {
-    try{
+app.post("/admin/users/find", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
         func.sid(cook,res,()=>{
             admin.find_user(inp,cook,res);
         },true,true)
-    } catch (error) {
-        func.log("router object creating error - "+error);
-    }
+    } catch (error) {func.log("router object creating error - "+error);}
 })
 
 
