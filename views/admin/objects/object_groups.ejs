@@ -4,24 +4,32 @@
         /* height: 5vh; */
         margin: auto 0px;
     }
-    #obj_group {
-        margin-bottom: 20px;
-    }
     .obj_group{
         display: flex;
+        margin-top: 0.5vw;
+    }
+    .obj_group label{
+        width: 100%;
+        padding-inline: 0.3vw;
+    }
+    #obj_group{
+        margin-bottom: 5vh;
     }
 </style>
 <div id="obj_group">
+    <h1>Разделы и группы</h1>
     <div style="display: flex;justify-content: space-between;">
         <div style="display: block;">
-            <h1>группы товаров</h1>
-            <button onclick="create_new_part()">доб. раздел</button>
         </div>
         <style>
             .group_drop{
-                width: 15vw;
+                /* width: 15vw; */
                 padding: 2px;
                 min-width: 15vw;
+            }
+            .part_div{
+
+                margin-left: 3vw;
             }
             .group_drop *{
                 pointer-events: none;
@@ -33,7 +41,7 @@
             }
         </style>
 
-        <div id="obj_parts" style="display: flex;justify-content: space-between; overflow: scroll;min-width: 50vw;">
+        <div id="obj_parts" style="display: flex;justify-content: space-between; overflow: scroll;min-width: 50vw;max-width: 70vw;">
         </div>
         <style>
             .group_inp{
@@ -47,6 +55,8 @@
         <ul id="group" class="cmenu"></ul>
         <!-- <select name="" id="group_select" onchange="edit_get_objs();"></select>
         <select name="" id="part_select"></select> -->
+        <button onclick="create_new_part()" class="btn_blue">Добавить раздел</button>
+
     </div>
 </div>
 
@@ -54,8 +64,29 @@
     // load_groups();
     function delete_group(gid,pid) {
         let name = document.getElementById("obj_group_"+gid).getAttribute("group_name");
-        if(confirm(`вы уверены вы хотите удалить группу ${name}`) == true){
-            $.post( "/admin/groups/delete", { gid:gid,pid:pid})
+        msg(`вы уверены вы хотите удалить группу ${name}`,{type:"ask",res:(out)=>{
+            if (out == true){
+                $.post( "/admin/groups/delete", { gid:gid,pid:pid})
+                .done(function( res ) {
+                    if(res["out"] == "good"){
+                        // console.log(res["body"]);
+                        // load_groups();
+                        edit_get_objs();
+                        hide_menus();
+                        setTimeout(()=>{
+                            parts_load();
+                            msg(`группа ${name} удалена`)
+                        },500)
+                    }
+                });
+            }
+        }})
+    }
+    function delete_part(pid) {
+        let name = document.getElementById("group_drop-"+pid).innerText;
+        msg(`вы уверены вы хотите удалить раздел ${name}`,{type:"ask",res:(out)=>{
+            if(out == true){
+            $.post( "/admin/parts/delete", {pid:pid})
             .done(function( res ) {
                 if(res["out"] == "good"){
                     // console.log(res["body"]);
@@ -64,11 +95,12 @@
                     hide_menus();
                     setTimeout(()=>{
                         parts_load();
-                        alert(`группа ${name} удалена`)
+                        msg(`раздел ${name} удалён`)
                     },500)
                 }
             });
         }
+        }})
     }
     function create_new_group(pid) {
         let group_name = ask("название группы");
@@ -82,7 +114,7 @@
                     hide_menus();
                     setTimeout(()=>{
                         parts_load();
-                        alert(`группа ${group_name.replaceAll(" ","$")} создана`)
+                        msg(`группа ${group_name.replaceAll(" ","$")} создана`)
                     },500)
                 }
             });
@@ -100,7 +132,7 @@
                     hide_menus();
                     setTimeout(()=>{
                         parts_load();
-                        alert(`раздел ${part_name.replaceAll(" ","$")} создан`)
+                        msg(`раздел ${part_name.replaceAll(" ","$")} создан`)
                     },500)
                 }
             });
@@ -115,7 +147,8 @@
                 let part = document.createElement("button")
                 let part_text = document.createElement("div")
                 let part_drop = document.createElement("img")
-                
+                let part_div = document.createElement("div");
+
                 part_drop.src = "/img/drop.png";
                 part_drop.alt = "\/";
 
@@ -127,11 +160,23 @@
                 part.setAttribute("groups",`${value["groups"]}`)
                 part.setAttribute("count",`${value["count"]}`)
                 part.setAttribute("pid",`${value["id"]}`)
+                let part_del = document.createElement("button");
+                part_del.id = `del_part-${value["id"]}`;
+                part_del.setAttribute("onclick",`delete_part(${value["id"]})`);
+                part_del.innerHTML = "удалить раздел";
+                part_del.classList.add("btn_blue");
+                part_del.style.minWidth = "15vw";
 
                 part.append(part_text);
                 part.append(part_drop);
 
-                parts.append(part);
+                part_div.append(part_del);
+                part_div.append(part);
+                part_div.id = `part_div-${value["id"]}`;
+                part_div.classList.add("part_div")
+
+
+                parts.append(part_div);
                 console.log(value);
             })
         })

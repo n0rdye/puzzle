@@ -44,7 +44,7 @@
 
 <section class="main">
     <div id="projs_div">
-        <button onclick="new_proj()" class="new_proj"><img class="p_img" src="img/new_proj.png" alt=""><h1>Новый проект</h1></button>
+        <button onclick="new_proj()" class="new_proj"><img class="p_img" src="/img/new_proj.png" alt=""><h1>Новый проект</h1></button>
     </div>
 </section>
 
@@ -64,7 +64,7 @@
         let name = ask("please enter project name");
         let objs = { height:"2",width:"4"};
         if(name != null && name!= "" && name!=" " && typeof name != "undefined" && name!="undefined"){
-            $.post( "/save_proj", {proj:JSON.stringify(objs),name:name,img:"img/img_placeholder.webp"})
+            $.post( "/save_proj", {proj:JSON.stringify(objs),name:name,img:"/img/proj_placeholder.webp"})
             .done(function( res ) {
             if(res["out"] == "good"){
                     // console.log(scr)

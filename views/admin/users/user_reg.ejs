@@ -2,28 +2,28 @@
     .user_reg_form{
         margin: auto;
         /* display: flex; */
-        text-align: center;
+        /* text-align: center; */
     }
 </style>
-<h1>регистрация пользователя</h1>
+<h1>Регистрация пользователя</h1>
 <form action="#" class="user_reg_form">
-    <div>
-        <input type="text" id="login" name="login" value="" placeholder="логин">
-        <input type="password" id="pass" name="pass" value="" placeholder="пароль">
-        <input type="submit" onclick='reg();' value="зарегистрировать">
+    <div style="display: flex;justify-content: space-between;">
+        <input type="password" id="pass" name="pass" value="" placeholder="Пароль" class="btn_white" style="text-align: center;">
+        <input type="text" id="login" name="login" value="" placeholder="Логин" class="btn_white" style="text-align: center; padding-inline: 5vw;">
+        <input type="submit" onclick='reg();' value="Зарегистрировать" class="btn_blue">
+        <div>
+            <label for="admin_check">Админ. привелегии</label>
+            <input type="checkbox" name="admin" value='false' id="admin_check" onchange="admin_ch()">
+        </div>
     </div>
-    <div>
-        <label for="admin_check">админ. привелегии</label>
-        <input type="checkbox" name="admin" value='false' id="admin_check" onchange="admin_ch()">
-        <div id="right_checks" style="display: none;justify-content: space-evenly;">
-            <div>
-                <input type="checkbox" name="admin" value='false' id="admin_user_check" onchange="right_calc()">
-                <label for="admin_user_check">право на изменение обьектов</label>
-            </div>
-            <div>
-                <input type="checkbox" name="admin" value='false' id="admin_obj_check" onchange="right_calc()">
-                <label for="admin_obj_check">право на изменение пользователей</label>
-            </div>
+    <div id="right_checks" style="display: none;justify-content: space-evenly;">
+        <div>
+            <input type="checkbox" name="admin" value='false' id="admin_user_check" onchange="right_calc()">
+            <label for="admin_user_check">Право на изменение обьектов</label>
+        </div>
+        <div>
+            <input type="checkbox" name="admin" value='false' id="admin_obj_check" onchange="right_calc()">
+            <label for="admin_obj_check">Право на изменение пользователей</label>
         </div>
     </div>
     <div id="reg_response"></div>

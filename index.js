@@ -7,6 +7,7 @@ const obj = require('./object');
 const proj = require('./project');
 const vars = require('./vars');
 const cookieParser = require('cookie-parser');
+const CssFilterConverter = require('css-filter-converter');
 
 // const {
 //     response,
@@ -264,6 +265,14 @@ app.post("/admin/parts/new", (req,res) => {try{
     },true,true)
 } catch (error) {func.log("router object creating error - "+error);}
 })
+app.post("/admin/parts/delete", (req,res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        obj.del_part(inp,cook,res);
+    },true,true)
+} catch (error) {func.log("router object creating error - "+error);}
+})
 app.post("/admin/groups/delete", (req,res) => {try{
         let inp = req.body;
         let cook = req.cookies;
@@ -314,7 +323,13 @@ app.post("/admin/users/find", (req,res) => {try{
 })
 
 
-
+app.get("/htc/:hex",(req,res) =>{
+    res.send(CssFilterConverter.hexToFilter(`#${req.params["hex"]}`));
+})
+app.post("/color",(req,res) =>{
+    let inp = req.body;
+    func.img_recolor(res,inp["img"],inp["hex"]);
+})
 app.all('*', (req, res) => {
     res.status(404).send('<h1>404! Page not</h1> <br> <a href="/">go to main page</a>');
 });

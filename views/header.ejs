@@ -139,6 +139,9 @@
             <a href=""><img src="/img/ok.svg" alt=""></a>
             <a href=""><img src="/img/telegram.svg" alt=""></a>
         </div>
+        <div class="tpanel">
+            <button onclick='logout();'>Выход</button>
+        </div>
     </div>        <!-- <div><button onclick="logout();">logout</button></div> -->
 </header>
 <div id="user_menu" class="cmenu"></div>
@@ -160,22 +163,22 @@
         let menu = document.getElementById("top_panel_center");
         if (res["admin"] == true){
             menu.innerHTML += `<button id="page_btn_admin" onclick='goto("/admin")'>Админ. панель</button><br>`;
+            switch (document.URL.split("/").at(-1)) {
+                case ("admin"):document.getElementById("page_btn_admin").style.border = "1px solid black";break;
+                case ("objects"):document.getElementById("page_btn_admin").style.border = "1px solid black";break;
+                case ("users"):document.getElementById("page_btn_admin").style.border = "1px solid black";break;
+                default:break;
+            }
         }
-        // menu.innerHTML += "<button onclick='logout();'>выйти</button><br>";
-        document.URL.split("puzzle.n0r.su/").at(-1)
-        switch (document.URL.split("puzzle.n0r.su/").at(-1)) {
+        switch (document.URL.split("/").at(-1)) {
             case ("main"):
                 document.getElementById("page_btn_main").style.border = "1px solid black";
                 break; 
-            case ("admin"):document.getElementById("page_btn_admin").style.border = "1px solid black";break;
-            case ("admin/objects"):document.getElementById("page_btn_admin").style.border = "1px solid black";break;
-            case ("admin/users"):document.getElementById("page_btn_admin").style.border = "1px solid black";break;
-            default:
-                break;
+            default:break;
         }
     });
 
-    console.log("asd");
+    // console.log("asd");
 
     // onscroll = (e)=>{
     //     hide_menus();
@@ -230,27 +233,6 @@
             open_menu();
         
         }
-        // else if(e.target.id == "object_menu"){
-        //     hide_menus();
-        //     let menu = document.getElementById("object_edit_menu");
-        //     let obj = e.target;
-        //     menu.setAttribute("obj_img",obj.getAttribute("src"));
-        //     menu.setAttribute("obj_name",obj.getAttribute("name"));
-        //     menu.setAttribute("obj_description",obj.getAttribute("description"));
-        //     menu.setAttribute("obj_height",obj.getAttribute("height"));
-        //     menu.setAttribute("obj_width",obj.getAttribute("width"));
-        //     menu.setAttribute("obj_id",obj.getAttribute("obj_id"));
-        //     menu.setAttribute("obj_cost",obj.getAttribute("cost"))
-        //     menu.setAttribute("obj_gid",obj.getAttribute("gid"))
-        //     menu.style.display = 'block';
-        //     // menu.style = `top:${e.target.getBoundingClientRect().top+27}px;left:${e.target.getBoundingClientRect().left-13}px`;
-        //     menu.style = `top:${e.target.getBoundingClientRect().top + 40}px;left:${e.target.getBoundingClientRect().left - 5}px`;
-        //     // menu.onmouseleave = () => menu.style.display = 'none';
-        //     // menu.innerHTML = "<p>Option1</p><p>Option2</p><p>Option3</p><p>Option4</p>"
-        //     // document.body.appendChild(menu)
-        //     open_menu();
-        
-        // }
         else if(e.target.id == "proj_cost"){
             hide_menus();
             document.getElementById("cost_list").style = `margin-top:2.5vw;left:${e.target.getBoundingClientRect().left}px`;
@@ -262,20 +244,22 @@
             document.getElementById("group").innerHTML = "";
 
             // console.log(e.target.getAttribute("groups").split(","));
-            document.getElementById("group").style = `margin-top:2.9vw;left:${e.target.getBoundingClientRect().left}px;width: 14vw;padding: 0.45vw;display:block;padding-bottom: 0.7vw;`;
             console.log("group");
             open_menu();
 
-            if (document.URL == "https://puzzle.n0r.su/admin/objects"){
+            if (document.URL.split("/").at(-1) == "objects" && document.URL.split("/").at(-2) == "admin"){
+                document.getElementById("group").style = `margin-top:4vw;left:${e.target.getBoundingClientRect().left}px;width: 14vw;padding: 0.45vw;display:block;padding-bottom: 0.7vw;`;
                 if(e.target.getAttribute("count") != 0)load_groups(()=>{},e.target.getAttribute("groups").split(","),true)
                 let groups = document.getElementById("group");
                 let new_grp_btn = document.createElement("button");
                 new_grp_btn.setAttribute("onclick",`create_new_group(${e.target.getAttribute("pid")})`);
-                new_grp_btn.innerText = "доб. группу";
+                new_grp_btn.innerText = "Добавить группу";
+                new_grp_btn.classList.add("btn_blue");
                 new_grp_btn.style.width = "14vw";
                 groups.append(new_grp_btn)
             }
             else{
+                document.getElementById("group").style = `margin-top:2.5vw;left:${e.target.getBoundingClientRect().left}px;width: 14vw;padding: 0.45vw;display:block;padding-bottom: 0.7vw;`;
                 if(e.target.getAttribute("count") != 0)load_groups(()=>{},e.target.getAttribute("groups").split(","))
             }
             // hide_menus();

@@ -27,15 +27,15 @@
     }
 </style>
 
-<div style="display: flex;justify-content: space-between;">
-    <h1>изменение объектов</h1>
-    <div id="find_obj_btns">
-        <button onclick="edit_get_objs(true)">найти по имени</button>
-        <button onclick='document.getElementById("objs_in_group").innerHTML = "";'>очистить</button>
-    </div>
-</div>
+<h1>Изменение объектов</h1>
 <div>
-    <div id="objs_in_group"></div>
+    <div id="objs_in_group" style="max-height: 20vh;height: 20vh;"></div>
+</div>
+<div style="display: flex;justify-content: space-between;float: right;">
+    <div id="find_obj_btns">
+        <button onclick="edit_get_objs(true)" class="btn_blue">найти по имени</button>
+        <button onclick='gids = [];edit_get_objs();' class="btn_blue">очистить</button>
+    </div>
 </div>
 
 <script>
@@ -46,18 +46,18 @@
     function set_edit(id){
         let menu = document.getElementById(`object_${id}`);
         set_obj_edit_params(menu.getAttribute("src"),
-        menu.getAttribute("name").split("/")[0],
-        menu.getAttribute("description"),
+        menu.getAttribute("name").split("~")[0],
         menu.getAttribute("height"),
         menu.getAttribute("width"),
         menu.getAttribute("cost"),
         menu.getAttribute("gid"),
+        menu.getAttribute("colors"),
         menu.getAttribute("obj_id"));
     }
 
-    function edit_get_objs(by_name){
+    function edit_get_objs(by_name = false){
         document.getElementById("objs_in_group").innerHTML = "";
-        set_obj_edit_params();
+        if (obj_edit_type == "edit") set_obj_edit_params();
         edit_load_objs((data)=>{
             data.forEach(value => {
                 // console.log(value);
@@ -80,15 +80,19 @@
             edit_get_objs();
         }
         hide_menus();
+        
     }
 
     function obj_del(id){
         // let select = document.getElementById("group_select");
         let menu = document.getElementById(`object_${id}`);
-        if (confirm(`вы точно хотите удалить ${menu.getAttribute("name").split("/")[0]}?`)){
+        if (confirm(`вы точно хотите удалить ${menu.getAttribute("name").split("~")[0]}?`)){
+            let wait_msg = msg("удаление товара",{type:"wait"});
             $.post( "/admin/objects/delete", { id:id,})
             .done(function( res ) {
                 if(res["out"] == "good"){
+                    msg_del(wait_msg.id);
+                    msg("товара удалён");
                     edit_get_objs();
                 }
             });
@@ -98,58 +102,64 @@
     function save_edited_obj(id){
         let gid = gids[0];
         let menu = document.getElementById(`object_${id}`);
-        let attributes = ["name","description","img","height","width","cost"];
+        let attributes = ["name","img","height","width","cost","colors"];
         let cur_atts = {
             name : document.getElementById("nobj_name").value,
-            description : document.getElementById("nobj_description").value,
             height : document.getElementById("obj_height").value,
             width : document.getElementById("obj_width").value,
-            img : document.querySelector('#img_prev').src,
-            cost : document.getElementById("obj_cost").value
+            img : document.getElementById('img_prev').src,
+            cost : document.getElementById("obj_cost").value,
+            colors : String(document.getElementById("obj_color_check").checked)
         }
         let changes = {}
         attributes.forEach(element => {
-            // console.log(cur_atts[element],menu.getAttribute(`obj_${element}`));
             if(element != attributes.at(-1)){
                 check_change(element);
                 // console.log(element);
             }
-            else{
+            else if (element == attributes.at(-1)){
                 check_change(element);
                 // console.log(changes);
                 if(Object.keys(changes).length > 0){
                     make_obj_save(changes);
                     // console.log(changes);
                 }
+                else{
+                    msg("нет изменений")
+                }
             }
         });
         function check_change(element){
-            if(element == "name" && cur_atts[element] != menu.getAttribute(`${element}`).split("/")[0]){
+            // console.log(changes[element],cur_atts[element]);
+            if(element == "name" && cur_atts[element] != menu.getAttribute(`${element}`).split("~")[0]){
                 changes[element] = cur_atts[element];
             }
-            else if (element != "name" && cur_atts[element] != menu.getAttribute(`${element}`)){
+            else if (element == "img" && cur_atts[element] != menu.getAttribute(`src`)){
+                changes[element] = cur_atts[element];
+            }
+            else if ((element != "name" && element != "img") && cur_atts[element] != menu.getAttribute(`${element}`)){
                 changes[element] = cur_atts[element];
             }
         }
         function make_obj_save(){
             load_group(gid,(group_db)=>{
-                if(changes["name"]) changes["name"] = (changes["name"]+"/g/"+group_db["name"].replaceAll(" ","$"));
-                document.getElementById("obj_resp").innerHTML = "сохранение товара";
+                if(changes["name"]) changes["name"] = (changes["name"]+"~g~"+group_db["name"]).replaceAll(" ","$");
+                let wait_msg = msg("сохранение товара",{type:"wait"});
                 $.post( "/admin/objects/edit", { id:menu.getAttribute(`obj_id`),changes:JSON.stringify(changes),gid:gid})
                 .done(function( res ) {
                     // console.log(res);
+                    msg_del(wait_msg.id);
                     if(res["out"] == "good"){
-                        document.getElementById("obj_resp").innerHTML = "товар сохранён";
-                        setTimeout(()=>{
-                            edit_get_objs();
-                            set_obj_edit_params();
-                            if(res["name_err"]){
-                                document.getElementById("obj_resp").innerHTML = ("название товара не было изменино поскольку оно занято");
-                            }
-                        },1000)
-                        setTimeout(()=>{
-                            document.getElementById("obj_resp").innerHTML = "";
-                        },3000)
+                        if(res["name_err"]){
+                            msg("название товара не было изменино поскольку оно занято",{type:"warning"})
+                        }
+                        else{
+                            msg("товар сохранён");
+                            setTimeout(()=>{
+                                edit_get_objs();
+                                set_obj_edit_params();
+                            },1500)
+                        }
                     }
                 });
             })
@@ -202,20 +212,21 @@
             let obj =  document.createElement('div');
             let name_text =  document.createElement('div');
             let img_elm =  document.createElement('img');
-            obj.title = `название:${value["name"].split("/")[0].replaceAll("$"," ")}\nцена:${value["cost"]}\nширина:${value["width"]}\nвысота${value["height"]}\nописание:${value["description"]}`;
+            obj.title = `название:${value["name"].split("~")[0].replaceAll("$"," ")}\nцена:${value["cost"]}\nширина:${value["width"]}\nвысота${value["height"]}\nименение цвета:${Boolean(value["colors"])}\nартикуль:${value["name"]}`;
             obj.id = `object_${value["id"]}`;
             obj.setAttribute("onclick",`set_edit(${value["id"]})`)
             obj.classList.add(value["name"]);
             obj.classList.add("object");
-            obj.setAttribute("name",value["name"].split("/")[0].replaceAll("$"," "))
-            obj.setAttribute("description",value["description"])
+            obj.setAttribute("name",value["name"].split("~")[0].replaceAll("$"," "))
+
             obj.setAttribute("src",img)
             obj.setAttribute("height",value["height"])
             obj.setAttribute("width",value["width"])
             obj.setAttribute("obj_id",value["id"])
             obj.setAttribute("cost",value["cost"])
+            obj.setAttribute("colors",Boolean(value["colors"]))
             obj.setAttribute("gid",value["gid"])
-            name_text.innerText = value["name"].split("/")[0].replaceAll("$"," ");
+            // name_text.innerText = value["name"].split("~")[0].replaceAll("$"," ");
             img_elm.src = img;
             obj.append(img_elm)
             obj.append(name_text)

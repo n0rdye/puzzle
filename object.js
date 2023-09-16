@@ -1,13 +1,16 @@
 const db = require('./db');
 const func = require('./func');
 const vars = require('./vars');
+const fs = require('fs');
+const imageDataURI = require('image-data-uri');
+
 
 module.exports.loads = (inp,cook,res)=>{
     try {
         let gin
         if (typeof inp["gid"] == 'undefined' || inp["gid"] == null) gin = "1 OR 1=1"
         else gin = inp["gid"]
-        db.ggv("objects","`name`,`id`,`height`,`width`,`description`,`cost`,`gid`,`colors`","gid",`${gin}`,(odata)=>{
+        db.ggv("objects","`name`,`id`,`height`,`width`,`cost`,`gid`,`colors`","gid",`${gin}`,(odata)=>{
             // func.log(odata);
             res.send({out:"good",body:odata});
         })
@@ -30,25 +33,34 @@ module.exports.load = (inp,cook,res)=>{
 
 module.exports.new = (inp,cook,res)=>{
     try {
-        
+        if (typeof inp["colors"] != 'undefined'){inp["colors"] = (inp["colors"] == "false")? 0:1;}
         db.gv("object_groups","id",`'${inp["gid"]}'`,(gname)=>{gname = gname[0]
             db.gv("object_partition","id",`'${gname["pid"]}'`,(pname)=>{pname = pname[0]
-                db.ggv("objects","name","gid",`'${inp["gid"]}' AND name = '${inp["name"]}/g/${gname["name"]}'`,(db_name)=>{
-                    if(db_name[0] != null){
-                        res.send({out:"bad",err:"name"});
-                    }
-                    else if (db_name[0] == null){
-                        db.nr("objects","`cost`,`name`,`img`,`height`,`width`,`description`,`gid`",`'${inp["cost"]}','${inp["name"]}/g/${gname["name"]}/p/${pname["name"]}','${inp["img"]}','${inp["height"]}','${inp["width"]}','${inp["desc"]}','${inp["gid"]}'`,true);
-                            db.sv("object_groups","count",`(count + 1)`,"id",inp["gid"],()=>{},true,true)
-                            func.log(`admin object created name:${inp["name"]} group:${gname["name"]}`);
-                            res.send({out:"good"});
-                    }
-                    // console.log(db_name);
-                    // db.ggv("objects","gid","name",`'${inp["name"]}'`,(db_name)=>{
-                        // })
-                },true)
+                save_img(inp["img"],`${inp["name"]}~g~${gname["name"]}~p~${pname["name"]}`,(img_path)=>{
+                    db.ggv("objects","name","gid",`'${inp["gid"]}' AND name = '${inp["name"]}~g~${gname["name"]}'`,(db_name)=>{
+                        if(db_name[0] != null){
+                            res.send({out:"bad",err:"name"});
+                        }
+                        else if (db_name[0] == null){
+                            db.nr("objects","`cost`,`name`,`img`,`height`,`width`,`gid`,`colors`",`'${inp["cost"]}','${inp["name"]}~g~${gname["name"]}~p~${pname["name"]}','${img_path}','${inp["height"]}','${inp["width"]}','${inp["gid"]}','${inp["colors"]}'`,true);
+                                db.sv("object_groups","count",`(count + 1)`,"id",inp["gid"],()=>{},true,true)
+                                func.log(`admin object created name:${inp["name"]} group:${gname["name"]}`);
+                                res.send({out:"good"});
+                        }
+                        // console.log(db_name);
+                        // db.ggv("objects","gid","name",`'${inp["name"]}'`,(db_name)=>{
+                            // })
+                    },true)
+                })
             })
         })
+        function save_img(data,name,callback) {
+            let img = imageDataURI.decode(data);
+            if (!fs.existsSync(`public/img/object/${name}`)){fs.mkdirSync(`public/img/object/${name}`);fs.mkdirSync(`public/img/object/${name}/colored`);}
+            fs.writeFile(`public/img/object/${name}/main.${img.imageType.split("/").at(-1)}`, img.dataBuffer,()=>{
+                if(callback)callback(`/img/object/${name}/main.${img.imageType.split("/").at(-1)}`);
+            });
+        }
     } catch (error) {
         func.log("backend object creating error - "+error);
     }
@@ -59,6 +71,8 @@ module.exports.save = (inp,cook,res)=>{
         // let changed = [];
         let changes = JSON.parse(inp["changes"]);
         let taken_name = false;
+        if (typeof changes["colors"] != 'undefined'){changes["colors"] = (changes["colors"] == "false")? 0:1;}
+        // console.log(changes);
         Object.entries(changes).forEach(([key,value]) => {
             // console.log(key,value);
             // console.log( Object.keys(changes).pop());
@@ -74,6 +88,27 @@ module.exports.save = (inp,cook,res)=>{
                         // console.log(taken_name);
                         chack_if_last(key)
                     }
+                })
+            }
+            else if (key == "img"){
+                db.gv("objects","id",`'${inp["id"]}'`,(db_data)=>{db_data = db_data[0]
+                    // console.log(db_data);
+                    fs.rm(`public/img/object/${db_data["name"]}`, { recursive: true }, () => {
+                        // fs.unlink(db_data["img"],()=>{});
+                        save_img(value,db_data["name"],(path)=>{
+                            db.sv("objects",key,path,"id",inp["id"],()=>{
+                                chack_if_last(key)
+                            },true);
+                        })
+    
+    
+                        function save_img(data,name,callback) {
+                            let img = imageDataURI.decode(data);
+                            if (!fs.existsSync(`public/img/object/${name}`)){fs.mkdirSync(`public/img/object/${name}`);fs.mkdirSync(`public/img/object/${name}/colored`);}}
+                            fs.writeFile(`public/img/object/${name}/main.${img.imageType.split("/").at(-1)}`, img.dataBuffer,()=>{
+                                if(callback)callback(`/img/object/${name}/main.${img.imageType.split("/").at(-1)}`);
+                            });
+                    });
                 })
             }
             else if (key != "name"){
@@ -99,6 +134,7 @@ module.exports.del = (inp,cook,res)=>{
             let gid = obj_db["gid"]; 
             let name = obj_db["name"]; 
             db.dl("objects",`id`,`'${inp["id"]}'`,()=>{
+                fs.rm(`public/img/object/${obj_db["name"]}`, { recursive: true }, () => {})
                 db.sv("object_groups","count",`(count - 1)`,"id",`${gid}`,()=>{},true,true)
                 func.log(`admin object deleted name:${name} group:${gid}`);
                 res.send({out:"good"});
@@ -236,8 +272,8 @@ module.exports.new_part = (inp,cook,res)=>{
 }
 module.exports.del_part = (inp,cook,res)=>{
     try {
-        db.ggv("object_partition",`name`,`id`,`'${inp["gid"]}'`,(gname)=>{gname = gname[0]["name"]
-            db.dl("object_partition",`id`,`'${inp["gid"]}'`,()=>{
+        db.ggv("object_partition",`name`,`id`,`'${inp["pid"]}'`,(gname)=>{gname = gname[0]["name"];
+            db.dl("object_partition",`id`,`'${inp["pid"]}'`,()=>{
                 func.log(`admin part deleted ${gname}`);
                 res.send({out:"good"});
             },true);

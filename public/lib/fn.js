@@ -75,10 +75,11 @@ function check_sid(redirect = true){
 }
 
 function logout(redirect = true) {
-    let dialog = confirm(`выйти?`);
-    if(dialog){
-        clear_ck(redirect);
-    }
+    msg(`Выйти?`,{type:"ask",res:(out)=>{
+        if(out){
+            clear_ck(redirect);
+        }
+    }});
 }
 
 function ask(text,def = "") {
@@ -119,7 +120,7 @@ function load_groups(callback,groups,admin = false){
                     group_inp.setAttribute("onchange",`group_check(${group["id"]})`)
                     // group_inp.innerText = group["name"].replaceAll("$"," ");
                     group_inp.setAttribute("group_count",group["count"]);
-                    console.log(group["count"]);
+                    // console.log(group["count"]);
                     group_inp.setAttribute("gid",group["id"]);
                     group_inp.id = `obj_group_${group["id"]}`;
                     group_inp.setAttribute("group_name",`${group["name"].replaceAll("$"," ")}`);
@@ -129,17 +130,17 @@ function load_groups(callback,groups,admin = false){
                         group_inp.setAttribute("checked","true");
                     }
 
-                    // console.log(document.url);
                     if(admin){
                         let group_del_btn = document.createElement("button");
                         group_del_btn.setAttribute("onclick",`delete_group(${group["id"]},${group["pid"]})`)
                         group_del_btn.innerText = "удалить";
-                        group_del_btn.style = "font-size: 1vw;width: 70px;";
+                        group_del_btn.classList.add("btn_blue");
+                        group_del_btn.style = "font-size: 0.8vw;width: 70px;";
                         group_div.append(group_del_btn)
                     }
 
-                    group_div.append(group_inp);
                     group_div.append(group_label);
+                    group_div.append(group_inp);
                     select.append(group_div)
             }
             // callback(res);
@@ -173,6 +174,13 @@ function group_check(gid){
     if (typeof gids_change != 'undefined'){
         gids_change();
     }
+}
+
+function color_change(hex,img,callback){
+    $.post( `/color`,{hex:hex,img:img})
+    .done(function( res ) {
+        if(callback) callback(res);
+    });
 }
 
 function load_parts(callback){
@@ -250,3 +258,46 @@ var openFile = function(event,callback) {
     };
     reader.readAsText(input.files[0]);
 };
+
+async function removeImageBackground(image) {
+    const backgroundColor = { red: 255, green: 255, blue: 255 };
+    const threshold = 10;
+  
+    const imageElement = new Image();
+    imageElement.src = image;
+    await new Promise(function(resolve) { imageElement.addEventListener('load', resolve); });
+  
+    var canvas = document.createElement('canvas');
+    canvas.width = imageElement.naturalWidth;
+    canvas.height = imageElement.naturalHeight;
+  
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(imageElement, 0, 0);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    for (var i = 0; i < imageData.data.length; i += 4) {
+      const red = imageData.data[i];
+      const green = imageData.data[i + 1];
+      const blue = imageData.data[i + 2];
+      if (Math.abs(red - backgroundColor.red) < threshold &&
+        Math.abs(green - backgroundColor.green) < threshold &&
+        Math.abs(blue - backgroundColor.blue) < threshold) {
+        imageData.data[i + 3] = 0;
+      }
+    }
+  
+    ctx.putImageData(imageData, 0, 0);
+    return canvas.toDataURL(`image/png`);
+  }
+
+  function downloadImg(url, filename) {
+    fetch(url)
+      .then(response => response.blob())
+      .then(blob => {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+    })
+    .catch(console.error);
+  }
+  

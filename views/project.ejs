@@ -35,7 +35,7 @@
         width: 400px;
         height: 200px;
         background-color: #fff;
-        background-image: url("/img/bg1red.png");
+        /* background-image: url("/img/bg1red.png"); */
         background-size: 200px;
         background-repeat: repeat;
         background-position: bottom 0px left 0px;
@@ -107,7 +107,7 @@
         margin: auto;
         padding-block: 20px;
         padding-bottom: 0px;
-        margin-top: 50px;
+        /* margin-top: 50px; */
     }
     #group{
         display: none;
@@ -142,11 +142,11 @@
             <label for="wall_width" style="margin: auto;">М.</label>
         </div>
         <div style="display: flex;width: 16vw;justify-content: space-between;">
-            <label for="wall_color" style="margin: auto;">цвет стены</label>
+            <label for="wall_color" style="margin: auto;">Цвет стены</label>
             <input type="color" id="wall_color" style="width: 5vw; border-radius: 0.5vw; border: 1px solid gray; min-height: 3.9vw;" value="#FFFFFF" onchange="wall_color_change()"> 
         </div>
-        <div style="display: flex;width: 15vw;justify-content: space-between;">
-            <button id="proj_cost" class="menu_btn" onclick="cost_drop();" style="width: 100%;">
+        <div id="cost_div" style="display: flex;width: 15vw;justify-content: space-between;">
+            <button id="proj_cost" class="menu_btn" style="width: 100%;z-index: 3;">
                 <div id="proj_cost_text" style="pointer-events: none;">Расчет стоимости</div>
                 <img src="/img/drop.png" style="width: 1vw;height: 0.5vw;pointer-events: none;" alt="\/">
             </button>
@@ -155,6 +155,7 @@
                     display: flex;
                     justify-content: space-between;
                     width: 14vw;
+                    padding-block: 0.4vw;
                 }
                 #cost_list{
                     list-style-type: none;
@@ -177,12 +178,35 @@
 </div>
 
 <div class="zones" style="position: relative;">
-    <div id="drags"></div>
+    <div id="drags">
+
+    </div>
     <div class="wall dropzone" id="wall"></div>
 </div>
 
 <div style="display:flex; justify-content: space-around;"></div>
 
+
+<div class="inputs" style="display: flex;justify-content: space-between;height: 5vh;">
+    <div id="obj_color_div" style="justify-content: space-evenly; width: 50vw;display: none;transform: translateX(30%);">
+        <label for="obj_color" style="width: 10vw;">цвет объекта</label>
+        <!-- <input id="obj_color" type="color" onchange="obj_color_change(event)"> -->
+        <div style="display: flex;justify-content: space-evenly; width: 30vw;">
+            <div style="background-color: #43368D; border-radius: 50%;height: 2vw;width: 2vw;" color="#43368D" onclick="obj_color_change('43368D')"></div>
+            <div style="background-color: #41AB34; border-radius: 50%;height: 2vw;width: 2vw;" color="#41AB34" onclick="obj_color_change('41AB34')"></div>
+            <div style="background-color: #F7EA55; border-radius: 50%;height: 2vw;width: 2vw;" color="#F7EA55" onclick="obj_color_change('F7EA55')"></div>
+            <div style="background-color: #E5231F; border-radius: 50%;height: 2vw;width: 2vw;" color="#E5231F" onclick="obj_color_change('E5231F')"></div>
+            <div style="background-color: #F39223; border-radius: 50%;height: 2vw;width: 2vw;" color="#F39223" onclick="obj_color_change('F39223')"></div>
+            <div style="background-color: #009FE3; border-radius: 50%;height: 2vw;width: 2vw;" color="#009FE3" onclick="obj_color_change('009FE3')"></div>
+            <div style="background-color: #CEE8EA; border-radius: 50%;height: 2vw;width: 2vw;" color="#CEE8EA" onclick="obj_color_change('CEE8EA')"></div>
+            <div style="background-color: #B9D585; border-radius: 50%;height: 2vw;width: 2vw;" color="#B9D585" onclick="obj_color_change('B9D585')"></div>
+            <div style="background-color: #F4F2C7; border-radius: 50%;height: 2vw;width: 2vw;" color="#F4F2C7" onclick="obj_color_change('F4F2C7')"></div>
+            <div style="background-color: #E699A7; border-radius: 50%;height: 2vw;width: 2vw;" color="#E699A7" onclick="obj_color_change('E699A7')"></div>
+            <div style="background-color: #F9C771; border-radius: 50%;height: 2vw;width: 2vw;" color="#F9C771" onclick="obj_color_change('F9C771')"></div>
+            <div style="background-color: #B7A3C7; border-radius: 50%;height: 2vw;width: 2vw;" color="#B7A3C7" onclick="obj_color_change('B7A3C7')"></div>
+        </div>
+    </div>
+</div>
 <div class="inputs" style="display: flex;justify-content: space-between;">
     <style>
         .btn_icon{
@@ -204,16 +228,29 @@
         <div class="btn_icon" onclick="go_forw()"><img src="/img/icon/forw.png" alt="forw"></div>
         <div class="btn_icon" onclick="obj_del()"><img src="/img/icon/del.png" alt="del"></div>
     </div>
+    <div style="display: flex;justify-content: space-between; width: 15vw;">
+        <div><input type="checkbox" id="grid_checkbox" checked="true" onchange='grid_view(JSON.parse(event.target.checked));'><label for="grid_checkbox">Показывать сетку</label></div>
+    </div>
     <div style="display: flex;justify-content: space-between; width: 7vw;">
         <div id="save_btn_icon" class="btn_icon" onclick="save_proj()"><img src="/img/icon/save.png" alt="save"></div>
-        <div class="btn_icon" onclick="document.getElementById('import_file').click();"><img src="/img/icon/download.png" alt="load"></div>
-        <input type='file' id="import_file" style="display: none;" accept="application/JSON" onchange='openFile(event,load_file)'>
+        <div class="btn_icon" onclick="img_download()"><img src="/img/icon/download.png" alt="load"></div>
+        <!-- <div class="btn_icon" onclick="document.getElementById('import_file').click();"><img src="/img/icon/download.png" alt="load"></div> -->
+        <!-- <input type='file' id="import_file" style="display: none;" accept="application/JSON" onchange='openFile(event,load_file)'> -->
     </div>
 </div>
 <div class="inputs" style="display: flex;justify-content: space-between;margin-top: 0px;">
     <div id="obj_group" style="display: flex;justify-content:space-evenly; width: 100vw;">
         <!-- <button name="" id="group_drop" >Помехи на стене</button> -->
         <style>
+            .obj_group{
+                /* width: 100%; */
+                display: flex;
+                padding-block: 0.3vw;         
+            }
+            .obj_group label{
+                width: 90%;
+                /* padding-inline: 0.3vw;          */
+            }
             .group_drop{
                 width: 15vw;
                 padding: 2px;
@@ -243,12 +280,85 @@
     </div>
 </div>
 <div class="czones"></div>
-
-
+<button onclick="capture()">cap</button>
 <script src="/lib/inter.js"></script>
 <script>
     let proj_name = "<%= proj_name %>";
 
+    if ( $.cookie("grid") != null){
+        document.getElementById("grid_checkbox").checked = JSON.parse($.cookie("grid"));
+        grid_view(JSON.parse($.cookie("grid")))
+    }else{
+        $.cookie("grid",true)
+        document.getElementById("grid_checkbox").checked = true;
+        grid_view(true)
+    }
+    function grid_view(check){
+        let grid = document.getElementsByClassName("wall")[0]
+        console.log(check);
+        if (check == false) {
+            grid.style.backgroundImage = "";
+            $.cookie("grid",false);
+
+        }
+        else{
+            grid.style.backgroundImage = 'url("/img/bg1red.png")';
+            $.cookie("grid",true);
+
+        }
+    }
+
+    function img_download(){
+        msg("добавить на фото стоимость ?",{type:"ask",res:(out)=>{
+            let wait_msg = msg("делаем фото",{type:"wait"})
+            proj_img((src)=>{
+                msg("изображение проекта готово",{time:3})
+                msg_del(wait_msg.id)
+                downloadImg(src,`${proj_name}.png`)
+            },out)
+        }})
+    }
+
+    function proj_img(callback,cost = false){
+        let width = (parseInt(document.getElementById("wall").style.width))
+        document.getElementById("drags").append(document.getElementById("wall"));
+        document.getElementById("drags").style.height = document.getElementById("wall").style.height;
+        if(cost == true){
+            width += 252;
+            document.getElementById("drags").append(document.getElementById("cost_div"));
+            document.getElementById("cost_div").style.marginLeft = `${parseInt(document.getElementById("wall").style.width) + 4}px`;
+            document.getElementById("cost_list").style.display = "block";
+        }
+        html2canvas(document.getElementById("drags"),{
+            y:7,
+            width:width,
+            logging:false,
+            scale:5
+        }).then(canvas => {
+            if(cost == true){
+                document.getElementById("cost_div").style.marginLeft = `0`;
+                document.getElementById("cost_list").style.display = "none";
+                document.getElementById("wall_input").append(document.getElementById("cost_div"));
+            }
+            document.getElementsByClassName("zones")[0].append(document.getElementById("wall"));
+            let src = "";
+            src = canvas.toDataURL();
+            // console.log(src);
+            callback(src)
+        });
+    }
+
+    function obj_color_change(color,in_obj = null){
+        if(color != "null"){
+            if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
+            let obj = (in_obj == null)? document.getElementById(cur_obj):in_obj;
+            // console.log(color);
+            color_change(color,obj.getAttribute("img"),(img)=>{
+                obj.src = img;
+                objs[obj.classList[0]][obj.id]["color"] = color;
+            });
+        }
+    } 
 
     function load_file(text){
         if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
@@ -295,14 +405,19 @@
             console.log(cur_obj);
             // console.log(drag.classList);
             if(objs[drag.classList[0]] != null&&objs[drag.classList[0]][drag.id] != null) {
+                console.log(objs[drag.classList[0]]);
                 delete objs[drag.classList[0]][drag.id];
+                if (Object.keys(objs[drag.classList[0]]).length < 1){
+                    delete objs[drag.classList[0]];
+                }
             }
             calc_total()
-
             drag.remove();
+            document.getElementById("obj_color_div").style.display = "none";
+            cur_obj = null;
         }
        }
-       catch{alert("объкт не выбран")}
+       catch{msg("объект не выбран")}
     }
 
     function group_drop(){
@@ -344,6 +459,7 @@
             part.classList.add("group_drop")
             part.setAttribute("groups",`${value["groups"]}`)
             part.setAttribute("count",`${value["count"]}`)
+            part.setAttribute("no-cost",`${value["no-cost"]}`)
             part.setAttribute("pid",`${value["id"]}`)
 
             part.append(part_text);
@@ -354,27 +470,27 @@
         })
     })
     
-    function cost_drop(id){
-        // let e = document.getElementById("cost")
-        // setTimeout(()=>{
-        //     document.getElementById("group").style.display = "block";
-        //     // document.getElementById("group").style.left = document.getElementById("group_drop").getBoundingClientRect().left;
-        //     let childs = document.getElementById("group").getElementsByTagName("input");
-        //     let i = 0;
-        //     Object.entries(childs).forEach(([key,value]) => {
-        //         console.log(key,value);
-        //         if(value.checked == true){
-        //             get_objs(value)
-        //             i++;
-        //         }
-        //         if (i==0){
-        //             document.getElementsByClassName("czones")[0].innerHTML = "";
-        //             drag_start()
-        //             // e.removeChild(e.getElementsByClassName(value))
-        //         }
-        //     });
-        // },1)
-    }
+    // function cost_drop(id){
+    //     // let e = document.getElementById("cost")
+    //     // setTimeout(()=>{
+    //     //     document.getElementById("group").style.display = "block";
+    //     //     // document.getElementById("group").style.left = document.getElementById("group_drop").getBoundingClientRect().left;
+    //     //     let childs = document.getElementById("group").getElementsByTagName("input");
+    //     //     let i = 0;
+    //     //     Object.entries(childs).forEach(([key,value]) => {
+    //     //         console.log(key,value);
+    //     //         if(value.checked == true){
+    //     //             get_objs(value)
+    //     //             i++;
+    //     //         }
+    //     //         if (i==0){
+    //     //             document.getElementsByClassName("czones")[0].innerHTML = "";
+    //     //             drag_start()
+    //     //             // e.removeChild(e.getElementsByClassName(value))
+    //     //         }
+    //     //     });
+    //     // },1)
+    // }
 
     function wall_color_change(){
        if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
@@ -471,8 +587,10 @@
 
     function save_proj(){
         // document.getElementById('top_panel_center').innerHTML=`сохранение ${proj_name}`;
+        let wait_msg = msg("идёт сохранение проекта",{type:"wait"});
         save((res)=>{
-            alert("проект сохранён")
+            msg_del(wait_msg.id);
+            msg("проект сохранён")
             // document.getElementById('top_panel_center').innerHTML=`сохранено ${proj_name} в облако`;
         })
     }

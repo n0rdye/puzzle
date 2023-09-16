@@ -10,7 +10,7 @@ let objs_forw = [];
 let proj_state = "loading";
 let cm_mod = 2;
 
-function create(clas,x,y,body,id,size){
+function create(clas,x,y,color = null,id,size){
     let main_clas = clas.split(" ")[0];
     // if (body == null || body == "") body = "[]";
     let obj = document.createElement("img");
@@ -21,6 +21,7 @@ function create(clas,x,y,body,id,size){
         obj.classList.add(cl);
     });
     get_obj(main_clas,(db_data)=>{
+        // console.log(db_data);
         // console.log(db_data);
         // db_data.forEach(db_data => {
         // });
@@ -50,12 +51,19 @@ function create(clas,x,y,body,id,size){
         }
         function make(img){
             obj.src = img;
-            obj.title = `${db_data["name"].replaceAll("$"," ").split("/g")[0]}\nцена:${db_data["cost"]}\n${db_data["description"]}\nширина:${db_data["width"]}см высота:${db_data["height"]}см`;
+            obj.title = `${db_data["name"].replaceAll("$"," ").split("/g")[0]}\nцена:${db_data["cost"]}\nширина:${db_data["width"]}см высота:${db_data["height"]}см`;
             obj.setAttribute("cost",db_data["cost"])
+            obj.setAttribute("colors",Boolean(db_data["colors"]))
+            obj.setAttribute("img",img)
+            obj.setAttribute("gid",db_data["gid"])
+            obj.setAttribute("color",color)
             // drag.transform = `translate(${drag.getAttribute("data-y")}px, ${drag.getAttribute("data-y")}px) scale(${db_data["width"] * cm_mod} ${db_data["height"] * cm_mod})`;
             if(size){
                 obj.style.width = `${db_data["width"] * cm_mod}px`;
                 obj.style.height = `${db_data["height"] * cm_mod}px`;
+            }
+            if (color != null){
+                obj_color_change(color,obj)
             }
         }
         calc_total();
@@ -67,18 +75,28 @@ function create(clas,x,y,body,id,size){
 
 function obj_click(id){
     if (cur_obj != id){
+        let obj = document.getElementById(id);
         cur_obj = id;
-        let drags = document.getElementsByClassName("drag");
-        Object.values(drags).forEach(element => {
-            // console.log(element.id,cur_obj);
-            if (element.id != cur_obj){
-                element.style.border = "0px";
-            }
-            else{
-                element.style.border = "1px black solid";
-            }
-        });
+        if (obj.getAttribute("colors") == "true"){
+            document.getElementById("obj_color_div").style.display = "flex";
+        }
+        else{
+            document.getElementById("obj_color_div").style.display = "none";
+        }
+        // console.log(obj.);
     }
+    // function obj_selection(){
+    //     let drags = document.getElementsByClassName("drag");
+    //     Object.values(drags).forEach(element => {
+    //         console.log(element.id,cur_obj);
+    //         if (element.id != cur_obj){
+    //             element.style.border = "0px";
+    //         }
+    //         else{
+    //             element.style.border = "1px black solid";
+    //         }
+    //     });
+    // }
 }
 
 function resize_drags(){
@@ -93,6 +111,7 @@ function wall_size_change(type,value = null){
    if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
 
     let wall = document.getElementsByClassName("wall")[0];
+    let drags = document.getElementById("drags");
     let scroll;
     if(type != null && type == "width") {
         if (value == null) scroll = parseFloat(document.getElementById("wall_width").value);
@@ -102,6 +121,7 @@ function wall_size_change(type,value = null){
 
         // console.log(scroll);
         wall.style.width = `${(scroll * 100) * cm_mod}px`;
+        wall.style.left = drags.getBoundingClientRect().left;
         objs["width"] = scroll;
     }
     if(type != null && type == "height") {
@@ -119,7 +139,7 @@ function wall_size_change(type,value = null){
 function calc_total(start = false){
     document.getElementById("cost_list").innerHTML = ""
     if (start) {
-        document.getElementById("proj_cost_text").innerText = `стоимость: ${objs["total"]} руб.`;
+        document.getElementById("proj_cost_text").innerText = `Стоимость: ${objs["total"]} руб.`;
         return;
     }
     let total=0;
@@ -128,13 +148,15 @@ function calc_total(start = false){
         if(key != "height"&&key!="width"&key!="total"){
             // console.log(Object.keys(value).length);
             // console.log(objs_store[key]);
-            if(objs_store[key] != null){
+            if(objs_store[key] != null && objs_store[key]["cost"] > 0){
                 // console.log(key,value); 
                 total += parseInt(parseInt(objs_store[key]["cost"]) * Object.keys(value).length);
                 let obj_cost_div = document.createElement("li");
                 obj_cost_div.innerHTML =
-                `<div style="display:flex;"> <div id='obj_cost_name'>${key.split("/g/")[0].replaceAll("$"," ")}</div>`+
-                `<div id='obj_cost_count'>&nbsp${Object.keys(value).length}x</div> </div>`+
+                `<div style="display:flex;"> ` +
+                    `<div id='obj_cost_name' style='font-size:calc(var(--main-font-size)/1);'>${key.split("~g~")[0].replaceAll("$"," ")}`+
+                    `<div id='obj_cost_count'>&nbsp${Object.keys(value).length}X</div> </div>`+
+                `</div>`+
                 `<div id='obj_cost'>${parseInt(parseInt(objs_store[key]["cost"]) * Object.keys(value).length)}</div>`;
                 document.getElementById("cost_list").append(obj_cost_div);
             }
@@ -153,15 +175,15 @@ function load(objss){
     // console.log(objs);
     objs = objss;
     Object.entries(objs).forEach(([keys, values]) => {
-        console.log(keys,values);
-        if (keys != "width" && keys != "height" && keys != "color"){
+        // console.log(keys,values);
+        if (keys != "width" && keys != "height" && keys != "color" && keys != "grided"){
             Object.entries(values).forEach(([key, value]) => {
                 if(key != "class"){
                     // console.log(key,keys);
                     // console.log(keys,value["x"],value["y"],value["body"]);
                     // let count = Object.keys(objs[keys]).length;
                     // console.log(count);
-                    create(keys+" drag",value["x"],value["y"],value["body"],key,true);
+                    create(keys+" drag",value["x"],value["y"],value["color"],key,true);
                 }
             })
         }
@@ -172,6 +194,9 @@ function load(objss){
         }
 
         if (keys == "color"){
+            document.getElementById("wall").style.backgroundColor = values;
+        }
+        if (keys == "grided"){
             document.getElementById("wall").style.backgroundColor = values;
         }
         if (keys == Object.keys(objs).at(-1)){
@@ -233,16 +258,9 @@ function save(callback,with_pic = true){
     // console.log(objs);
     proj_from = "cloud";
     if(with_pic){
-        html2canvas(document.querySelector("body"),{
-            height: document.getElementById("wall").style.height.split("p")[0], 
-            width:document.getElementById("wall").style.width.split("p")[0], 
-            y:document.getElementById("wall").getBoundingClientRect().top,
-            x:document.getElementById("wall").getBoundingClientRect().left
-        }).then(canvas => {
-            let src = "";
-            src = canvas.toDataURL();
+        proj_img((src)=>{
             make_save(src);
-        });
+        })
     }
     else{
         make_save();
@@ -267,7 +285,7 @@ function load_objs(callback,group){
         if(res["out"] == "good"){
             // console.log(res["body"]);
             res["body"].forEach(element => {
-                objs_store[`${element["name"]}`] = {description:element["description"],height:element["height"],width:element["width"],id:element["id"],name:element["name"],cost:element["cost"]}
+                objs_store[`${element["name"]}`] = {height:element["height"],width:element["width"],id:element["id"],name:element["name"],cost:element["cost"],colors:element["colors"]}
             });
             callback(res["body"]);
         }
@@ -275,7 +293,7 @@ function load_objs(callback,group){
 }
 
 function get_obj(clas,callback){
-    if(objs_store != null && objs_store[clas] != null){
+    if(objs_store[clas] != null){
         callback(objs_store[clas]);
     }
     else{
@@ -349,6 +367,7 @@ interact('.dropzone').dropzone({
         if(drag.id == "none") drag.id = get_id(drag.classList[0]);
         if (objs[drag.classList[0]][drag.id] == null){
             objs[drag.classList[0]][drag.id] = {};
+            drag.setAttribute("onclick",`obj_click("${drag.id}")`);
             calc_total()
         }
         zone.classList.add('drop-target');drag.classList.add('can-drop');
@@ -357,9 +376,9 @@ interact('.dropzone').dropzone({
     ondrop: function (event) {var drag = event.relatedTarget
         
        if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
-        objs[drag.classList[0]][drag.id] = {y:drag.getAttribute('data-y'),x:drag.getAttribute('data-x'),body:drag.innerHTML};
+        objs[drag.classList[0]][drag.id] = {y:drag.getAttribute('data-y'),x:drag.getAttribute('data-x'),body:drag.innerHTML,color:drag.getAttribute("color")};
         drag.classList.add('in_zone');drag.classList.remove('can-drop');
-        // console.log(objs["KeyBoard/g/не$основное"]["KeyBoard/g/не$основное_1"]);
+        // console.log(objs["KeyBoard~g~не$основное"]["KeyBoard~g~не$основное_1"]);
         
     },
     ondropdeactivate: function (event) {var zone = event.target;zone.classList.remove('drop-active');zone.classList.remove('drop-target');}
@@ -379,11 +398,12 @@ interact('.createzone').dropzone({
                 // drag.transform = `translate(${drag.getAttribute("data-y")}px, ${drag.getAttribute("data-y")}px) scale(${db_data["width"] * cm_mod} ${db_data["height"] * cm_mod})`;
                 drag.style.width = `${db_data["width"] * cm_mod}px`;
                 drag.style.height = `${db_data["height"] * cm_mod}px`;
+
                 // console.log(db_data);
             })
             let x = zone.getBoundingClientRect().left - document.getElementById("drags").getBoundingClientRect().left;
             let y = zone.getBoundingClientRect().top - document.getElementById("drags").getBoundingClientRect().top;
-            create(`${zone.classList[0]} spawn drag`,x,y,`${zone.classList[0]}`,`none`);
+            create(`${zone.classList[0]} spawn drag`,x,y,null,`none`);
            if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
             drag.classList.remove('spawn');
         }
@@ -404,7 +424,7 @@ function drag_start() {
     Object.entries(zones).forEach(([key, zone]) => {
         let x = zone.getBoundingClientRect().left - document.getElementById("drags").getBoundingClientRect().left;
         let y = zone.getBoundingClientRect().top - document.getElementById("drags").getBoundingClientRect().top;
-        create(`${zone.classList[0]} spawn drag`,x,y,`${zone.classList[0]}`,`none`);
+        create(`${zone.classList[0]} spawn drag`,x,y,null,`none`);
     });
 }
 

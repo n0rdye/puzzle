@@ -9,7 +9,7 @@
         text-align: center;
         margin: 0px auto;
         padding: 10px;
-        background-color:cornsilk;
+        background-color:white;
     }
     #users_section li div:not(#first_user div){
         /* margin: auto; */
@@ -18,7 +18,7 @@
     }
     #first_user div{
         /* text-align: center; */
-        width: 100px;
+        width: 200px;
         text-align: center;
     }
     #users_section ul{
@@ -32,25 +32,26 @@
         margin: auto 0px;
         /* height: 25px; */
     }
+    
 </style>
 
 <div style="display: flex;justify-content: space-between;">
     <h1>пользователи</h1>
     <div id="find_user_btns">
-        <button onclick="load_users_data(users_from,true);">найти по имени</button>
-        <button onclick="load_users_data(users_from)">очистить</button>
+        <button onclick="load_users_data(users_from,true);" class="btn_blue">Найти по имени</button>
+        <button onclick="load_users_data(users_from)" class="btn_blue">Очистить</button>
     </div>
 </div>
 <section id="users_section">
-    <div style="display: flex;justify-content: space-between;margin: auto;">
-        <div style="display: flex;"><h1>всего:&nbsp;</h1> <h1 id="users_count">0</h1></div>
-        <div style="display: flex;margin: auto 0px;">с&nbsp;<div id="users_from">0</div>&nbsp;по&nbsp;<div id="users_to">10</div></div>
-        <div style="margin: auto 0px;"><button onclick="if(users_from-load_interval>=0){users_from-=load_interval;load_users_data(users_from);}">< 10 назад</button></div>
-        <div style="margin: auto 0px;"><button onclick="users_from+=load_interval;load_users_data(users_from);">даллее ></button></div>
-    </div>
-    <div>
-        <li id="first_user"><div>логин</div><div>превилегии</div><div>функции</div></li>
+    <div style="height: 430px;">
+        <li id="first_user"><div>Логин</div><div>Превилегии</div><div>Функции</div></li>
         <ul id="user_list"></ul>
+    </div>
+    <div style="display: flex;justify-content: space-between;margin: auto;">
+        <div style="display: flex;"><h1>Всего:&nbsp;</h1> <h1 id="users_count">0</h1></div>
+        <div style="display: flex;margin: auto 0px;">с&nbsp;<div id="users_from">0</div>&nbsp;по&nbsp;<div id="users_to">10</div></div>
+        <div style="margin: auto 0px;"><button onclick="if(users_from-load_interval>=0){users_from-=load_interval;load_users_data(users_from);}" class="btn_gray">< 10 назад</button></div>
+        <div style="margin: auto 0px;"><button onclick="users_from+=load_interval;load_users_data(users_from);" class="btn_gray">даллее ></button></div>
     </div>
 </section>
 
@@ -125,7 +126,7 @@
                     document.getElementById(`${key}_${id}`).innerText = value;
                 }
                 if(res["out"] == "bad"){
-                    alert("this name is in use")
+                    msg("пользователь с таким иминем уже есть",{type:"warning"})
                 }
             });
         }

@@ -150,7 +150,7 @@
                 if (res["out"] == "bad"){
                     console.log(res["err"]);
                     if (res["err"] == "user" || res["err"] == "pass"){
-                        alert("wrong password or login")
+                        msg("wrong password or login",{type:"warning"})
                     }
                 }
                 else{

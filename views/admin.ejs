@@ -5,20 +5,24 @@
         width: 80vw;
         margin: auto;
     }
+    body{
+        background-color: #F0F8FF;
+    }
 </style>
 
 <!-- <h1 style="text-align: center;">привет админ</h1> <br> -->
 
     <section class="admin_edits" style="display: flex; justify-content: space-evenly;">
-        <button onclick="goto('/admin/objects')">панель управления объектами</button>
-        <button onclick="goto('/admin/users')">панель управления пользователями</button>
-    </section>
-
-    <section style="display: flex; justify-content: space-between;">
-        <h1>логи</h1> <br>
-        <div class="logs_div" style="margin: auto 0px;display: flex;">
-            <button onclick="goto('/get_logs');">скачать логи</button>
+        <button onclick="goto('/admin/objects')" class="btn_white">Панель управления объектами</button>
+        <button onclick="goto('/admin/users')" class="btn_white">Панель управления пользователями</button>
+        <div class="logs_div" style="margin: auto 0px;display: flex; margin-left: 20vw;">
+            <button onclick="goto('/get_logs');" class="btn_white">Скачать логи</button>
         </div>
+    </section>
+    <br>
+    <section style="display: flex;">
+        <h1 style="width: 7.5vw;height: 600px;">Логи</h1>
+        <div style="background-color: white;width: 70vw;"></div>
     </section>
 
 <%- include('./static/end.ejs') %>

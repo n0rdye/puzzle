@@ -1,0 +1,150 @@
+<style>
+    #message_div{
+        width: 100vw;
+        height: 90vh;
+        display: block;
+        position: fixed;
+        z-index: 10000;
+        background-color: transparent;
+        transition: background-color 1s;
+        pointer-events: none;
+        top: 10vh;
+    }
+    .message{
+        margin: auto;
+        margin-bottom: 0px;
+        margin-right: 0px;
+        width: auto;
+        height: auto;
+        min-width: 100px;
+        max-width: 200px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border: 0.2vw rgba(0, 0, 0, 0.2) solid;
+        border-radius: 0.5vw;
+        margin-block: 1vw;
+        text-align: center;
+        pointer-events: all;
+        margin-right: 1vw;
+        font-size: calc(var(--main-font-size)/1.2);
+        padding: 0.5vw;
+        transform: translateX(120%);
+        transition: 300ms;
+    }
+    .yes-ans, .no-ans{
+        background-color: transparent;
+        border: 0px;
+        cursor: pointer;
+    }
+</style>
+
+
+<div id="message_div"></div>
+
+<script>
+    let msg_int = 0;
+    function msg(text,params = {type:null,time:null,res:null}){
+        params.time = (params.time == null)? 8:params.time;
+        params.type = (params.type == null)? "msg":params.type;
+        msg_int++;
+        params.time = params.time * 700;
+        let msg_div = document.createElement("div");
+        let msg_root = document.getElementById("message_div");
+        msg_div.classList.add("message");
+        msg_div.innerText = text;
+        msg_div.id = `msg_${msg_int}`;
+        msg_root.appendChild(msg_div)
+        // console.log(`msg_${msg_int}`);
+        setTimeout(()=>{
+            msg_div.style.transform = "translateX(0%)";
+        },100)
+        switch (params.type) {
+            case "help":
+                msg_div.style.borderColor = "rgba(255, 255, 0, 0.5)";
+                break;
+            case "ask":
+                msg_div.style.borderColor = "rgba(0, 255, 0, 0.5)";
+                break;
+            case "warning":
+                msg_div.style.borderColor = "rgba(255, 0, 0, 0.5)";
+                break;
+            case "wait":
+                msg_div.style.borderColor = "rgba(0, 0, 255, 0.5)";
+                break;            
+            default:
+                break;
+        }
+        // console.log(params.type,params.time);
+
+        if (params.type == "ask"){
+            // msg_div.setAttribute("onclick",`msg_del("msg_${msg_int}")`);
+            let yes = document.createElement("button");
+            let no = document.createElement("button");
+            let q_div = document.createElement("div");
+            q_div.style = "display:flex;justify-content: space-between;z-index:20000";
+            yes.innerText = "да";
+            no.innerText = "нет";
+            yes.classList.add("yes-ans")
+            no.classList.add("no-ans")
+            yes.id = `${msg_div.id}-yes`;
+            no.id = `${msg_div.id}-no`;
+            q_div.append(yes)
+            q_div.append(no)
+            msg_div.append(q_div)
+
+            document.getElementById("message_div").style.pointerEvents = "all";
+            document.getElementById("message_div").setAttribute("onclick",`document.getElementById('${msg_div.id}').setAttribute("ans","false")`)
+
+            msg_div.setAttribute("ans","null")
+            yes.setAttribute("onclick",`document.getElementById('${msg_div.id}').setAttribute("ans","true")`)
+            no.setAttribute("onclick",`document.getElementById('${msg_div.id}').setAttribute("ans","false")`)
+            var observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type = "attributes" && mutation.target.getAttribute("ans") != "null") {
+                        console.log(mutation);
+                        if(mutation.target.getAttribute("ans") == "true"){
+                            params.res(true);fin();
+                        }
+                        else if (mutation.target.getAttribute("ans") == "false"){
+                            params.res(false);fin();
+                        }
+                    }
+                });
+            });
+            observer.observe(msg_div, {attributes: true });
+
+
+            function fin(){
+                observer.disconnect();
+                document.getElementById("message_div").style.pointerEvents = "none";
+                if (document.getElementById(msg_div.id) != null){
+                    msg_div.style.transform = "translateX(120%)";
+                    setTimeout(() => {
+                        msg_root.removeChild(msg_div); 
+                    }, 200);
+                }
+            } 
+        }
+        else if(params.type != "wait" && params.type != "ask"){
+            msg_div.setAttribute("onclick",`msg_del("msg_${msg_int}")`);
+            setTimeout(()=>{
+                if (document.getElementById(msg_div.id) != null){
+                    msg_div.style.transform = "translateX(120%)";
+                    setTimeout(() => {
+                        msg_root.removeChild(msg_div); 
+                        console.log(params.type);
+                    }, 200);
+                }
+            },params.time)
+        }
+        return msg_div;
+    }
+
+    function msg_del(id){
+        let msg_div = document.getElementById(`${id}`);
+        let msg_root = document.getElementById("message_div");
+        msg_div.style.transform = "translateX(120%)";
+        setTimeout(() => {
+            msg_root.removeChild(msg_div); 
+        }, 200);
+    }
+</script>

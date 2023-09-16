@@ -7,6 +7,9 @@ const fs = require('fs');
 const db = require('./db');
 const moment = require("moment");
 const vars = require('./vars');
+const replaceColor = require('replace-color');
+const { escapeXML } = require('ejs');
+const imageDataURI = require('image-data-uri');
 
 module.exports.sendfile = (fileName, response) => {
     const filePath = "./"+fileName; 
@@ -124,7 +127,7 @@ module.exports.logs_file = (res)=>{
 
 
 module.exports.get_uuid = (name = "/") =>{
-    if (name != "/") name = this.encrypt(name,"name");
+    // if (name != "/") name = this.encrypt(name,"name");
     let unid = uuid.v4() + '%%'+name+'#e'+(621);
     return unid;
 }
@@ -141,3 +144,38 @@ module.exports.decrypt = (text,cipher) =>{
     return de;
 }
 
+
+module.exports.img_recolor = (res,image,color) => {
+    // console.log(color);
+    image = `public/${image}`
+    let name = image.split("/").at(-2);
+    if (fs.existsSync(`public/img/object/${name}/colored/${color}.png`)) {
+            res.send(`/img/object/${name}/colored/${color}.png`)
+        }
+    else{
+        replaceColor({
+            image: image,
+            colors: {
+              type: 'hex',
+              targetColor: "#FFFFFF",
+              replaceColor: `#${color}`
+            },
+            deltaE: 10
+          })
+            .then((jimpObject) => {
+                if (!fs.existsSync(`public/img/object/${name}`)){fs.mkdirSync(`public/img/object/${name}`)}
+                jimpObject.write(`public/img/object/${name}/colored/${color}.png`, (err) => {
+                    if (err) return console.log(err)
+                    else{
+                        imageDataURI.encodeFromFile(`public/img/object/${name}/colored/${color}.png`)
+                        .then(data => {
+                            res.send(data)
+                        })
+                    }
+                })
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+    }
+}

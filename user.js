@@ -93,11 +93,11 @@ module.exports.sid_log=(inp,cook,res,req)=>{
         func.sid(cook,res,(include) => {
             if (include){
                 res.send({out:"good",url:"/main"});
-                if(req.headers.referer.split("http://n0rsrv2:3002/")[1] == "login") func.log("good boy "+ id["uuid"]+" logged in by sid logs from " + id["sid"]);
+                if(req.headers.referer.split("https://n0r.su/")[1] == "login") func.log("good boy "+ id["uuid"]+" logged in by sid logs from " + id["sid"]);
             }
             else if (!include){
                 res.send({out:"bad"});
-                if(req.headers.referer.split("http://n0rsrv2:3002/")[1] == "login") func.log("bad boy "+ id["uuid"]+" tried to login by sid but sid expired from " + id["sid"]);
+                if(req.headers.referer.split("https://n0r.su/")[1] == "login") func.log("bad boy "+ id["uuid"]+" tried to login by sid but sid expired from " + id["sid"]);
             }
         },false)   
     } catch (error) {
