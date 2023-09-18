@@ -50,12 +50,14 @@ function create(clas,x,y,color = null,id,size){
             }
         }
         function make(img){
+            // console.log(db_data);
             obj.src = img;
-            obj.title = `${db_data["name"].replaceAll("$"," ").split("/g")[0]}\nцена:${db_data["cost"]}\nширина:${db_data["width"]}см высота:${db_data["height"]}см`;
+            obj.title = `${db_data["name"].replaceAll("$"," ").split("~g")[0]}\nцена:${db_data["cost"]}\nширина:${db_data["width"]}см высота:${db_data["height"]}см`;
             obj.setAttribute("cost",db_data["cost"])
             obj.setAttribute("colors",Boolean(db_data["colors"]))
             obj.setAttribute("img",img)
             obj.setAttribute("gid",db_data["gid"])
+            obj.setAttribute("pid",db_data["pid"])
             obj.setAttribute("color",color)
             // drag.transform = `translate(${drag.getAttribute("data-y")}px, ${drag.getAttribute("data-y")}px) scale(${db_data["width"] * cm_mod} ${db_data["height"] * cm_mod})`;
             if(size){
@@ -78,7 +80,13 @@ function obj_click(id){
         let obj = document.getElementById(id);
         cur_obj = id;
         if (obj.getAttribute("colors") == "true"){
-            document.getElementById("obj_color_div").style.display = "flex";
+            clear_palette();
+            obj_colors_load(()=>{
+                document.getElementById("obj_color_div").style.display = "flex";
+                if( document.getElementById(`color_${obj.getAttribute("color")}`) != null){
+                    document.getElementById(`color_${obj.getAttribute("color")}`).style.border = "1px blue solid"
+                }
+            });
         }
         else{
             document.getElementById("obj_color_div").style.display = "none";
@@ -148,7 +156,7 @@ function calc_total(start = false){
         if(key != "height"&&key!="width"&key!="total"){
             // console.log(Object.keys(value).length);
             // console.log(objs_store[key]);
-            if(objs_store[key] != null && objs_store[key]["cost"] > 0){
+            if(objs_store[key] != null && objs_store[key]["cost"] > 0 && JSON.parse(document.getElementById(`group_drop-${objs_store[key]["pid"]}`).getAttribute("no-cost")) == false){
                 // console.log(key,value); 
                 total += parseInt(parseInt(objs_store[key]["cost"]) * Object.keys(value).length);
                 let obj_cost_div = document.createElement("li");
@@ -194,9 +202,6 @@ function load(objss){
         }
 
         if (keys == "color"){
-            document.getElementById("wall").style.backgroundColor = values;
-        }
-        if (keys == "grided"){
             document.getElementById("wall").style.backgroundColor = values;
         }
         if (keys == Object.keys(objs).at(-1)){
@@ -285,7 +290,7 @@ function load_objs(callback,group){
         if(res["out"] == "good"){
             // console.log(res["body"]);
             res["body"].forEach(element => {
-                objs_store[`${element["name"]}`] = {height:element["height"],width:element["width"],id:element["id"],name:element["name"],cost:element["cost"],colors:element["colors"]}
+                objs_store[`${element["name"]}`] = {height:element["height"],width:element["width"],id:element["id"],name:element["name"],cost:element["cost"],colors:element["colors"],gid:element["gid"],pid:element["pid"]}
             });
             callback(res["body"]);
         }

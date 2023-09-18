@@ -10,7 +10,7 @@ module.exports.loads = (inp,cook,res)=>{
         let gin
         if (typeof inp["gid"] == 'undefined' || inp["gid"] == null) gin = "1 OR 1=1"
         else gin = inp["gid"]
-        db.ggv("objects","`name`,`id`,`height`,`width`,`cost`,`gid`,`colors`","gid",`${gin}`,(odata)=>{
+        db.ggv("objects","`name`,`id`,`height`,`width`,`cost`,`gid`,`colors`,`pid`","gid",`${gin}`,(odata)=>{
             // func.log(odata);
             res.send({out:"good",body:odata});
         })
@@ -42,7 +42,7 @@ module.exports.new = (inp,cook,res)=>{
                             res.send({out:"bad",err:"name"});
                         }
                         else if (db_name[0] == null){
-                            db.nr("objects","`cost`,`name`,`img`,`height`,`width`,`gid`,`colors`",`'${inp["cost"]}','${inp["name"]}~g~${gname["name"]}~p~${pname["name"]}','${img_path}','${inp["height"]}','${inp["width"]}','${inp["gid"]}','${inp["colors"]}'`,true);
+                            db.nr("objects","`cost`,`name`,`img`,`height`,`width`,`gid`,`colors`,`pid`",`'${inp["cost"]}','${inp["name"]}~g~${gname["name"]}~p~${pname["name"]}','${img_path}','${inp["height"]}','${inp["width"]}','${inp["gid"]}','${inp["colors"]}','${gname["pid"]}'`,true);
                                 db.sv("object_groups","count",`(count + 1)`,"id",inp["gid"],()=>{},true,true)
                                 func.log(`admin object created name:${inp["name"]} group:${gname["name"]}`);
                                 res.send({out:"good"});
@@ -56,11 +56,47 @@ module.exports.new = (inp,cook,res)=>{
         })
         function save_img(data,name,callback) {
             let img = imageDataURI.decode(data);
-            if (!fs.existsSync(`public/img/object/${name}`)){fs.mkdirSync(`public/img/object/${name}`);fs.mkdirSync(`public/img/object/${name}/colored`);}
+            if (!fs.existsSync(`public/img/object/${name}`)){fs.mkdirSync(`public/img/object/${name}`);}
             fs.writeFile(`public/img/object/${name}/main.${img.imageType.split("/").at(-1)}`, img.dataBuffer,()=>{
                 if(callback)callback(`/img/object/${name}/main.${img.imageType.split("/").at(-1)}`);
             });
         }
+    } catch (error) {
+        func.log("backend object creating error - "+error);
+    }
+}
+
+module.exports.new_color = (inp,cook,res)=>{
+    try {
+        db.fv("color_palette","color",inp["color"],(in_db)=>{in_db = in_db[0];
+            if(typeof in_db == 'undefined'){
+                db.nr("color_palette","color",`'${inp["color"]}'`,true,(db)=>{
+                    res.send({out:"good"});
+                    func.log(`admin added new color:${inp["color"]}`)
+                })
+            }else{
+                res.send({out:"bad"});
+            }
+        })
+    } catch (error) {
+        func.log("backend object creating error - "+error);
+    }
+}
+module.exports.del_color = (inp,cook,res)=>{
+    try {
+        db.dl("color_palette","id",inp["id"],(in_db)=>{
+            res.send({out:"good"});
+            func.log(`admin deleted color:${inp["color"]}`)
+        },true);
+    } catch (error) {
+        func.log("backend object creating error - "+error);
+    }
+}
+module.exports.load_colors = (inp,cook,res)=>{
+    try {
+        db.gav("color_palette","0",(in_db)=>{
+            res.send({out:"good",body:in_db})
+        })
     } catch (error) {
         func.log("backend object creating error - "+error);
     }
@@ -96,19 +132,21 @@ module.exports.save = (inp,cook,res)=>{
                     fs.rm(`public/img/object/${db_data["name"]}`, { recursive: true }, () => {
                         // fs.unlink(db_data["img"],()=>{});
                         save_img(value,db_data["name"],(path)=>{
+                            // console.log(db_data["name"]);
                             db.sv("objects",key,path,"id",inp["id"],()=>{
                                 chack_if_last(key)
                             },true);
                         })
     
-    
                         function save_img(data,name,callback) {
                             let img = imageDataURI.decode(data);
-                            if (!fs.existsSync(`public/img/object/${name}`)){fs.mkdirSync(`public/img/object/${name}`);fs.mkdirSync(`public/img/object/${name}/colored`);}}
+                            if (!fs.existsSync(`public/img/object/${name}`)){fs.mkdirSync(`public/img/object/${name}`);}
                             fs.writeFile(`public/img/object/${name}/main.${img.imageType.split("/").at(-1)}`, img.dataBuffer,()=>{
                                 if(callback)callback(`/img/object/${name}/main.${img.imageType.split("/").at(-1)}`);
                             });
-                    });
+                        }
+
+                    })
                 })
             }
             else if (key != "name"){

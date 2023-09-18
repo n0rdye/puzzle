@@ -60,9 +60,9 @@
             }
         });
     }
-    function new_proj(){
+    function new_proj(objs = null){
         let name = ask("please enter project name");
-        let objs = { height:"2",width:"4"};
+        objs = (objs == null)? { height:"2",width:"4"}:objs;
         if(name != null && name!= "" && name!=" " && typeof name != "undefined" && name!="undefined"){
             $.post( "/save_proj", {proj:JSON.stringify(objs),name:name,img:"/img/proj_placeholder.webp"})
             .done(function( res ) {
@@ -84,7 +84,7 @@
             projs.forEach(proj => {
             console.log(proj);
             let div = document.getElementById("projs_div");
-            div.innerHTML += `<button id='proj_${proj["name"]}' class='proj'>
+            div.innerHTML += `<button id='proj_${proj["name"]}' proj_id='${proj["id"]}' class='proj'>
                 <img src='${proj["img"]}' alt='${proj["name"]}' class="p_img" onclick="goto('/proj/load/${proj["name"]}')">
                 <div class="p_props">
                     <div class="p_left"  style="text-align:left">
@@ -93,8 +93,8 @@
                     </div>
                     <div class="p_right">
                         <img src="/img/icon/edit.svg" style="width:24px;height:24px" onclick="">
-                        <img src="/img/icon/copy.svg" style="width:24px;height:24px" onclick="">
-                        <img src="/img/icon/download.svg" style="width:24px;height:24px" onclick="download_proj('${proj["id"]}','${proj["name"]}')">
+                        <img src="/img/icon/copy.svg" style="width:24px;height:24px" onclick="copy_proj('${proj["name"]}')">
+                        <img src="/img/icon/download.svg" style="width:24px;height:24px" onclick="downloadImg('${proj["img"]}','${proj["name"]}');msg('скачивание');">
                         <img src="/img/icon/trash.svg" style="width:24px;height:24px" onclick="del_proj('${proj["name"]}')">
                     </div>    
                 </div>
@@ -121,6 +121,15 @@
                 }
             })
         }
+    }
+
+    function copy_proj(proj){
+        $.post( "/load_proj",{name:proj})
+        .done(function( res ) {
+            if(res["out"] == "good"){
+                new_proj(JSON.parse(res["body"]))
+            }
+        })
     }
 </script>
 <%- include('./static/end.ejs',{soc:true}) %>

@@ -48,10 +48,11 @@
                     let color_check = document.getElementById("obj_color_check");
                     let old_prev = document.getElementById("img_prev").src;
                     if(color_check.checked == true){
+                        obj_colors_load();
                         removeImageBackground(document.getElementById("img_prev").src).then((out)=>{
                             document.getElementById("img_prev").src = out;
                         })
-                        msg("при измении цвета все цвета кроме прозрачного изменятся",{type:"help",time:10});
+                        msg("помните что только hex:#c8c8c8 или rgb:200,200,200 цвета будут заменины при смене цвета ",{type:"help",time:10});
                     }
                     else{
                         document.getElementById("img_prev").src = old_prev;
@@ -235,9 +236,7 @@
                         }
                         else if(res["out"] == "good"){
                             msg("товар добавлен");
-                            setTimeout(()=>{
-                                edit_get_objs();
-                            },5000)
+                            edit_get_objs();
                         }
                     });
                 }

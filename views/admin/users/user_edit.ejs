@@ -43,15 +43,15 @@
     </div>
 </div>
 <section id="users_section">
-    <div style="height: 430px;">
+    <div style="height: 360px;">
         <li id="first_user"><div>Логин</div><div>Превилегии</div><div>Функции</div></li>
         <ul id="user_list"></ul>
     </div>
     <div style="display: flex;justify-content: space-between;margin: auto;">
         <div style="display: flex;"><h1>Всего:&nbsp;</h1> <h1 id="users_count">0</h1></div>
         <div style="display: flex;margin: auto 0px;">с&nbsp;<div id="users_from">0</div>&nbsp;по&nbsp;<div id="users_to">10</div></div>
-        <div style="margin: auto 0px;"><button onclick="if(users_from-load_interval>=0){users_from-=load_interval;load_users_data(users_from);}" class="btn_gray">< 10 назад</button></div>
-        <div style="margin: auto 0px;"><button onclick="users_from+=load_interval;load_users_data(users_from);" class="btn_gray">даллее ></button></div>
+        <div style="margin: auto 0px;"><button id="back_btn" class="btn_gray">< 10 назад</button></div>
+        <div style="margin: auto 0px;"><button  id="forw_btn" class="btn_gray">даллее ></button></div>
     </div>
 </section>
 
@@ -59,10 +59,32 @@
 <script>
     let users_from = 0;
     let load_interval = 5;
+    function user_count_check(){
+        if(parseInt(document.getElementById("users_count").innerText) >= parseInt(document.getElementById("users_to").innerText)){
+            document.getElementById("forw_btn").classList = "btn_blue";
+            document.getElementById("forw_btn").setAttribute("onclick",`users_from+=load_interval;load_users_data(users_from);`);
+
+        }
+        else{
+            document.getElementById("forw_btn").setAttribute("onclick",``);
+            document.getElementById("forw_btn").classList = "btn_gray";
+        }
+
+        if(parseInt(document.getElementById("users_from").innerText) == 0){
+            document.getElementById("back_btn").setAttribute("onclick",``);
+            document.getElementById("back_btn").classList = "btn_gray";
+        }
+        else{
+            document.getElementById("back_btn").setAttribute("onclick",`if(users_from-load_interval>=0){users_from-=load_interval;load_users_data(users_from);};`);
+            document.getElementById("back_btn").classList = "btn_blue";
+        }
+    }
     load_users_data(users_from);
     function load_users_data(from,by_name=false){
         // if(to == "forward") {users_from+=load_interval;}
         // else if(to == "back") {users_from-=load_interval;}
+        document.getElementById("back_btn").setAttribute("onclick",``);
+        document.getElementById("forw_btn").setAttribute("onclick",``);
         document.getElementById("user_list").innerHTML = "";
         document.getElementById("users_from").innerText = from;
         document.getElementById("users_to").innerText = from+load_interval;
@@ -80,6 +102,7 @@
             
                         user_sec.append(user_pass);user_sec.append(user_name);user_sec.append(user_prevs);user_sec.append(user_buttons);
                         document.getElementById("user_list").append(user_sec);
+                        user_count_check();
                     });
                 }
                 else if (res["out"] == "bad"){
@@ -90,6 +113,7 @@
         else{
             let login = ask("имя");
             if (login != ""){
+                form = 0;
                 $.post( "/admin/users/find",{login:login,from:from,load_interval:load_interval})
                 .done(function( res ) {
                     if(res["out"] == "good"){
@@ -103,6 +127,10 @@
                             user_sec.append(user_pass);user_sec.append(user_name);user_sec.append(user_prevs);user_sec.append(user_buttons);
                             document.getElementById("user_list").append(user_sec);
                         });
+                    }
+                    else if(res["out"] == "bad"){
+                        msg("нет пользователя с таким иминем")
+                        load_users_data(users_from);
                     }
                 });
             }

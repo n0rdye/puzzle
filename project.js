@@ -71,6 +71,8 @@ module.exports.save = (inp,cook,res)=>{
     try {
         db.gv("users","uuid",`'${cook["uuid"]}'`, (udata)=>{ udata = udata[0]
             db.gv("projects","uid",udata["id"],(pdata)=>{
+                var date = moment().format('YYYY-MM-DD');
+                var time = moment().format('hh:mm:ss');
                 let projin = null;
                 // func.log(pdata);
                 pdata.forEach(projt => {
@@ -82,14 +84,13 @@ module.exports.save = (inp,cook,res)=>{
                 if(projin == null){
                     // func.log("proj not in");
                     // func.log(pname,udata["id"],proj);
-                    var date = moment().format('YYYY-MM-DD');
-                    var time = moment().format('hh:mm:ss');
                     func.log(`good boy ${udata["uuid"]} created project ${inp["name"]} from ${cook["sid"]}`);
                     db.nr("projects","`uid`,`name`,`body`,`img`,creation_date",`'${udata["id"]}','${inp["name"]}','${inp["proj"]}','${inp["img"]}','${date+"T"+time}'`);
                     res.send({out:"good"});
                 } else if (projin != null){
                     db.sv("projects","body",inp["proj"],"id",projin["id"],()=>{});
-                    if(inp["img"] != "") db.sv("projects","img",inp["img"],"id",projin["id"],()=>{},"user");
+                    db.sv("projects","last_change_date",`${date+"T"+time}`,"id",projin["id"],()=>{});
+                    if(inp["img"] != "") db.sv("projects","img",inp["img"],"id",projin["id"],()=>{});
                     func.log(`good boy ${udata["uuid"]} saved project ${projin["name"]} from ${cook["sid"]}`);
                     // func.log("proj in");
                     res.send({out:"good"});

@@ -99,6 +99,21 @@ function get_sid(){
     });
 }
 
+function load_colors(callback){
+    $.post( "/object/colors/get", {})
+    .done(function( res ) {
+        if(res["out"] == "good"){
+            if(callback)callback(res["body"])
+        }
+    });
+}
+function clear_palette(){
+    Object.values(document.getElementsByClassName("color_palette")).forEach(element => {
+        element.style.border = "0px blue solid";
+    });
+}
+
+
 function load_groups(callback,groups,admin = false){
     let select = document.getElementById("group");
     // let name = select.options[select.selectedIndex].text;

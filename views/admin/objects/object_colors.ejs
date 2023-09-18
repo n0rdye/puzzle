@@ -1,0 +1,63 @@
+<div id="admin_colors" style="display: flex;justify-content: space-between;margin-top: 4vh;">
+    <div id="obj_color_div" style="justify-content: space-between; width: 50vw;display: flex;">
+        <label for="obj_colors" style="min-width: 10vw;float: left;">цвет объекта</label>
+        <div id="obj_colors" style="display: flex; width: 30vw;overflow: auto;"></div>      
+    </div>
+    <div id="inp">
+        <input type="color" id="new_color" style="margin: auto;">
+        <button onclick="new_color()" class="btn_blue">добавить цвет</button>
+        <button onclick="del_color()" class="btn_blue">удалить цвет</button>
+    </div>
+</div>
+
+<script>
+    let cur_color = "";
+    obj_colors_load();
+    function obj_colors_load() {
+        let div = document.getElementById("obj_colors");
+        div.innerHTML = "";
+        load_colors((colors)=>{
+            Object.entries(colors).forEach(([key,value]) => {
+                // console.log(value);
+                let color_div = document.createElement("div");
+                color_div.style = `background-color: #${value["color"]}; border-radius: 50%;height: 2vw;min-width: 2vw;margin-inline: 0.5vw;`;
+                color_div.classList.add("color_palette");
+                color_div.id=`color_${value["color"]}`;
+                color_div.setAttribute("color_id",`${value["id"]}`)
+                color_div.setAttribute("onclick",`clear_palette();document.getElementById('color_${value["color"]}').style.border = "1px blue solid";cur_color = 'color_${value["color"]}';`)
+                color_div.title = `#${value["color"]}`;
+                div.append(color_div);
+            });
+        })
+    }
+    function new_color(){
+        let color = document.getElementById("new_color").value.replace("#","");
+        let wait_msg = msg("добавление цвета",{type:"wait"})
+        $.post( "/admin/colors/new", {color:color})
+        .done(function( res ) {
+            if(res["out"] == "good"){
+                msg_del(wait_msg.id);
+                msg("цвет добавлен");
+                obj_colors_load();
+                console.log(res["body"]);
+            }
+            else if (res["out"] == "bad"){
+                msg_del(wait_msg.id);
+                msg("цвет уже добавлен");
+            }
+        });
+    }
+    function del_color(){
+        let color_id = document.getElementById(cur_color).getAttribute("color_id")
+        let wait_msg = msg("удаление цвета",{type:"wait"})
+        $.post( "/admin/colors/delete", {id:color_id})
+        .done(function( res ) {
+            if(res["out"] == "good"){
+                msg_del(wait_msg.id);
+                msg("цвет удалён");
+                obj_colors_load();
+                console.log(res["body"]);
+            }
+        });
+    }
+</script>

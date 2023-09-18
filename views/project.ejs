@@ -189,22 +189,9 @@
 
 <div class="inputs" style="display: flex;justify-content: space-between;height: 5vh;">
     <div id="obj_color_div" style="justify-content: space-evenly; width: 50vw;display: none;transform: translateX(30%);">
-        <label for="obj_color" style="width: 10vw;">цвет объекта</label>
+        <label for="obj_colors" style="min-width: 10vw;">цвет объекта</label>
+        <div id="obj_colors" style="display: flex; width: 30vw;overflow: auto;"></div>      
         <!-- <input id="obj_color" type="color" onchange="obj_color_change(event)"> -->
-        <div style="display: flex;justify-content: space-evenly; width: 30vw;">
-            <div style="background-color: #43368D; border-radius: 50%;height: 2vw;width: 2vw;" color="#43368D" onclick="obj_color_change('43368D')"></div>
-            <div style="background-color: #41AB34; border-radius: 50%;height: 2vw;width: 2vw;" color="#41AB34" onclick="obj_color_change('41AB34')"></div>
-            <div style="background-color: #F7EA55; border-radius: 50%;height: 2vw;width: 2vw;" color="#F7EA55" onclick="obj_color_change('F7EA55')"></div>
-            <div style="background-color: #E5231F; border-radius: 50%;height: 2vw;width: 2vw;" color="#E5231F" onclick="obj_color_change('E5231F')"></div>
-            <div style="background-color: #F39223; border-radius: 50%;height: 2vw;width: 2vw;" color="#F39223" onclick="obj_color_change('F39223')"></div>
-            <div style="background-color: #009FE3; border-radius: 50%;height: 2vw;width: 2vw;" color="#009FE3" onclick="obj_color_change('009FE3')"></div>
-            <div style="background-color: #CEE8EA; border-radius: 50%;height: 2vw;width: 2vw;" color="#CEE8EA" onclick="obj_color_change('CEE8EA')"></div>
-            <div style="background-color: #B9D585; border-radius: 50%;height: 2vw;width: 2vw;" color="#B9D585" onclick="obj_color_change('B9D585')"></div>
-            <div style="background-color: #F4F2C7; border-radius: 50%;height: 2vw;width: 2vw;" color="#F4F2C7" onclick="obj_color_change('F4F2C7')"></div>
-            <div style="background-color: #E699A7; border-radius: 50%;height: 2vw;width: 2vw;" color="#E699A7" onclick="obj_color_change('E699A7')"></div>
-            <div style="background-color: #F9C771; border-radius: 50%;height: 2vw;width: 2vw;" color="#F9C771" onclick="obj_color_change('F9C771')"></div>
-            <div style="background-color: #B7A3C7; border-radius: 50%;height: 2vw;width: 2vw;" color="#B7A3C7" onclick="obj_color_change('B7A3C7')"></div>
-        </div>
     </div>
 </div>
 <div class="inputs" style="display: flex;justify-content: space-between;">
@@ -309,7 +296,7 @@
     }
 
     function img_download(){
-        msg("добавить на фото стоимость ?",{type:"ask",res:(out)=>{
+        msg("добавить на фото стоимость?",{type:"ask",res:(out)=>{
             let wait_msg = msg("делаем фото",{type:"wait"})
             proj_img((src)=>{
                 msg("изображение проекта готово",{time:3})
@@ -331,6 +318,7 @@
         }
         html2canvas(document.getElementById("drags"),{
             y:7,
+            x:2,
             width:width,
             logging:false,
             scale:5
@@ -348,6 +336,27 @@
         });
     }
 
+    function obj_colors_load(callback) {
+        let div = document.getElementById("obj_colors");
+        div.innerHTML = "";
+        load_colors((colors)=>{
+            Object.entries(colors).forEach(([key,value]) => {
+                // console.log(value);
+                let color_div = document.createElement("div");
+                color_div.style = `background-color: #${value["color"]}; border-radius: 50%;height: 2vw;min-width: 2vw;margin-inline: 0.5vw;`;
+                color_div.classList.add("color_palette");
+                color_div.id=`color_${value["color"]}`;
+                color_div.setAttribute("color",`${value["color"]}`)
+                color_div.setAttribute("onclick",`clear_palette();document.getElementById('color_${value["color"]}').style.border = "1px blue solid";obj_color_change('${value["color"]}')`)
+                color_div.title = `#${value["color"]}`;
+                div.append(color_div);
+                if(key = Object.keys(colors).at(-1)){
+                    if(callback)callback();
+                }
+            });
+        })
+    }
+
     function obj_color_change(color,in_obj = null){
         if(color != "null"){
             if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
@@ -355,6 +364,7 @@
             // console.log(color);
             color_change(color,obj.getAttribute("img"),(img)=>{
                 obj.src = img;
+                obj.setAttribute("color",color)
                 objs[obj.classList[0]][obj.id]["color"] = color;
             });
         }

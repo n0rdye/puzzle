@@ -157,7 +157,7 @@ module.exports.img_recolor = (res,image,color) => {
             image: image,
             colors: {
               type: 'hex',
-              targetColor: "#FFFFFF",
+              targetColor: "#c8c8c8",
               replaceColor: `#${color}`
             },
             deltaE: 10

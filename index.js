@@ -189,6 +189,17 @@ app.post("/object/group/get", (req,res) => {try{
     } catch (error) {func.log("router single object getting error - "+error);}
 })
 
+// colors
+app.post("/object/colors/get", (req,res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    // func.log(inp["name"]);
+    func.sid(cook,res,()=>{
+        obj.load_colors(inp,cook,res);
+    })
+} catch (error) {func.log("router single object getting error - "+error);}
+})
+
 
 /// admin
 app.get("/admin", (req,res) =>{try {
@@ -216,6 +227,24 @@ app.get("/admin/:type", (req,res) =>{try {
 app.get("/get_logs", (req,res) => {
     try{let cook = req.cookies;func.sid(cook,res,()=>{func.logs_file(res);})} 
     catch (error) {func.log("router logs download error - "+error);}
+})
+app.post("/admin/colors/new", (req,res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    // func.log(inp["name"]);
+    func.sid(cook,res,()=>{
+        obj.new_color(inp,cook,res);
+    })
+} catch (error) {func.log("router single object getting error - "+error);}
+})
+app.post("/admin/colors/delete", (req,res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    // func.log(inp["name"]);
+    func.sid(cook,res,()=>{
+        obj.del_color(inp,cook,res);
+    })
+} catch (error) {func.log("router single object getting error - "+error);}
 })
 app.post("/admin/objects/new", (req,res) => {try{
         let inp = req.body;
