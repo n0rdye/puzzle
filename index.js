@@ -133,6 +133,14 @@ app.post("/proj/download", (req,res) => {try{
         })
     } catch (error) {func.log("router project loading error - "+error);}
 })
+app.post("/proj/rename", (req,res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        proj.rename(inp,cook,res);
+    })
+} catch (error) {func.log("router project loading error - "+error);}
+})
 app.post("/get_projs", (req,res) => {
     try{
         let inp = req.body;

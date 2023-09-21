@@ -4,9 +4,12 @@
         margin: auto;
     }
     .pass_blur{
-        color:transparent; text-shadow:0 0 7px #555, 0 0 10px #000; 
-        border:0; padding:0; margin:0; -webkit-filter:blur(3px); 
-        margin-right: 20px;
+        color:transparent; 
+        text-shadow:0 0 20px #555, 0 0 20px #000; 
+        border:0; 
+        padding:0; 
+        margin:0; 
+        filter:blur(5px); 
     }
     #users_section li{
         display: flex;
@@ -36,6 +39,9 @@
         /* display: flex; */
         margin: auto 0px;
         /* height: 25px; */
+    }
+    .user_edit{
+        cursor: pointer;
     }
     
 </style>
@@ -129,15 +135,15 @@
         
         function make_user(user,res){
             let user_sec = document.createElement("li");user_sec.id = `user_${user["id"]}`;
-            let user_name = document.createElement("div");user_name.id = `login_${user["id"]}`;user_name.innerText = user["login"];user_name.setAttribute("onclick",`user_edit("login",${user["id"]})`);
-            let user_pass = document.createElement("div");user_pass.id = `pass_${user["id"]}`;user_pass.innerText = user["pass"];user_pass.classList.add("pass_blur"); user_pass.setAttribute("onclick",`user_edit("pass",${user["id"]})`);
+            let user_name = document.createElement("div");user_name.id = `login_${user["id"]}`;user_name.innerText = user["login"];user_name.setAttribute("onclick",`user_edit("login",${user["id"]})`);user_name.classList.add("user_edit");
+            let user_pass = document.createElement("div");user_pass.id = `pass_${user["id"]}`;user_pass.innerText = user["pass"];user_pass.classList.add("pass_blur"); user_pass.setAttribute("onclick",`user_edit("pass",${user["id"]})`);user_pass.classList.add("user_edit");
     
             let admin = find_admin(res["admins"],user["id"])
             // console.log(admin);
-            let user_prevs = document.createElement("input");user_prevs.setAttribute("type","checkbox");;user_prevs.id = `admin_${user["id"]}`;user_prevs.checked = admin["admin"];user_prevs.setAttribute("onclick",`user_edit('admin',${user["id"]})`);
-            let user_prevs_usr = document.createElement("input");user_prevs_usr.setAttribute("type","checkbox");;user_prevs_usr.id = `admin_usr_${user["id"]}`;user_prevs_usr.checked = admin["admin_usr"];user_prevs_usr.setAttribute("onclick",`admin_edit(${user["id"]})`);
-            let user_prevs_obj = document.createElement("input");user_prevs_obj.setAttribute("type","checkbox");user_prevs_obj.id = `admin_obj_${user["id"]}`;user_prevs_obj.checked = admin["admin_obj"];user_prevs_obj.setAttribute("onclick",`admin_edit(${user["id"]})`);
-            let user_del_btn = document.createElement("button");user_del_btn.id = `user_del_btn-${user["id"]}`; user_del_btn.innerText = "удалить"; user_del_btn.setAttribute("onclick",`user_del(${user["id"]})`); 
+            let user_prevs = document.createElement("input");user_prevs.setAttribute("type","checkbox");;user_prevs.id = `admin_${user["id"]}`;user_prevs.checked = admin["admin"];user_prevs.setAttribute("onclick",`user_edit('admin',${user["id"]})`);user_prevs.classList.add("user_edit");
+            let user_prevs_usr = document.createElement("input");user_prevs_usr.setAttribute("type","checkbox");;user_prevs_usr.id = `admin_usr_${user["id"]}`;user_prevs_usr.checked = admin["admin_usr"];user_prevs_usr.setAttribute("onclick",`admin_edit(${user["id"]})`);user_prevs_usr.classList.add("user_edit");
+            let user_prevs_obj = document.createElement("input");user_prevs_obj.setAttribute("type","checkbox");user_prevs_obj.id = `admin_obj_${user["id"]}`;user_prevs_obj.checked = admin["admin_obj"];user_prevs_obj.setAttribute("onclick",`admin_edit(${user["id"]})`);user_prevs_obj.classList.add("user_edit");
+            let user_del_btn = document.createElement("button");user_del_btn.id = `user_del_btn-${user["id"]}`; user_del_btn.innerText = "удалить"; user_del_btn.setAttribute("onclick",`user_del(${user["id"]})`); user_del_btn.classList.add("user_edit");user_del_btn.classList.add("btn_blue");
             if (JSON.parse(admin["admin"]) == true) {
                 user_prevs_obj.style.pointerEvents = "all";
                 user_prevs_usr.style.pointerEvents = "all";
@@ -199,7 +205,7 @@
         let pass= document.getElementById(`pass_${id}`).innerText;
         let value = null;
         if (key == 'login' || key == "pass") {
-            value = ask("",document.getElementById(`${key}_${id}`).innerText);
+            value = ask(`изменение ${key} пользователя ${login}`,document.getElementById(`${key}_${id}`).innerText);
         }
         else if (key == "admin"){
             value = admin;

@@ -92,7 +92,7 @@
                         <div>${proj["creation_date"].split("T")[0]}</div>
                     </div>
                     <div class="p_right">
-                        <img src="/img/icon/edit.svg" style="width:24px;height:24px" onclick="">
+                        <img src="/img/icon/edit.svg" style="width:24px;height:24px" onclick="rename_proj('${proj["name"]}')">
                         <img src="/img/icon/copy.svg" style="width:24px;height:24px" onclick="copy_proj('${proj["name"]}')">
                         <img src="/img/icon/download.svg" style="width:24px;height:24px" onclick="downloadImg('${proj["img"]}','${proj["name"]}');msg('скачивание');">
                         <img src="/img/icon/trash.svg" style="width:24px;height:24px" onclick="del_proj('${proj["name"]}')">
@@ -130,6 +130,19 @@
                 new_proj(JSON.parse(res["body"]))
             }
         })
+    }
+
+    function rename_proj(name){
+        let cur_proj = document.getElementById(`proj_${name}`);
+        let new_name = ask(`новое имя для проекта ${name}`);
+        if(new_name != null){
+            $.post( "/proj/rename",{name:new_name,id:cur_proj.getAttribute("proj_id")})
+            .done(function( res ) {
+                if(res["out"] == "good"){
+                    goto("/main");
+                }
+            })
+        }
     }
 </script>
 <%- include('./static/end.ejs',{soc:true}) %>

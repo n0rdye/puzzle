@@ -50,6 +50,21 @@ module.exports.download = (inp,cook,res)=>{
     }
 }
 
+module.exports.rename = (inp,cook,res)=>{
+    try {
+        db.gv("projects","`name`",`'${inp["name"]}'`,(proj_name)=>{ proj_name = proj_name[0];
+            // console.log(proj_name);
+            if(proj_name == null){
+                db.sv("projects","name",`${inp["name"]}`,"id",`${inp["id"]}`, (db)=>{
+                    res.send({out:"good"});
+                })
+            }
+        })
+    } catch (error) {
+        func.log("backend projects loading err0r - " - error);
+    }
+}
+
 module.exports.del = (inp,cook,res)=>{
     try {
         db.gv("projects","name",`'${inp["name"]}'`,(pdata)=>{pdata=pdata[0]
