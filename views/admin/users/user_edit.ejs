@@ -3,13 +3,18 @@
         width: 80vw;
         margin: auto;
     }
+    .pass_blur{
+        color:transparent; text-shadow:0 0 7px #555, 0 0 10px #000; 
+        border:0; padding:0; margin:0; -webkit-filter:blur(3px); 
+        margin-right: 20px;
+    }
     #users_section li{
         display: flex;
         justify-content: space-between;
         text-align: center;
         margin: 0px auto;
         padding: 10px;
-        background-color:white;
+        /* background-color:white; */
     }
     #users_section li div:not(#first_user div){
         /* margin: auto; */
@@ -43,9 +48,9 @@
     </div>
 </div>
 <section id="users_section">
-    <div style="height: 360px;">
-        <li id="first_user"><div>Логин</div><div>Превилегии</div><div>Функции</div></li>
-        <ul id="user_list"></ul>
+    <div style="height: 330px;background-color: white;margin-bottom: 3vh;">
+        <li id="first_user"><div>Логин</div><div>Пароль</div><div>Админ. права</div><div>Амин. польз</div><div>Админ. объект.</div><div>Удалить</div></li>
+        <ul id="user_list" style="padding-inline: 2vw;"></ul>
     </div>
     <div style="display: flex;justify-content: space-between;margin: auto;">
         <div style="display: flex;"><h1>Всего:&nbsp;</h1> <h1 id="users_count">0</h1></div>
@@ -94,14 +99,7 @@
                 if(res["out"] == "good"){
                     document.getElementById("users_count").innerText = res["count"];
                     res["body"].forEach(user => {
-                        let user_sec = document.createElement("li");user_sec.id = `user_${user["id"]}`;
-                        let user_name = document.createElement("div");user_name.id = `login_${user["id"]}`;user_name.innerText = user["login"];
-                        let user_pass = document.createElement("div");user_pass.id = `pass_${user["id"]}`;user_pass.innerText = user["pass"];user_pass.style.display = "none";
-                        let user_prevs = document.createElement("div");user_prevs.id = `admin_${user["id"]}`;user_prevs.innerText = Boolean(user["admin"]);
-                        let user_buttons = document.createElement("button");user_buttons.id = "user_buttons"; user_buttons.innerText = "изменить"; user_buttons.classList.add(user["id"]); user_buttons.classList.add("menu_btn"); 
-            
-                        user_sec.append(user_pass);user_sec.append(user_name);user_sec.append(user_prevs);user_sec.append(user_buttons);
-                        document.getElementById("user_list").append(user_sec);
+                        make_user(user,res);
                         user_count_check();
                     });
                 }
@@ -118,14 +116,7 @@
                 .done(function( res ) {
                     if(res["out"] == "good"){
                         res["body"].forEach(user => {
-                            let user_sec = document.createElement("li");user_sec.id = `user_${user["id"]}`;
-                            let user_name = document.createElement("div");user_name.id = `login_${user["id"]}`;user_name.innerText = user["login"];
-                            let user_pass = document.createElement("div");user_pass.id = `pass_${user["id"]}`;user_pass.innerText = user["pass"];user_pass.style.display = "none";
-                            let user_prevs = document.createElement("div");user_prevs.id = `admin_${user["id"]}`;user_prevs.innerText = Boolean(user["admin"]);
-                            let user_buttons = document.createElement("button");user_buttons.id = "user_buttons"; user_buttons.innerText = "изменить"; user_buttons.classList.add(user["id"]); user_buttons.classList.add("menu_btn"); 
-                
-                            user_sec.append(user_pass);user_sec.append(user_name);user_sec.append(user_prevs);user_sec.append(user_buttons);
-                            document.getElementById("user_list").append(user_sec);
+                            make_user(user,res);
                         });
                     }
                     else if(res["out"] == "bad"){
@@ -135,23 +126,94 @@
                 });
             }
         }
-    }
-    function user_edit(key){
-        let user = document.getElementById("user_edit_menu");
-        let id = user.getAttribute("login_id");
-        let login = user.getAttribute("login_name");
-        let admin = JSON.parse(user.getAttribute("login_admin"));
-        let pass= user.getAttribute("login_pass");
-        let value = null;
+        
+        function make_user(user,res){
+            let user_sec = document.createElement("li");user_sec.id = `user_${user["id"]}`;
+            let user_name = document.createElement("div");user_name.id = `login_${user["id"]}`;user_name.innerText = user["login"];user_name.setAttribute("onclick",`user_edit("login",${user["id"]})`);
+            let user_pass = document.createElement("div");user_pass.id = `pass_${user["id"]}`;user_pass.innerText = user["pass"];user_pass.classList.add("pass_blur"); user_pass.setAttribute("onclick",`user_edit("pass",${user["id"]})`);
+    
+            let admin = find_admin(res["admins"],user["id"])
+            // console.log(admin);
+            let user_prevs = document.createElement("input");user_prevs.setAttribute("type","checkbox");;user_prevs.id = `admin_${user["id"]}`;user_prevs.checked = admin["admin"];user_prevs.setAttribute("onclick",`user_edit('admin',${user["id"]})`);
+            let user_prevs_usr = document.createElement("input");user_prevs_usr.setAttribute("type","checkbox");;user_prevs_usr.id = `admin_usr_${user["id"]}`;user_prevs_usr.checked = admin["admin_usr"];user_prevs_usr.setAttribute("onclick",`admin_edit(${user["id"]})`);
+            let user_prevs_obj = document.createElement("input");user_prevs_obj.setAttribute("type","checkbox");user_prevs_obj.id = `admin_obj_${user["id"]}`;user_prevs_obj.checked = admin["admin_obj"];user_prevs_obj.setAttribute("onclick",`admin_edit(${user["id"]})`);
+            let user_del_btn = document.createElement("button");user_del_btn.id = `user_del_btn-${user["id"]}`; user_del_btn.innerText = "удалить"; user_del_btn.setAttribute("onclick",`user_del(${user["id"]})`); 
+            if (JSON.parse(admin["admin"]) == true) {
+                user_prevs_obj.style.pointerEvents = "all";
+                user_prevs_usr.style.pointerEvents = "all";
+            }
+            else{
+                user_prevs_obj.style.pointerEvents = "none";user_prevs_obj.checked = false;
+                user_prevs_usr.style.pointerEvents = "none";user_prevs_usr.checked = false;
+            }
+    
+            user_sec.append(user_name);user_sec.append(user_pass);
+            user_sec.append(user_prevs);user_sec.append(user_prevs_usr);user_sec.append(user_prevs_obj);
+            user_sec.append(user_del_btn);
+            document.getElementById("user_list").append(user_sec);
 
-        if(key!="admin") {value = ask(key,document.getElementById(`${key}_${id}`).innerText)}
-        else if (confirm(`вы точно хотите изменить привелегии пользователя ${login} на ${!admin}?`) == true){value = (!admin)};
+        }
+    }
+
+    function find_admin(admins,id){
+        if(Object.keys(admins).length > 0){
+            rights = {admin:false,admin_usr:false,admin_obj:false};
+            Object.entries(admins).forEach(([key,value]) => {
+                // console.log(value);
+                if(value["uid"] == parseInt(id) && rights != {}){
+                    rights["admin"] = true;
+                    if(value["rights"] == 3){
+                        rights["admin_usr"] = true;
+                        rights["admin_obj"] = true;
+                        // return rights;
+                    }
+                    else if(value["rights"] == 1){
+                        rights["admin_usr"] = false;
+                        rights["admin_obj"] = true;
+                        // return rights;
+                    }
+                    else if(value["rights"] == 2){
+                        rights["admin_usr"] = true;
+                        rights["admin_obj"] = false;
+                        // return rights;
+                    }
+                }
+                // if(key == Object.keys(admins).at(-1)){
+                //     // console.log("end");
+                //     rights["admin"] = false;
+                //     rights["admin_obj"] = false;
+                //     rights["admin_usr"] = false;
+                //     // return rights;
+                // }
+            });
+        }
+        // console.log(rights,"asd");
+        // return rights;
+        // console.log(rights);
+        return rights;
+    }
+    function user_edit(key,id,...args){
+        // console.log(args);
+        let login = document.getElementById(`login_${id}`).innerText;
+        let admin = JSON.parse(document.getElementById(`admin_${id}`).checked);
+        let pass= document.getElementById(`pass_${id}`).innerText;
+        let value = null;
+        if (key == 'login' || key == "pass") {
+            value = ask("",document.getElementById(`${key}_${id}`).innerText);
+        }
+        else if (key == "admin"){
+            value = admin;
+        }
+        else if (key == "rights"){
+            value = args[0]["rights"];
+        }
+
         if(value != null){
             $.post( "/admin/users/edit",{key:key,value:value,id:id,login:login})
             .done(function( res ) {
                 // console.log("serv reg");
                 if(res["out"] == "good"){
-                    document.getElementById(`${key}_${id}`).innerText = value;
+                    load_users_data(users_from);
                 }
                 if(res["out"] == "bad"){
                     msg("пользователь с таким иминем уже есть",{type:"warning"})
@@ -159,10 +221,40 @@
             });
         }
     }
-    function user_del(){
-        let user = document.getElementById("user_edit_menu");
-        let id = user.getAttribute("login_id");
-        let login = user.getAttribute("login_name");
+
+    function change_admin_prevs(admin,id){
+        if (admin) {
+            document.getElementById(`admin_usr_${id}`).style.pointerEvents = "all";
+            document.getElementById(`admin_obj_${id}`).style.pointerEvents = "all";
+        }
+        else{
+            document.getElementById(`admin_usr_${id}`).style.pointerEvents = "none";
+            document.getElementById(`admin_obj_${id}`).style.pointerEvents = "none";
+            document.getElementById(`admin_usr_${id}`).checked = false;
+            document.getElementById(`admin_obj_${id}`).checked = false;
+        }
+    }
+
+    function admin_edit(id){
+        let obj_right = document.getElementById(`admin_usr_${id}`).checked;
+        let user_right = document.getElementById(`admin_obj_${id}`).checked;
+        if(obj_right & user_right){
+            rights = 3;
+        }
+        else if(obj_right){
+            rights = 2;
+        }
+        else if(user_right){
+            rights = 1;
+        }
+        else{
+            rights = 0;
+        }
+        console.log(rights);
+        user_edit("rights",id,{rights:rights})
+    }
+    function user_del(id){
+        let login = document.getElementById(`login_${id}`).innerText;
         if(confirm(`вы точно хотите удалить пользователя ${login}?`) == true){
             $.post( "/admin/users/delete",{login:login,id:id})
             .done(function( res ) {

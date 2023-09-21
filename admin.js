@@ -8,12 +8,15 @@ module.exports.get_users = (inp,cook,res)=>{
         db.crc("users",(row_count)=>{
             // console.log(row_count);
             db.gav("users",`${inp["from"]},${inp["load_interval"]}`,(data)=>{
-                if(data["length"] > 0){
-                    res.send({body:data,count:row_count,out:"good"});
-                }
-                else{
-                    res.send({out:"bad"});
-                }
+                db.gav("admins",`0`,(admins)=>{
+                    if(data["length"] > 0){
+                        res.send({body:data,admins:admins,count:row_count,out:"good"});
+                    }
+                    else{
+                        res.send({out:"bad"});
+                    }
+                },true)
+
             },true)
         },true)
     } catch(error){
@@ -56,7 +59,13 @@ module.exports.edit_user = (inp,cook,res)=>{
                 // }
                 // change();
             })
-        }else {change();}
+        }else if (inp["key"] == "rights"){
+            db.sv("admins",inp["key"],inp["value"],"uid",inp["id"],(db_res)=>{
+                func.log(`admin ${cook["uuid"]} changed user ${inp["login"]} ${inp["key"]} to ${inp["value"]}`);
+                res.send({out:"good"});
+            },true,true)
+        }
+        else {change();}
 
         function change(){
             db.sv("users",inp["key"],inp["value"],"id",inp["id"],(db_res)=>{
@@ -68,6 +77,7 @@ module.exports.edit_user = (inp,cook,res)=>{
         func.log("backend user information changing error - "+error);
     }
 }
+
 
 module.exports.del_user = (inp,cook,res)=>{
     try {
@@ -139,7 +149,9 @@ module.exports.find_user = (inp,cook,res)=>{
     try {
         db.fva("users","login",inp["login"],`${inp["from"]},${inp["load_interval"]}`,(data)=>{
             if(data["length"] > 0){
-                res.send({body:data,out:"good"});
+                db.gav("admins",`0`,(admins)=>{
+                    res.send({body:data,admins,admins,out:"good"});
+                },true)
             }
             else{
                 res.send({out:"bad"});

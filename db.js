@@ -5,15 +5,15 @@ const db_host = "localhost";
 const admin = mysql.createConnection({
     host: db_host,
     user: 'admin',
-    password: '484',
-    database: 'users'
+    password: 'secretpassword',
+    database: 'puzzle'
 });
 
 const user = mysql.createConnection({
     host: db_host,
     user: 'user',
     password: 'user',
-    database: 'users'
+    database: 'puzzle'
 });
 
 db = (prevs = false) => {
