@@ -2,7 +2,6 @@ window.dragMoveListener = dragMoveListener;
 let root = document.getElementById("drags");
 let objs = { height:"2",width:"4",color:"#FFFFFF"};
 let objs_store = {};
-let objs_imgs = {};
 let proj_from = "cloud";
 let cur_obj;
 let objs_back = [];
@@ -10,7 +9,7 @@ let objs_forw = [];
 let proj_state = "loading";
 let cm_mod = 2;
 
-function create(clas,x,y,color = null,id,size){
+function create(clas,x,y,color = null,id,size,layer = 0){
     let main_clas = clas.split(" ")[0];
     // if (body == null || body == "") body = "[]";
     let obj = document.createElement("img");
@@ -39,15 +38,7 @@ function create(clas,x,y,color = null,id,size){
             // }
         }
         else if (db_data != null){
-            if (objs_imgs[main_clas] == null){
-                load_obj(main_clas,"`img`",(odata)=>{
-                    objs_imgs[main_clas] = odata["img"];
-                    make(odata["img"]);
-                })
-            }
-            else{
-                make(objs_imgs[main_clas])
-            }
+            make(objs_store[main_clas]["img"])
         }
         function make(img){
             // console.log(db_data);
@@ -55,7 +46,7 @@ function create(clas,x,y,color = null,id,size){
             obj.title = `${db_data["name"].replaceAll("$"," ").split("~g")[0]}\nцена:${db_data["cost"]}\nширина:${db_data["width"]}см высота:${db_data["height"]}см`;
             obj.setAttribute("cost",db_data["cost"])
             obj.setAttribute("colors",Boolean(db_data["colors"]))
-            obj.setAttribute("img",img)
+            obj.setAttribute("data-img",img)
             obj.setAttribute("gid",db_data["gid"])
             obj.setAttribute("pid",db_data["pid"])
             obj.setAttribute("color",color)
@@ -70,7 +61,18 @@ function create(clas,x,y,color = null,id,size){
         }
         calc_total();
     })
-    obj.setAttribute("onclick",`obj_click("${id}")`);
+    obj.setAttribute("decoding","async");
+    obj.setAttribute("loading","lazy");
+    if(id != "none"){obj.setAttribute("onclick",`obj_click("${id}")`);}
+    // console.log(main_clas);
+    if(main_clas.split("~p~").at(-1) == "Бизиборды"){
+        obj.setAttribute("layer",99999);
+        obj.style.zIndex = 99999;
+    }
+    else{
+        obj.setAttribute("layer",layer);
+        obj.style.zIndex = layer;
+    }
     root.append(obj);
     set_pos(obj,x,y);
 }
@@ -78,6 +80,10 @@ function create(clas,x,y,color = null,id,size){
 function obj_click(id){
     if (cur_obj != id){
         let obj = document.getElementById(id);
+
+        let cur_layer = obj.style.zIndex;
+        document.getElementById("layer_inp").value = cur_layer;
+
         cur_obj = id;
         if (obj.getAttribute("colors") == "true"){
             clear_palette();
@@ -91,20 +97,22 @@ function obj_click(id){
         else{
             document.getElementById("obj_color_div").style.display = "none";
         }
+        obj_selection();
         // console.log(obj.);
     }
-    // function obj_selection(){
-    //     let drags = document.getElementsByClassName("drag");
-    //     Object.values(drags).forEach(element => {
-    //         console.log(element.id,cur_obj);
-    //         if (element.id != cur_obj){
-    //             element.style.border = "0px";
-    //         }
-    //         else{
-    //             element.style.border = "1px black solid";
-    //         }
-    //     });
-    // }
+    function obj_selection(){
+        let drags = document.getElementsByClassName("drag");
+        Object.values(drags).forEach(element => {
+            // console.log(element.id,cur_obj);
+            if (element.id != cur_obj){
+                element.style.border = "0px";
+            }
+            else{
+                element.style.border = "2px black solid"; 
+                element.style.borderRadius = "0.2vw"; 
+            }
+        });
+    }
 }
 
 function resize_drags(){
@@ -191,7 +199,7 @@ function load(objss){
                     // console.log(keys,value["x"],value["y"],value["body"]);
                     // let count = Object.keys(objs[keys]).length;
                     // console.log(count);
-                    create(keys+" drag",value["x"],value["y"],value["color"],key,true);
+                    create(keys+" drag",value["x"],value["y"],value["color"],key,true,value["layer"]);
                 }
             })
         }
@@ -205,7 +213,6 @@ function load(objss){
             document.getElementById("wall").style.backgroundColor = values;
         }
         if (keys == Object.keys(objs).at(-1)){
-            loaded();
             proj_state = "loaded";
         }
     });
@@ -234,7 +241,7 @@ function load_proj_cloud(){
             // document.getElementById("top_panel_center").innerText = `${proj_name} (облако)`;
         }
         else if(res["out"] == "bad proj"){
-            console.log("bad");
+            // console.log("bad");
             save(()=>{
                 goto("/proj/load/"+proj_name);
             },false);
@@ -284,13 +291,13 @@ function save(callback,with_pic = true){
 
 function load_objs(callback,group){
     // let select = document.getElementById("group_select");
-    console.log(group);
+    // console.log(group);
     $.post( "/get_objs",{gid:group})
     .done(function( res ) {
         if(res["out"] == "good"){
             // console.log(res["body"]);
             res["body"].forEach(element => {
-                objs_store[`${element["name"]}`] = {height:element["height"],width:element["width"],id:element["id"],name:element["name"],cost:element["cost"],colors:element["colors"],gid:element["gid"],pid:element["pid"]}
+                objs_store[`${element["name"]}`] = {img:element["img"],height:element["height"],width:element["width"],id:element["id"],name:element["name"],cost:element["cost"],colors:element["colors"],gid:element["gid"],pid:element["pid"]}
             });
             callback(res["body"]);
         }
@@ -320,7 +327,7 @@ function load_obj(name,key,callback){
 
 function dragMoveListener (event) {
     var drag = event.target
-    obj_click(drag.id)
+    if(drag.id != "none"){obj_click(drag.id)}
     var x = (parseFloat(drag.getAttribute('data-x')) || 0) + event.dx
     var y = (parseFloat(drag.getAttribute('data-y')) || 0) + event.dy
     set_pos(drag,x,y);
@@ -381,7 +388,7 @@ interact('.dropzone').dropzone({
     ondrop: function (event) {var drag = event.relatedTarget
         
        if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
-        objs[drag.classList[0]][drag.id] = {y:drag.getAttribute('data-y'),x:drag.getAttribute('data-x'),body:drag.innerHTML,color:drag.getAttribute("color")};
+        objs[drag.classList[0]][drag.id] = {y:drag.getAttribute('data-y'),x:drag.getAttribute('data-x'),body:drag.innerHTML,color:drag.getAttribute("color"),layer:drag.getAttribute('layer')};
         drag.classList.add('in_zone');drag.classList.remove('can-drop');
         // console.log(objs["KeyBoard~g~не$основное"]["KeyBoard~g~не$основное_1"]);
         
@@ -408,7 +415,7 @@ interact('.createzone').dropzone({
             })
             let x = zone.getBoundingClientRect().left - document.getElementById("drags").getBoundingClientRect().left;
             let y = zone.getBoundingClientRect().top - document.getElementById("drags").getBoundingClientRect().top;
-            create(`${zone.classList[0]} spawn drag`,x,y,null,`none`);
+            create(`${zone.classList[0]} spawn drag`,x,y,null,`none`,false,0);
            if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
             drag.classList.remove('spawn');
         }
@@ -429,7 +436,7 @@ function drag_start() {
     Object.entries(zones).forEach(([key, zone]) => {
         let x = zone.getBoundingClientRect().left - document.getElementById("drags").getBoundingClientRect().left;
         let y = zone.getBoundingClientRect().top - document.getElementById("drags").getBoundingClientRect().top;
-        create(`${zone.classList[0]} spawn drag`,x,y,null,`none`);
+        create(`${zone.classList[0]} spawn drag`,x,y,null,`none`,false,0);
     });
 }
 

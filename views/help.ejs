@@ -1,0 +1,16 @@
+<%- include('./static/start.ejs',{name:'help',async: true}) %>
+<%- include('./header.ejs') %>
+
+
+<section class="main">
+        <div> 
+                <h1>Морской Сергей Юрьевич - руководитель проекта:</h1> 
+                <div style="display: flex;"><h1 style="margin-right: 1vw;">Kонтакты:</h1><img style="margin: auto 0px;cursor: pointer;" onclick="goto('https://tlgg.ru/@teleanonym')" src="/img/telegram.svg"></div>
+        </div>
+</section>
+
+
+<%- include('./static/end.ejs',{soc:true}) %>
+<script>
+    setTimeout(()=>{loaded()},500);
+</script>

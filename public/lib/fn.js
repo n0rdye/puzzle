@@ -82,11 +82,12 @@ function logout(redirect = true) {
     }});
 }
 
-function ask(text,def = "") {
-    let name = prompt(text,def);
-    if(name != "" && name != " "){
-        return name;
-    }
+function ask(text,params={def:"",func}) {
+    msg(text,{type:"enter",def:params.def,res:(out)=>{
+        if(out != false){
+            params.func(out);
+        }
+    }})
 }
 
 
@@ -316,3 +317,58 @@ async function removeImageBackground(image) {
     .catch(console.error);
   }
   
+
+
+  function img_cache(callback){
+    function preloadImages(array,callback) {
+        // let wait_msg = msg("кеширование картинок",{type:"wait"})
+        if (!preloadImages.list) {
+            preloadImages.list = [];
+        }
+        var list = preloadImages.list;
+        for (var i = 0; i < array.length; i++) {
+            console.log(array[i],is_cached(array[i]));
+            if(!is_cached(array[i])){
+                var img = new Image();
+                img.onload = function() {
+                    var index = list.indexOf(this);
+                    if (index !== -1) {
+                        list.splice(index, 1);
+                    }
+                    // if(i==array.length-1){
+                    //     msg_del(wait_msg.id);
+                    // }
+                }
+                list.push(img);
+                img.src = array[i];
+                if(i==array.length-1){
+                    callback();
+                }
+            }
+        }
+    }
+
+    $.post( "/get_objs")
+    .done(function( res ) {
+        if(res["out"] == "good"){
+            // console.log(res["body"]);
+            let sources = [];
+            res["body"].forEach(element => {
+                sources.push(element["img"]);
+                if(element == res["body"].at(-1)){
+                    // console.log(sources);
+                    preloadImages(sources,()=>{
+                        // console.log("cached");
+                        callback();
+                    })
+                }
+            });
+        }
+    });
+
+    function is_cached(img_url){
+        var imgEle = document.createElement("img");
+        imgEle.src = img_url;
+        return imgEle.complete || (imgEle.width+imgEle.height) > 0;
+    }
+}

@@ -141,9 +141,10 @@
     // logo.style.transform = 'translate(-40vw,-20vh)';
     // logo.style.position = "absolute"
     function log(){
-        const login = CryptoJS.AES.encrypt(document.getElementById('login').value,$.cookie("sid")).toString();
-        const pass = CryptoJS.AES.encrypt(document.getElementById('pass').value,$.cookie("sid")).toString();
         const sid = $.cookie("sid");
+        console.log(sid);
+        const login = CryptoJS.AES.encrypt(document.getElementById('login').value,sid).toString();
+        const pass = CryptoJS.AES.encrypt(document.getElementById('pass').value,sid).toString();
         if(login!=""&&pass!=""){
             $.post( "/back_login", { login:login,pass:pass,sid:sid })
             .done(function( res ) {

@@ -29,40 +29,25 @@ const app = express();
 // const { name } = require('ejs');
 
 const maxRequestBodySize = '20mb';
+let cache_options = {
+    maxAge: "4d",
+    etag: false
+}
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({
     extended: false,
     limit: maxRequestBodySize
 }));
-app.use(express.static('public'));
+app.use(express.static('public',cache_options));
 app.use(cookieParser());
 
 
 
 /// user
-app.get('/', (req, res) => {
-    let inp = req.body;
-    let cook = req.cookies;
-    func.sid(cook,res,(include)=>{
-        if(include){
-            res.redirect('main');
-        }
-        else{
-            res.redirect('login');
-        }
-    },false)
-});
 app.get("/login" , (req,res) =>{
     res.render('login');
 })
-app.get("/main", (req,res) =>{try{
-        let inp = req.body;
-        let cook = req.cookies;
-        func.sid(cook,res,()=>{
-            res.render('main');
-        })
-    } catch (error) {func.log("router getting user information by uuid error - "+error);}
-});
+
 app.post('/back_login', (req, res) => {try {
         let inp = req.body;
         let cook = req.cookies;
@@ -360,6 +345,39 @@ app.post("/admin/users/find", (req,res) => {try{
 })
 
 
+app.get('/', (req, res) => {
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,(include)=>{
+        if(include){
+            res.redirect('main');
+        }
+        else{
+            res.redirect('login');
+        }
+    },false)
+});
+app.get("/main", (req,res) =>{try{
+        let inp = req.body;let cook = req.cookies;
+        func.sid(cook,res,()=>{
+            res.render('main');
+        })
+    } catch (error) {func.log("router getting user information by uuid error - "+error);}
+});
+app.get("/help", (req,res) =>{try{
+    let inp = req.body;let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        res.render('help');
+    })
+} catch (error) {func.log("router getting user information by uuid error - "+error);}
+});
+app.get("/temp", (req,res) =>{try{
+    let inp = req.body;let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        res.render('templates');
+    })
+} catch (error) {func.log("router getting user information by uuid error - "+error);}
+});
 app.get("/htc/:hex",(req,res) =>{
     res.send(CssFilterConverter.hexToFilter(`#${req.params["hex"]}`));
 })
@@ -368,6 +386,7 @@ app.post("/color",(req,res) =>{
     func.img_recolor(res,inp["img"],inp["hex"]);
 })
 app.all('*', (req, res) => {
-    res.status(404).send('<h1>404! Page not</h1> <br> <a href="/">go to main page</a>');
+    res.status(404)
+    res.render("static/404");
 });
 app.listen(process.env.PORT || 8080, () => func.log("server for puzzle started UwU"));

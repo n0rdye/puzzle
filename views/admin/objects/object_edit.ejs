@@ -29,7 +29,7 @@
 
 <h1>Изменение объектов</h1>
 <div>
-    <div id="objs_in_group" style="max-height: 20vh;height: 20vh;"></div>
+    <div id="objs_in_group"></div>
 </div>
 <div style="display: flex;justify-content: space-between;float: right;">
     <div id="find_obj_btns">
@@ -86,7 +86,7 @@
     function obj_del(id){
         // let select = document.getElementById("group_select");
         let menu = document.getElementById(`object_${id}`);
-        if (confirm(`вы точно хотите удалить ${menu.getAttribute("name").split("~")[0]}?`)){
+        msg(`вы точно хотите удалить ${menu.getAttribute("name").split("~")[0]}?`,{type:"ask",res:(out)=>{if(res){
             let wait_msg = msg("удаление товара",{type:"wait"});
             $.post( "/admin/objects/delete", { id:id,})
             .done(function( res ) {
@@ -96,7 +96,7 @@
                     edit_get_objs();
                 }
             });
-        }
+        }}})
     }
 
     function save_edited_obj(id){
@@ -194,16 +194,16 @@
             });
         }
         else{
-            let name = ask("название");
-            if(name != "")[
-                $.post( "/admin/objects/find", { name:name.replaceAll(" ","$")})
-                .done(function( res ) {
-                    if(res["out"] == "good"){
-                        // console.log(res["body"]);
-                        callback(res["body"])
-                    }
-                })
-            ]
+            ask("название",{func:(name)=>{
+                    $.post( "/admin/objects/find", { name:name.replaceAll(" ","$")})
+                    .done(function( res ) {
+                        if(res["out"] == "good"){
+                            // console.log(res["body"]);
+                            callback(res["body"])
+                        }
+                    })
+                }
+            });
         }
     }
 

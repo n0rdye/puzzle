@@ -1,0 +1,25 @@
+<%- include('../static/start.ejs',{name:'404',async: true}) %>
+<%- include('../header.ejs') %>
+
+<style>
+    a{
+        text-decoration: none;
+        cursor: pointer;
+        color: blue;
+    }
+</style>
+
+<section class="main" >
+    <div style="margin: auto;width: 40vw;text-align: center;">
+        <h1>Ой!!!</h1>
+        <h2>На сайте не нашлась такая страница</h2>
+        <h1>Можете <a onclick="goto('/main')">Вернутся на главную страницу</a> или <a onclick="goto('/help')">сообщить в поддержку</a></h1>
+        
+    </div>
+
+</section>
+
+<%- include('../static/end.ejs',{soc:true}) %>
+<script>
+    setTimeout(()=>{loaded()},500);
+</script>

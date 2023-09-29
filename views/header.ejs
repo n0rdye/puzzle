@@ -127,7 +127,7 @@
         <div id="top_panel_left" class="tpanel"></div>
         <div id="top_panel_center" class="tpanel">
             <button id="page_btn_main" onclick="goto('/main')">Мои проекты</button>
-            <button id="page_btn_tamp" onclick="goto('/tamp')">Шаблоны</button>
+            <button id="page_btn_tamp" onclick="goto('/temp')">Шаблоны</button>
             <button id="page_btn_gallery" onclick="goto('/gallery')">Галерея</button>
             <button id="page_btn_faq" onclick="goto('/faq')">FAQ</button>
             <button id="page_btn_help" onclick="goto('/help')">Связаться с поддержкой</button>
@@ -162,6 +162,7 @@
         
         let menu = document.getElementById("top_panel_center");
         if (res["admin"] == true){
+            if (typeof admin != "undefined"){Object.values(admin).forEach(afunc => {afunc()});}
             menu.innerHTML += `<button id="page_btn_admin" onclick='goto("/admin")'>Админ. панель</button><br>`;
             switch (document.URL.split("/").at(-1)) {
                 case ("admin"):document.getElementById("page_btn_admin").style.border = "1px solid black";break;

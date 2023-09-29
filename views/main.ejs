@@ -61,24 +61,25 @@
         });
     }
     function new_proj(objs = null){
-        let name = ask("please enter project name");
-        objs = (objs == null)? { height:"2",width:"4"}:objs;
-        if(name != null && name!= "" && name!=" " && typeof name != "undefined" && name!="undefined"){
-            $.post( "/save_proj", {proj:JSON.stringify(objs),name:name,img:"/img/proj_placeholder.webp"})
-            .done(function( res ) {
-            if(res["out"] == "good"){
-                    // console.log(scr)
-                    // console.log("good");
-                    // if(callback) callback(res);
-                    goto(`/proj/load/${name}`);
-                }
-            })
-        }
+        let name = ask("Введите название проекта ",{func:(name)=>{
+            objs = (objs == null)? { height:"2",width:"4"}:objs;
+            if(name != null && name!= "" && name!=" " && typeof name != "undefined" && name!="undefined"){
+                $.post( "/save_proj", {proj:JSON.stringify(objs),name:name,img:"/img/proj_placeholder.webp"})
+                .done(function( res ) {
+                    if(res["out"] == "good"){
+                        goto(`/proj/load/${name}`);
+                    }
+                    else if(res["out"] == "bad" && res["err"] == "proj"){
+                        msg("Проект уже существует")
+                    }
+                })
+            }
+        }});
     }
     load_projs((projs)=>{
         console.log(projs);
         if(projs.length == 0){
-            setTimeout(loaded(),1000)
+            setTimeout(()=>{loaded()},500);
         }
         else{
             projs.forEach(proj => {
@@ -99,7 +100,7 @@
                     </div>    
                 </div>
                 </button>`;
-            setTimeout(loaded(),1000)
+                setTimeout(()=>{loaded()},500);
         });
         }
     });
@@ -112,37 +113,52 @@
     }
 
     function del_proj(proj_name){
-        let del = confirm(`удалить проект ${proj_name}?`);
-        if(del == true){
-            $.post( "/proj/delete",{name:proj_name})
-            .done(function( res ) {
-                if(res["out"] == "good"){
-                    goto("/main")
-                }
-            })
-        }
+        msg(`удалить проект ${proj_name}?`,{type:"ask",res:(out)=>{
+            if(out){
+                $.post( "/proj/delete",{name:proj_name})
+                .done(function( res ) {
+                    if(res["out"] == "good"){
+                        goto("/main")
+                    }
+                })
+            }
+        }})
     }
 
     function copy_proj(proj){
         $.post( "/load_proj",{name:proj})
         .done(function( res ) {
             if(res["out"] == "good"){
-                new_proj(JSON.parse(res["body"]))
+                let name = ask("Введите название копии проекта ",{func:(name)=>{
+                    if(name != null && name!= "" && name!=" " && typeof name != "undefined" && name!="undefined"){
+                        $.post( "/save_proj", {proj:res["body"],name:name,img:"/img/proj_placeholder.webp"})
+                        .done(function( res ) {
+                            if(res["out"] == "good"){
+                                goto(`/proj/load/${name}`);
+                            }
+                            else if(res["out"] == "bad" && res["err"] == "proj"){
+                                msg("Проект уже существует")
+                            }
+                        })
+                    }
+                }});
             }
         })
     }
 
+
     function rename_proj(name){
         let cur_proj = document.getElementById(`proj_${name}`);
-        let new_name = ask(`новое имя для проекта ${name}`);
-        if(new_name != null){
-            $.post( "/proj/rename",{name:new_name,id:cur_proj.getAttribute("proj_id")})
-            .done(function( res ) {
-                if(res["out"] == "good"){
-                    goto("/main");
-                }
-            })
-        }
+        ask(`новое имя для проекта ${name}`,{func:(new_name)=>{
+            if(new_name != null){
+                $.post( "/proj/rename",{name:new_name,id:cur_proj.getAttribute("proj_id")})
+                .done(function( res ) {
+                    if(res["out"] == "good"){
+                        goto("/main");
+                    }
+                })
+            }
+        }});
     }
 </script>
 <%- include('./static/end.ejs',{soc:true}) %>

@@ -41,7 +41,7 @@
         background-position: bottom 0px left 0px;
         border: 2px solid black;
         /* overflow: visible; */
-        z-index: 2;
+        z-index: -1;
     }
 
     .createzone {
@@ -209,11 +209,33 @@
             width: 2vw;
         }
     </style>
-    <div style="display: flex;justify-content: space-between; width: 20vw;">
+    <div style="display: flex;justify-content: space-between; width: 35vw;">
         <div class="btn_icon"><img src="/img/icon/copy.png" alt="copy"></div>
         <div class="btn_icon" onclick="go_back()"><img src="/img/icon/back.png" alt="back"></div>
         <div class="btn_icon" onclick="go_forw()"><img src="/img/icon/forw.png" alt="forw"></div>
         <div class="btn_icon" onclick="obj_del()"><img src="/img/icon/del.png" alt="del"></div>
+        <div class="layer_changer">
+            <div class="btn_icon layer_btn" onclick="obj_change_layer('up')"><img src="/img/icon/up.png" alt="up"></div>
+            <input id="layer_inp" type="number" oninput="obj_change_layer('inp')">
+            <div class="btn_icon layer_btn" onclick="obj_change_layer('down')"><img src="/img/icon/down.png" alt="down"></div>
+        </div>
+        <style>
+            #layer_inp{
+                width: 2vw;
+                appearance: textfield;
+                text-align: center;
+                border: 0px;
+            }
+            .layer_btn{
+                border: 0px;
+            }
+            .layer_changer{
+                display: flex;
+                background-color: white;
+                border: 1px gray solid;
+                border-radius: 0.5vw;
+            }
+        </style>
     </div>
     <div style="display: flex;justify-content: space-between; width: 15vw;">
         <div><input type="checkbox" id="grid_checkbox" checked="true" onchange='grid_view(JSON.parse(event.target.checked));'><label for="grid_checkbox">Показывать сетку</label></div>
@@ -267,10 +289,14 @@
     </div>
 </div>
 <div class="czones"></div>
-<button onclick="capture()">cap</button>
 <script src="/lib/inter.js"></script>
 <script>
     let proj_name = "<%= proj_name %>";
+    document.getElementById("layer_inp").value = 0;
+    img_cache(()=>{
+        loaded();
+    })
+
 
     if ( $.cookie("grid") != null){
         document.getElementById("grid_checkbox").checked = JSON.parse($.cookie("grid"));
@@ -310,6 +336,10 @@
         let width = (parseInt(document.getElementById("wall").style.width))
         document.getElementById("drags").append(document.getElementById("wall"));
         document.getElementById("drags").style.height = document.getElementById("wall").style.height;
+        document.getElementById("cost_list").style.left = "";
+        Object.values(document.getElementsByClassName("spawn")).forEach((spawn)=>{
+            spawn.src = "";
+        })
         if(cost == true){
             width += 252;
             document.getElementById("drags").append(document.getElementById("cost_div"));
@@ -333,6 +363,7 @@
             src = canvas.toDataURL();
             // console.log(src);
             callback(src)
+            drag_start();
         });
     }
 
@@ -406,8 +437,36 @@
         }
     }
 
+    function obj_change_layer(type) {
+        let obj = document.getElementById(cur_obj);
+        if(obj != null){
+            let cur_layer = obj.style.zIndex;
+            if (type == "up" && cur_layer < 99999){
+                objs[obj.classList[0]][obj.getAttribute("id")].layer = parseInt(cur_layer) + 1;
+                obj.style.zIndex = parseInt(cur_layer) + 1;
+                document.getElementById("layer_inp").value = parseInt(cur_layer) + 1;
+            } else if (type == "down" && cur_layer > 0){
+                objs[obj.classList[0]][obj.getAttribute("id")].layer = parseInt(cur_layer) - 1;
+                obj.style.zIndex = parseInt(cur_layer) - 1;
+                document.getElementById("layer_inp").value = parseInt(cur_layer) - 1;
+            }
+            else if ((type == "inp")){
+                let inp_val = parseInt(document.getElementById("layer_inp").value);
+                if(inp_val >= 0 && inp_val < 99999){
+                    objs[obj.classList[0]][obj.getAttribute("id")].layer = inp_val;
+                    obj.style.zIndex = inp_val;
+                }
+                else{
+                    document.getElementById("layer_inp").value = cur_layer;
+                }
+            }
+        }
+        // console.log(objs[obj.classList[0]][obj.getAttribute("id")]);
+    }
+
     function obj_del(){
        if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
+       document.getElementById("layer_inp").value = 0;
 
        try{
         let drag = document.getElementById(cur_obj);
@@ -578,17 +637,6 @@
         drag_start()
     }
 
-    // function del_proj(){
-    //     let del = confirm(`удалить проект ${proj_name}?`);
-    //     if(del == true){
-    //         $.post( "/proj/delete",{name:proj_name})
-    //         .done(function( res ) {
-    //             if(res["out"] == "good"){
-    //                 goto("/main")
-    //             }
-    //         })
-    //     }
-    // }
 
     // console.log(proj_name);
     // let menu = document.getElementById("project_menu");

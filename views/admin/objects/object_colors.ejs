@@ -49,15 +49,16 @@
     }
     function del_color(){
         let color_id = document.getElementById(cur_color).getAttribute("color_id")
-        let wait_msg = msg("удаление цвета",{type:"wait"})
-        $.post( "/admin/colors/delete", {id:color_id})
-        .done(function( res ) {
-            if(res["out"] == "good"){
-                msg_del(wait_msg.id);
-                msg("цвет удалён");
-                obj_colors_load();
-                console.log(res["body"]);
-            }
-        });
+        msg("Удалить этот цвет?",{type:"ask",res:(out)=>{if(out){
+            $.post( "/admin/colors/delete", {id:color_id})
+            .done(function( res ) {
+                if(res["out"] == "good"){
+                    msg("цвет удалён");
+                    obj_colors_load();
+                    console.log(res["body"]);
+                }
+            });
+        }}})
+
     }
 </script>

@@ -1,0 +1,65 @@
+<%- include('./static/start.ejs',{name:'templates',async: true}) %>
+<%- include('./header.ejs') %>
+
+<style>
+    .t_img{
+        /* pointer-events: none; */
+        height: 200px;
+        border-radius: 10px;
+        width: 290px;
+        box-shadow: 0px 4px 4px 0px #00000040;
+        cursor: pointer;
+    }
+    .temp, .new_temp{
+        border: 0px;
+        background-color: transparent;
+    }
+    .p_left{
+        display: block;
+    }
+    .p_left div{
+        font-size: calc(var(--main-font-size)/2);
+    }
+    .p_right{
+        display: flex;
+        margin-top:15px;
+        justify-content: space-between;
+        width: 130px;
+    }
+    .p_props{
+        display: flex;
+        justify-content: space-between;
+    }
+    .p_props img{
+        cursor: pointer;
+    }
+    .main h1{
+        /* font-size: --main-font-size; */
+        font-weight: 100;
+        margin: 0px;
+        padding: 0px;
+        margin-top: 10px;
+    }
+</style>
+<!-- <script src="/lib/interact.min.js"></script> -->
+
+<section class="main">
+    <div id="temp_div">
+        
+    </div>
+</section>
+
+<!-- <script src="/lib/inter.js"></script> -->
+
+
+
+<%- include('./static/end.ejs',{soc:true}) %>
+<script>
+    setTimeout(()=>{loaded()},500);
+    admin["temp"] = ()=>{
+
+        document.getElementById("temp_div").innerHTML += `
+        <button onclick="new_temp()" class="new_temp"><img class="t_img" src="/img/new_proj.png" alt=""><h1>Новый проект</h1></button>
+        `
+    }
+</script>

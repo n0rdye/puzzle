@@ -10,7 +10,7 @@ module.exports.loads = (inp,cook,res)=>{
         let gin
         if (typeof inp["gid"] == 'undefined' || inp["gid"] == null) gin = "1 OR 1=1"
         else gin = inp["gid"]
-        db.ggv("objects","`name`,`id`,`height`,`width`,`cost`,`gid`,`colors`,`pid`","gid",`${gin}`,(odata)=>{
+        db.ggv("objects","`name`,`id`,`height`,`width`,`cost`,`gid`,`colors`,`pid`,`img`","gid",`${gin}`,(odata)=>{
             // func.log(odata);
             res.send({out:"good",body:odata});
         })

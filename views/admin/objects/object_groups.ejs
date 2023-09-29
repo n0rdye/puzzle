@@ -86,57 +86,59 @@
         let name = document.getElementById("group_drop-"+pid).innerText;
         msg(`вы уверены вы хотите удалить раздел ${name}`,{type:"ask",res:(out)=>{
             if(out == true){
-            $.post( "/admin/parts/delete", {pid:pid})
-            .done(function( res ) {
-                if(res["out"] == "good"){
-                    // console.log(res["body"]);
-                    // load_groups();
-                    edit_get_objs();
-                    hide_menus();
-                    setTimeout(()=>{
-                        parts_load();
-                        msg(`раздел ${name} удалён`)
-                    },500)
-                }
-            });
-        }
+                $.post( "/admin/parts/delete", {pid:pid})
+                .done(function( res ) {
+                    if(res["out"] == "good"){
+                        // console.log(res["body"]);
+                        // load_groups();
+                        edit_get_objs();
+                        hide_menus();
+                        setTimeout(()=>{
+                            parts_load();
+                            msg(`раздел ${name} удалён`)
+                        },500)
+                    }
+                });
+            }
         }})
     }
     function create_new_group(pid) {
-        let group_name = ask("название группы");
-        if(group_name != null && group_name != ""){
-            $.post( "/admin/groups/new", { name:group_name.replaceAll(" ","$"),pid:pid})
-            .done(function( res ) {
-                if(res["out"] == "good"){
-                    // console.log(res["body"]);
-                    // load_groups();
-                    edit_get_objs();
-                    hide_menus();
-                    setTimeout(()=>{
-                        parts_load();
-                        msg(`группа ${group_name.replaceAll(" ","$")} создана`)
-                    },500)
-                }
-            });
-        }
+        ask("название группы",{func:(group_name)=>{
+            if(group_name != null && group_name != ""){
+                $.post( "/admin/groups/new", { name:group_name.replaceAll(" ","$"),pid:pid})
+                .done(function( res ) {
+                    if(res["out"] == "good"){
+                        // console.log(res["body"]);
+                        // load_groups();
+                        edit_get_objs();
+                        hide_menus();
+                        setTimeout(()=>{
+                            parts_load();
+                            msg(`группа ${group_name.replaceAll(" ","$")} создана`)
+                        },500)
+                    }
+                });
+            }
+        }});
     }
 
     function create_new_part() {
-        let part_name = ask("название раздела");
-        if(part_name != null && part_name != ""){
-            $.post( "/admin/parts/new", { name:part_name.replaceAll(" ","$")})
-            .done(function( res ) {
-                if(res["out"] == "good"){
-                    // console.log(res["body"]);
-                    // load_groups();
-                    hide_menus();
-                    setTimeout(()=>{
-                        parts_load();
-                        msg(`раздел ${part_name.replaceAll(" ","$")} создан`)
-                    },500)
+        ask("название раздела",{func:(part_name)=>{
+                if(part_name != null && part_name != ""){
+                    $.post( "/admin/parts/new", { name:part_name.replaceAll(" ","$")})
+                    .done(function( res ) {
+                        if(res["out"] == "good"){
+                            // console.log(res["body"]);
+                            // load_groups();
+                            hide_menus();
+                            setTimeout(()=>{
+                                parts_load();
+                                msg(`раздел ${part_name.replaceAll(" ","$")} создан`)
+                            },500)
+                        }
+                    });
                 }
-            });
-        }
+        }})
     }
 
     function parts_load(){

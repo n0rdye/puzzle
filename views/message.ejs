@@ -17,6 +17,7 @@
         width: auto;
         height: auto;
         min-width: 100px;
+        position:relative;
         max-width: 200px;
         background-color: rgba(255, 255, 255, 0.9);
         border: 0.2vw rgba(0, 0, 0, 0.2) solid;
@@ -42,7 +43,7 @@
 
 <script>
     let msg_int = 0;
-    function msg(text,params = {type:null,time:null,res:null}){
+    function msg(text,params = {type:null,time:null,res:null,def:null}){
         params.time = (params.time == null)? 8:params.time;
         params.type = (params.type == null)? "msg":params.type;
         msg_int++;
@@ -64,6 +65,9 @@
             case "ask":
                 msg_div.style.borderColor = "rgba(0, 255, 0, 0.5)";
                 break;
+            case "enter":
+                msg_div.style.borderColor = "rgba(0, 255, 0, 0.5)";
+                break;
             case "warning":
                 msg_div.style.borderColor = "rgba(255, 0, 0, 0.5)";
                 break;
@@ -81,8 +85,8 @@
             let no = document.createElement("button");
             let q_div = document.createElement("div");
             q_div.style = "display:flex;justify-content: space-between;z-index:20000";
-            yes.innerText = "да";
-            no.innerText = "нет";
+            yes.innerText = "Да";
+            no.innerText = "Нет";
             yes.classList.add("yes-ans")
             no.classList.add("no-ans")
             yes.id = `${msg_div.id}-yes`;
@@ -103,6 +107,60 @@
                         console.log(mutation);
                         if(mutation.target.getAttribute("ans") == "true"){
                             params.res(true);fin();
+                        }
+                        else if (mutation.target.getAttribute("ans") == "false"){
+                            params.res(false);fin();
+                        }
+                    }
+                });
+            });
+            observer.observe(msg_div, {attributes: true });
+
+
+            function fin(){
+                observer.disconnect();
+                document.getElementById("message_div").style.pointerEvents = "none";
+                if (document.getElementById(msg_div.id) != null){
+                    msg_div.style.transform = "translateX(120%)";
+                    setTimeout(() => {
+                        msg_root.removeChild(msg_div); 
+                    }, 200);
+                }
+            } 
+        }
+        else if(params.type == "enter"){
+            let yes = document.createElement("button");
+            let no = document.createElement("button");
+            let text = document.createElement("input");
+            let q_div = document.createElement("div");
+            text.value = (typeof params.def != "undefined")? params.def:"";
+            text.style.width = "90%";
+            text.style.marginBlock = "0.5vw";
+            text.style.border = "1px gray solid";
+            text.style.borderRadius = "0.5vw";
+            q_div.style = "display:flex;justify-content: space-between;z-index:20000";
+            yes.innerText = "Ок";
+            no.innerText = "Отменить";
+            yes.classList.add("yes-ans")
+            no.classList.add("no-ans")
+            yes.id = `${msg_div.id}-yes`;
+            no.id = `${msg_div.id}-no`;
+            q_div.append(yes)
+            q_div.append(no)
+            msg_div.append(text)
+            msg_div.append(q_div)
+            msg_div.setAttribute("ans","null")
+            yes.setAttribute("onclick",`document.getElementById('${msg_div.id}').setAttribute("ans","true")`)
+            no.setAttribute("onclick",`document.getElementById('${msg_div.id}').setAttribute("ans","false")`)
+            document.getElementById("message_div").style.pointerEvents = "all";
+            // document.getElementById("message_div").setAttribute("onclick",`document.getElementById('${msg_div.id}').setAttribute("ans","false")`)
+
+            var observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type = "attributes" && mutation.target.getAttribute("ans") != "null") {
+                        console.log(mutation);
+                        if(mutation.target.getAttribute("ans") == "true"){
+                            params.res(text.value);fin();
                         }
                         else if (mutation.target.getAttribute("ans") == "false"){
                             params.res(false);fin();

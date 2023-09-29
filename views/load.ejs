@@ -30,7 +30,7 @@
         cursor: pointer;
     }
     #load_help{
-        width: 12vw;
+        /* width: 12vw; */
         justify-content: space-between;
         position:absolute;
         top:50%;
@@ -47,7 +47,14 @@
 
 <div id="load_div">
     <img id="load_logo" src="/img/Умничка лого с обводкой-02 1.png" onclick="goto('/')" alt="">
-    <div id="load_help"><a href="">reload</a><br><a href="/main">go to main page</a></div>
+    <div id="load_help">
+        <div>Страница Долго загружается?</div>
+        <div>Вы можете</div>
+        <br>
+        <div><a href="">Перезагрузить</a><br><a href="/main">На главную страницу</a></div>
+        <br>
+        <div>Но лучьше подождать</div>
+    </div>
 </div>
 
 <script>
@@ -100,5 +107,5 @@
         if(page_state != "loaded"){
             document.getElementById("load_help").style.display = "block";
         }
-    },7000)
+    },5000)
 </script>

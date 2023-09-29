@@ -115,22 +115,23 @@
             });
         }
         else{
-            let login = ask("имя");
-            if (login != ""){
-                form = 0;
-                $.post( "/admin/users/find",{login:login,from:from,load_interval:load_interval})
-                .done(function( res ) {
-                    if(res["out"] == "good"){
-                        res["body"].forEach(user => {
-                            make_user(user,res);
-                        });
-                    }
-                    else if(res["out"] == "bad"){
-                        msg("нет пользователя с таким иминем")
-                        load_users_data(users_from);
-                    }
-                });
-            }
+            ask("имя",{func:(out)=>{
+                if(out != null && out != "" && out != " "){
+                    from = 0;
+                    $.post( "/admin/users/find",{login:out,from:from,load_interval:load_interval})
+                    .done(function( res ) {
+                        if(res["out"] == "good"){
+                            res["body"].forEach(user => {
+                                make_user(user,res);
+                            });
+                        }
+                        else if(res["out"] == "bad"){
+                            msg("нет пользователя с таким иминем")
+                            load_users_data(users_from);
+                        }
+                    });
+                }
+            }})
         }
         
         function make_user(user,res){
@@ -205,16 +206,21 @@
         let pass= document.getElementById(`pass_${id}`).innerText;
         let value = null;
         if (key == 'login' || key == "pass") {
-            value = ask(`изменение ${key} пользователя ${login}`,document.getElementById(`${key}_${id}`).innerText);
+            ask(`изменение ${key} пользователя ${login}`,{def:document.getElementById(`${key}_${id}`).innerText,func:(out)=>{
+                if(out != null && out != "" && out != " "){
+                    make(out);
+                }
+            }});
         }
         else if (key == "admin"){
             value = admin;
+            make(value)
         }
         else if (key == "rights"){
             value = args[0]["rights"];
+            make(value)
         }
-
-        if(value != null){
+        function make(value){
             $.post( "/admin/users/edit",{key:key,value:value,id:id,login:login})
             .done(function( res ) {
                 // console.log("serv reg");
@@ -261,14 +267,15 @@
     }
     function user_del(id){
         let login = document.getElementById(`login_${id}`).innerText;
-        if(confirm(`вы точно хотите удалить пользователя ${login}?`) == true){
-            $.post( "/admin/users/delete",{login:login,id:id})
-            .done(function( res ) {
-                if(res["out"] == "good"){
-                    load_users_data(users_from);
-                }
-            });
-        }
+        msg(`вы точно хотите удалить пользователя ${login}?`,{type:"ask",res:(out)=>{if(out){
+                $.post( "/admin/users/delete",{login:login,id:id})
+                .done(function( res ) {
+                    if(res["out"] == "good"){
+                        load_users_data(users_from);
+                    }
+                });
+            }
+        }})
     }
 
     let user_edit_menu = document.createElement("div");user_edit_menu.id = "user_edit_menu"; user_edit_menu.classList.add("cmenu"); 
