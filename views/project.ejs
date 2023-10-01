@@ -393,7 +393,7 @@
             if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
             let obj = (in_obj == null)? document.getElementById(cur_obj):in_obj;
             // console.log(color);
-            color_change(color,obj.getAttribute("img"),(img)=>{
+            color_change(color,obj.getAttribute("data-img"),(img)=>{
                 obj.src = img;
                 obj.setAttribute("color",color)
                 objs[obj.classList[0]][obj.id]["color"] = color;
