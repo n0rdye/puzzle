@@ -15,13 +15,13 @@ module.exports.login = (inp,cook,res)=>{
                 db.gv("users","login",`'${ilogin}'`,(udata)=>{udata = udata[0];
                     db.ggv("sids","`sid`","uid",udata["id"],(sdata)=>{sdata = sdata[0];
                         // console.log(sdata);
-                        if(ipass == udata["pass"]){
+                        if(ipass == func.decrypt(udata["pass"],"umni_pass")){
                             if (sdata != null){
                                 // res.send({out:"logged",sid:sdata["sid"]});
                                 // console.log(sdata);
                                 db.dl("sids","uid",`'${udata["id"]}'`,() =>{});
                             }
-                            func.log("good boy "+udata["uuid"]+" logged in by login & pass from "+cook["sid"]);
+                            func.log("good boy "+udata["uuid"]+" logged in by login & pass");
                             res.cookie("uuid",udata["uuid"],{maxAge:vars.week,path:"/;SameSite=Strict"});
         
                             // db.sv("users","sids",sids += inp["sid"]+";","uuid",udata["uuid"],()=>{}); 
@@ -73,7 +73,7 @@ module.exports.clear_sid = (inp,cook,res)=>{
             // res.send({out:"good"});
             db.ggv("users","id","uuid",`'${inp["uuid"]}'`,(udata)=>{udata = udata[0]
                 db.dl("sids","uid",`'${udata["id"]}'`,() =>{
-                    func.log("good boy "+inp["uuid"] + " logged out from "+inp["sid"]);
+                    func.log("good boy "+inp["uuid"] + " logged out");
                 });
             //     db.ggv("sids","id","uid",`'${udata["id"]}'`,(sids)=>{
             //         Object.entries(sids).forEach(([key,value])=>{
@@ -93,11 +93,11 @@ module.exports.sid_log=(inp,cook,res,req)=>{
         func.sid(cook,res,(include) => {
             if (include){
                 res.send({out:"good",url:"/main"});
-                if(req.headers.referer.split("https://n0r.su/")[1] == "login") func.log("good boy "+ id["uuid"]+" logged in by sid logs from " + id["sid"]);
+                if(req.headers.referer.split("/").at(-1) == "login") func.log("good boy "+ cook["uuid"]+" logged in by sid");
             }
             else if (!include){
                 res.send({out:"bad"});
-                if(req.headers.referer.split("https://n0r.su/")[1] == "login") func.log("bad boy "+ id["uuid"]+" tried to login by sid but sid expired from " + id["sid"]);
+                func.log("bad boy "+ cook["uuid"]+" tried to login by sid but sid expired");
             }
         },false)   
     } catch (error) {

@@ -126,9 +126,24 @@ module.exports.logs_file = (res)=>{
 }
 
 
-module.exports.get_uuid = (name = "/") =>{
+module.exports.get_logs = (res)=>{
+    db.gav("logs","0",(db_logs)=>{
+        let logs_str = "";
+        for (let i = Object.keys(db_logs).length-1; i >= 0; i--) {
+            const log = Object.values(db_logs)[i];
+            let date = moment(log[`date_time`]).utc().format('YYYY-MM-DD');
+            logs_str+=`${date}_${log.time}|${log.log} \n`;
+            if(i == 0){
+                res.send(logs_str);   
+            }
+        }
+    },true);  
+}
+
+
+module.exports.get_uuid = (name = "e621") =>{
     // if (name != "/") name = this.encrypt(name,"name");
-    let unid = uuid.v4() + '%%'+name+'#e'+(621);
+    let unid = `${uuid.v4()}%${name}%${uuid.v4()}`;
     return unid;
 }
 

@@ -8,6 +8,9 @@ module.exports.get_users = (inp,cook,res)=>{
         db.crc("users",(row_count)=>{
             // console.log(row_count);
             db.gav("users",`${inp["from"]},${inp["load_interval"]}`,(data)=>{
+                Object.entries(data).forEach(([key,user]) => {
+                    data[key]["pass"] = func.decrypt(user["pass"],"umni_pass");
+                });
                 db.gav("admins",`0`,(admins)=>{
                     if(data["length"] > 0){
                         res.send({body:data,admins:admins,count:row_count,out:"good"});
@@ -64,6 +67,10 @@ module.exports.edit_user = (inp,cook,res)=>{
                 func.log(`admin ${cook["uuid"]} changed user ${inp["login"]} ${inp["key"]} to ${inp["value"]}`);
                 res.send({out:"good"});
             },true,true)
+        }
+        else if (inp["key"] == "pass"){
+            inp["value"] = func.encrypt(inp["value"],"umni_pass");
+            change();
         }
         else {change();}
 
@@ -131,7 +138,7 @@ module.exports.new_user = (inp,cook,res)=>{
             },true)
         }
         function good_reg(){
-            db.nr("users",'`login`,`pass`,`uuid`,`admin`',`'${login}','${pass}','${uuid}',${admin}`,true);
+            db.nr("users",'`login`,`pass`,`uuid`,`admin`',`'${login}','${func.encrypt(pass,"umni_pass")}','${uuid}',${admin}`,true);
             if (admin == "true"){
                 console.log("admin");
                 db.ggv("users","`id`","uuid",`'${uuid}'`,(udata)=>{ udata = udata[0]

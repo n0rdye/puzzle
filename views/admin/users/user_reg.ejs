@@ -85,12 +85,12 @@
                     // console.log("serv reg");
                     if(res["out"] == "good"){
                         // console.log(res["body"]);
-                        document.getElementById("reg_response").innerHTML = `user ${login} successfully registered `;
+                        msg(`Пользователь ${login} успешно добавлен`)
                         load_users_data(users_from);
 
                     }
                     else if (res["out"] == "bad"){
-                        document.getElementById("reg_response").innerHTML = "cannot register user "+login+" already in use";
+                        msg(`Пользователь с логином ${login} уже существует`)
                     }
                 });
             }

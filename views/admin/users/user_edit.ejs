@@ -50,7 +50,7 @@
     <h1>пользователи</h1>
     <div id="find_user_btns">
         <button onclick="load_users_data(users_from,true);" class="btn_blue">Найти по имени</button>
-        <button onclick="load_users_data(users_from)" class="btn_blue">Очистить</button>
+        <button onclick="users_from=0;load_interval=5;load_users_data(users_from)" class="btn_blue">Очистить</button>
     </div>
 </div>
 <section id="users_section">

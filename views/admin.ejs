@@ -21,12 +21,47 @@
     </section>
     <br>
     <section style="display: flex;">
-        <h1 style="width: 7.5vw;height: 600px;">Логи</h1>
-        <div style="background-color: white;width: 70vw;"></div>
+        <div style="width: 7.5vw;">
+            <h1>Логи</h1>
+            <button onclick="logs();" class="btn_white">Обновить</button>
+            <br>
+            <label for="logs_check" style="font-size: calc(var(--main-font-size)/1.5);">Автозагрузка</label>
+            <input type="checkbox" id="logs_check" oninput="logs_check(event)">
+        </div>
+        <div id="logs" style="background-color: white;width: 70vw;font-size: calc(var(--main-font-size)/1.4);overflow: auto;height: 80vh;"></div>
     </section>
 
 <%- include('./static/end.ejs') %>
 <script>
+    log_check();
+    function log_check(){
+        if($.cookie("auto_log") != null){
+            if(JSON.parse($.cookie("auto_log")) == true){
+                logs();
+            }
+        document.getElementById("logs_check").checked = JSON.parse($.cookie("auto_log"));
+        }else{
+            $.cookie("auto_log",true)
+            log_check()
+        }
+    }
+
+    function logs() {
+        let wait_msg = msg("Загрузка логов",{type:"wait"});
+        $.get("/logs")
+        .done(function( res ) {
+            document.getElementById("logs").innerText = res;
+            msg_del(wait_msg.id);
+            msg("Логи загружены")
+        })
+    }
+
+    function logs_check(event){
+        let log_inp = event.target;
+        let check = log_inp.checked;
+        $.cookie("auto_log",check);
+    }
+
     setTimeout(()=>{
         loaded()
     },1000);

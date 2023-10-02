@@ -15,7 +15,7 @@ module.exports.load = (inp,cook,res)=>{
                     }
                 })
                 if (projt != null){
-                    func.log(`good boy ${udata["uuid"]} loaded project ${projt["name"]} from ${cook["sid"]}`);
+                    func.log(`good boy ${udata["uuid"]} loaded project ${projt["name"]}`);
                     res.send({out:"good",body:projt["body"]});
                 }
                 else{
@@ -71,7 +71,7 @@ module.exports.del = (inp,cook,res)=>{
             // res.send({out:"good",body:pdata});
             db.dl("projects","id",pdata["id"],()=>{
                 res.send({out:"good"});
-                func.log(`good boy ${cook["uuid"]} deleted project ${inp["name"]} from ${cook["sid"]}`);
+                func.log(`good boy ${cook["uuid"]} deleted project ${inp["name"]}`);
             })
         })
         // db.ggv("users","`name`,`id`","uuid",`'${cook["uuid"]}'`,(udata)=>{ udata = udata[0];
@@ -91,7 +91,7 @@ module.exports.save = (inp,cook,res)=>{
                 if(pdata == null){
                     // func.log("proj not in");
                     // func.log(pname,udata["id"],proj);
-                    func.log(`good boy ${udata["uuid"]} created project ${inp["name"]} from ${cook["sid"]}`);
+                    func.log(`good boy ${udata["uuid"]} created project ${inp["name"]}`);
                     db.nr("projects","`uid`,`name`,`body`,`img`,creation_date",`'${udata["id"]}','${inp["name"]}','${inp["proj"]}','${inp["img"]}','${date+"T"+time}'`);
                     res.send({out:"good"});
                 } else if (pdata != null && pdata["uid"] == udata["id"]){
@@ -100,7 +100,7 @@ module.exports.save = (inp,cook,res)=>{
                             db.sv("projects","body",inp["proj"],"id",projin["id"],()=>{});
                             db.sv("projects","last_change_date",`${date+"T"+time}`,"id",projin["id"],()=>{});
                             if(inp["img"] != "") db.sv("projects","img",inp["img"],"id",projin["id"],()=>{});
-                            func.log(`good boy ${udata["uuid"]} saved project ${projin["name"]} from ${cook["sid"]}`);
+                            func.log(`good boy ${udata["uuid"]} saved project ${projin["name"]}`);
                             // func.log("proj in");
                             res.send({out:"good"});
                         })
@@ -115,3 +115,4 @@ module.exports.save = (inp,cook,res)=>{
         func.log("backend project saving err0r - "+error);
     }
 }
+

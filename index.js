@@ -6,6 +6,7 @@ const admin = require('./admin');
 const obj = require('./object');
 const proj = require('./project');
 const vars = require('./vars');
+const templates = require('./templates.js');
 const cookieParser = require('cookie-parser');
 const CssFilterConverter = require('css-filter-converter');
 
@@ -52,26 +53,26 @@ app.post('/back_login', (req, res) => {try {
         let inp = req.body;
         let cook = req.cookies;
         user.login(inp,cook,res);
-    } catch (error) {func.log("router login error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 });
 app.post("/sid_log",(req,res) =>{try{
         let inp = req.body;
         let cook = req.cookies;
         user.sid_log(inp,cook,res,req);
-    } catch (error) {func.log("router sid logging in error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/get_sid" , (req,res) =>{try{
         let inp = req.body;
         let sid = func.get_uuid();
         res.cookie("sid",sid,{maxAge:(vars.week),path:"/;SameSite=Strict"});
         res.send({out:"good"});
-    } catch (error) {func.log("router sid getting error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 });
 app.post("/clear_sid" , (req,res) =>{try{
         let inp = req.body;
         let cook = req.cookies;
         user.clear_sid(inp,cook,res);
-    } catch (error) {func.log("router sid clearing error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 });
 app.post("/get_cr_uuid", (req,res) => {try{
         let inp = req.body;
@@ -79,7 +80,7 @@ app.post("/get_cr_uuid", (req,res) => {try{
         func.sid(cook,res,()=>{
             user.get_cr(inp,cook,res);
         })
-    } catch (error) {func.log("router getting user information by uuid error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 
 /// project
@@ -92,7 +93,7 @@ app.post("/save_proj", (req,res) => {try{
         func.sid(cook,res,()=>{
             proj.save(inp,cook,res);
         })
-    } catch (error) {func.log("router project saving error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/load_proj", (req,res) => {try{
         let inp = req.body;
@@ -100,7 +101,7 @@ app.post("/load_proj", (req,res) => {try{
         func.sid(cook,res,()=>{
             proj.load(inp,cook,res);
         })
-    } catch (error) {func.log("router project loading error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/proj/delete", (req,res) => {try{
         let inp = req.body;
@@ -108,7 +109,7 @@ app.post("/proj/delete", (req,res) => {try{
         func.sid(cook,res,()=>{
             proj.del(inp,cook,res);
         })
-    } catch (error) {func.log("router project loading error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/proj/download", (req,res) => {try{
         let inp = req.body;
@@ -116,7 +117,7 @@ app.post("/proj/download", (req,res) => {try{
         func.sid(cook,res,()=>{
             proj.download(inp,cook,res);
         })
-    } catch (error) {func.log("router project loading error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/proj/rename", (req,res) => {try{
     let inp = req.body;
@@ -124,7 +125,7 @@ app.post("/proj/rename", (req,res) => {try{
     func.sid(cook,res,()=>{
         proj.rename(inp,cook,res);
     })
-} catch (error) {func.log("router project loading error - "+error);}
+} catch (error) {route_err({req:req,error:error});}
 })
 app.post("/get_projs", (req,res) => {
     try{
@@ -133,7 +134,7 @@ app.post("/get_projs", (req,res) => {
         func.sid(cook,res,()=>{
             proj.loads(inp,cook,res);
         })
-    } catch (error) {func.log("router user projects getting error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/get_objs", (req,res) => {
     try{
@@ -143,7 +144,7 @@ app.post("/get_objs", (req,res) => {
         func.sid(cook,res,()=>{
             obj.loads(inp,cook,res);
         })
-    } catch (error) {func.log("router objects getting error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/get_obj", (req,res) => {try{
         let inp = req.body;
@@ -152,7 +153,7 @@ app.post("/get_obj", (req,res) => {try{
         func.sid(cook,res,()=>{
             obj.load(inp,cook,res);
         })
-    } catch (error) {func.log("router single object getting error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/get_groups", (req,res) => {try{
         let inp = req.body;
@@ -161,7 +162,7 @@ app.post("/get_groups", (req,res) => {try{
         func.sid(cook,res,()=>{
             obj.load_groups(inp,cook,res);
         })
-    } catch (error) {func.log("router single object getting error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/object/parts/get", (req,res) => {try{
         let inp = req.body;
@@ -170,7 +171,7 @@ app.post("/object/parts/get", (req,res) => {try{
         func.sid(cook,res,()=>{
             obj.load_parts(inp,cook,res);
         })
-    } catch (error) {func.log("router single object getting error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/object/group/get", (req,res) => {try{
         let inp = req.body;
@@ -179,7 +180,7 @@ app.post("/object/group/get", (req,res) => {try{
         func.sid(cook,res,()=>{
             obj.load_group(inp,cook,res);
         })
-    } catch (error) {func.log("router single object getting error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 
 // colors
@@ -190,7 +191,7 @@ app.post("/object/colors/get", (req,res) => {try{
     func.sid(cook,res,()=>{
         obj.load_colors(inp,cook,res);
     })
-} catch (error) {func.log("router single object getting error - "+error);}
+} catch (error) {route_err({req:req,error:error});}
 })
 
 
@@ -201,7 +202,7 @@ app.get("/admin", (req,res) =>{try {
         func.sid(cook,res,(rights)=>{
             res.render('admin');
         },true,true)
-    } catch (error) {func.log("router admin page error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 });
 app.get("/admin/:type", (req,res) =>{try {
     let inp = req.body;
@@ -215,11 +216,11 @@ app.get("/admin/:type", (req,res) =>{try {
         }
         else{res.redirect('/admin');}
     },true,true)
-} catch (error) {func.log("router admin page error - "+error);}
+} catch (error) {route_err({req:req,error:error});}
 });
 app.get("/get_logs", (req,res) => {
     try{let cook = req.cookies;func.sid(cook,res,()=>{func.logs_file(res);})} 
-    catch (error) {func.log("router logs download error - "+error);}
+    catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/colors/new", (req,res) => {try{
     let inp = req.body;
@@ -228,7 +229,7 @@ app.post("/admin/colors/new", (req,res) => {try{
     func.sid(cook,res,()=>{
         obj.new_color(inp,cook,res);
     })
-} catch (error) {func.log("router single object getting error - "+error);}
+} catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/colors/delete", (req,res) => {try{
     let inp = req.body;
@@ -237,7 +238,7 @@ app.post("/admin/colors/delete", (req,res) => {try{
     func.sid(cook,res,()=>{
         obj.del_color(inp,cook,res);
     })
-} catch (error) {func.log("router single object getting error - "+error);}
+} catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/objects/new", (req,res) => {try{
         let inp = req.body;
@@ -245,7 +246,7 @@ app.post("/admin/objects/new", (req,res) => {try{
         func.sid(cook,res,()=>{
             obj.new(inp,cook,res);
         },true,true)
-    } catch (error) {func.log("router object creating error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/objects/edit", (req,res) => {try{
         let inp = req.body;
@@ -253,7 +254,7 @@ app.post("/admin/objects/edit", (req,res) => {try{
         func.sid(cook,res,()=>{
             obj.save(inp,cook,res);
         },true,true)
-    } catch (error) {func.log("router object creating error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/objects/delete", (req,res) => {try{
         let inp = req.body;
@@ -261,7 +262,7 @@ app.post("/admin/objects/delete", (req,res) => {try{
         func.sid(cook,res,()=>{
             obj.del(inp,cook,res);
         },true,true)
-    } catch (error) {func.log("router object creating error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/objects/find", (req,res) => {try{
         let inp = req.body;
@@ -269,7 +270,7 @@ app.post("/admin/objects/find", (req,res) => {try{
         func.sid(cook,res,()=>{
             obj.find(inp,cook,res);
         },true,true)
-    } catch (error) {func.log("router object creating error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/groups/new", (req,res) => {try{
         let inp = req.body;
@@ -277,7 +278,7 @@ app.post("/admin/groups/new", (req,res) => {try{
         func.sid(cook,res,()=>{
             obj.new_group(inp,cook,res);
         },true,true)
-    } catch (error) {func.log("router object creating error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/parts/new", (req,res) => {try{
     let inp = req.body;
@@ -285,7 +286,7 @@ app.post("/admin/parts/new", (req,res) => {try{
     func.sid(cook,res,()=>{
         obj.new_part(inp,cook,res);
     },true,true)
-} catch (error) {func.log("router object creating error - "+error);}
+} catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/parts/delete", (req,res) => {try{
     let inp = req.body;
@@ -293,7 +294,7 @@ app.post("/admin/parts/delete", (req,res) => {try{
     func.sid(cook,res,()=>{
         obj.del_part(inp,cook,res);
     },true,true)
-} catch (error) {func.log("router object creating error - "+error);}
+} catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/groups/delete", (req,res) => {try{
         let inp = req.body;
@@ -301,7 +302,7 @@ app.post("/admin/groups/delete", (req,res) => {try{
         func.sid(cook,res,()=>{
             obj.del_group(inp,cook,res);
         },true,true)
-    } catch (error) {func.log("router object creating error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/users/get", (req,res) => {try{
         let inp = req.body;
@@ -309,7 +310,7 @@ app.post("/admin/users/get", (req,res) => {try{
         func.sid(cook,res,()=>{
             admin.get_users(inp,cook,res);
         },true,true)
-    } catch (error) {func.log("router object creating error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post('/admin/users/new', (req, res) => {try{
         let inp = req.body;
@@ -317,7 +318,7 @@ app.post('/admin/users/new', (req, res) => {try{
         func.sid(cook,res,()=>{
             admin.new_user(inp,cook,res);
         },true,true)
-    } catch (error) {func.log("router registration error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/users/edit", (req,res) => {try{
         let inp = req.body;
@@ -325,7 +326,7 @@ app.post("/admin/users/edit", (req,res) => {try{
         func.sid(cook,res,()=>{
             admin.edit_user(inp,cook,res);
         },true,true)
-    } catch (error) {func.log("router object creating error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/users/delete", (req,res) => {try{
         let inp = req.body;
@@ -333,7 +334,7 @@ app.post("/admin/users/delete", (req,res) => {try{
         func.sid(cook,res,()=>{
             admin.del_user(inp,cook,res);
         },true,true)
-    } catch (error) {func.log("router object creating error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/users/find", (req,res) => {try{
         let inp = req.body;
@@ -341,10 +342,53 @@ app.post("/admin/users/find", (req,res) => {try{
         func.sid(cook,res,()=>{
             admin.find_user(inp,cook,res);
         },true,true)
-    } catch (error) {func.log("router object creating error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
 })
 
 
+// templates
+app.post('/admin/template/save', (req, res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        templates.save(inp,cook,res);
+    },true,true)
+} catch (error) {route_err({req:req,error:error});}
+})
+app.post("/admin/template/rename", (req,res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        templates.rename(inp,cook,res);
+    },true,true)
+} catch (error) {route_err({req:req,error:error});}
+})
+app.post("/admin/template/delete", (req,res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        templates.del(inp,cook,res);
+    },true,true)
+} catch (error) {route_err({req:req,error:error});}
+})
+app.post("/template/load", (req,res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        templates.load(inp,cook,res);
+    })
+} catch (error) {route_err({req:req,error:error});}
+})
+app.post("/template/loads", (req,res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        templates.loads(inp,cook,res);
+    })
+} catch (error) {route_err({req:req,error:error});}
+})
+
+// main routes
 app.get('/', (req, res) => {
     let inp = req.body;
     let cook = req.cookies;
@@ -362,21 +406,28 @@ app.get("/main", (req,res) =>{try{
         func.sid(cook,res,()=>{
             res.render('main');
         })
-    } catch (error) {func.log("router getting user information by uuid error - "+error);}
+    } catch (error) {route_err({req:req,error:error});}
+});
+app.get("/logs", (req,res) =>{try{
+    let inp = req.body;let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        func.get_logs(res);
+    })
+} catch (error) {route_err({req:req,error:error});}
 });
 app.get("/help", (req,res) =>{try{
     let inp = req.body;let cook = req.cookies;
     func.sid(cook,res,()=>{
         res.render('help');
     })
-} catch (error) {func.log("router getting user information by uuid error - "+error);}
+} catch (error) {route_err({req:req,error:error});}
 });
 app.get("/temp", (req,res) =>{try{
     let inp = req.body;let cook = req.cookies;
     func.sid(cook,res,()=>{
         res.render('templates');
     })
-} catch (error) {func.log("router getting user information by uuid error - "+error);}
+} catch (error) {route_err({req:req,error:error});}
 });
 app.get("/htc/:hex",(req,res) =>{
     res.send(CssFilterConverter.hexToFilter(`#${req.params["hex"]}`));
@@ -390,3 +441,8 @@ app.all('*', (req, res) => {
     res.render("static/404");
 });
 app.listen(process.env.PORT || 8080, () => func.log("server for puzzle started UwU"));
+
+
+function route_err(params = {req:null,error:null}) {
+    func.log(`router ${req.route.path} error - `+error)
+}

@@ -327,7 +327,6 @@ async function removeImageBackground(image) {
         }
         var list = preloadImages.list;
         for (var i = 0; i < array.length; i++) {
-            console.log(array[i],is_cached(array[i]));
             if(!is_cached(array[i])){
                 var img = new Image();
                 img.onload = function() {
@@ -360,6 +359,9 @@ async function removeImageBackground(image) {
                     preloadImages(sources,()=>{
                         // console.log("cached");
                         callback();
+                        sources.forEach(element => {
+                            console.log(element,is_cached(element));
+                        });
                     })
                 }
             });
