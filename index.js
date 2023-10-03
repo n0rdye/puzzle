@@ -20,6 +20,7 @@ const CssFilterConverter = require('css-filter-converter');
 // const createApplication = require('express/lib/express');
 // const { render } = require('express/lib/response');
 const app = express();
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 
 // const {
 //     pathToFileURL
