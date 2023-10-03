@@ -222,6 +222,7 @@ function load(objss){
         }
         if (keys == Object.keys(objs).at(-1)){
             proj_state = "loaded";
+            loaded();
         }
     });
     resize_drags();

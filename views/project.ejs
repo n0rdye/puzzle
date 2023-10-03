@@ -293,9 +293,7 @@
 <script>
     let proj_name = "<%= proj_name %>";
     document.getElementById("layer_inp").value = 0;
-    img_cache(()=>{
-        loaded();
-    })
+    img_cache(()=>{})
 
 
     if ( $.cookie("grid") != null){
