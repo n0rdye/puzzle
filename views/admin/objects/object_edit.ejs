@@ -86,7 +86,7 @@
     function obj_del(id){
         // let select = document.getElementById("group_select");
         let menu = document.getElementById(`object_${id}`);
-        msg(`вы точно хотите удалить ${menu.getAttribute("name").split("~")[0]}?`,{type:"ask",res:(out)=>{if(res){
+        msg(`вы точно хотите удалить ${menu.getAttribute("name").split("~")[0]}?`,{type:"ask",res:(out)=>{if(out){
             let wait_msg = msg("удаление товара",{type:"wait"});
             $.post( "/admin/objects/delete", { id:id,})
             .done(function( res ) {

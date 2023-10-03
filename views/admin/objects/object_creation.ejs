@@ -165,7 +165,7 @@
 
         name_div.value = name;
         img_file.value = null;
-        img_prev.src = img;
+        img_prev.src = getBase64Image(img);
         img_prev.style.height = `${height* cm_mult}px`;
         img_prev.style.width = `${width* cm_mult}px`;
         cost_text.value = cost;
@@ -238,6 +238,7 @@
                             msg("товар добавлен");
                             setTimeout(()=>{
                                 edit_get_objs();
+                                set_obj_edit_params();
                             },500)
                         }
                     });

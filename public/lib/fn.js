@@ -316,8 +316,22 @@ async function removeImageBackground(image) {
     })
     .catch(console.error);
   }
-  
 
+  function getBase64Image(img_url) {  
+    img = new Image();
+    img.src = img_url;
+    let canvas = document.createElement("canvas");  
+    canvas.width = img.width;  
+    canvas.height = img.height;  
+   
+    let ctx = canvas.getContext("2d");  
+    ctx.drawImage(img, 0, 0);  
+    
+    let dataURL = canvas.toDataURL("image/png");  
+    
+    return dataURL;
+    // return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");  
+}  
 
   function img_cache(callback){
     function preloadImages(array,callback) {
