@@ -441,7 +441,7 @@
         let obj = document.getElementById(cur_obj);
         if(obj != null){
             let cur_layer = obj.style.zIndex;
-            if (type == "up" && cur_layer < 99999){
+            if (type == "up" && cur_layer < 9999){
                 objs[obj.classList[0]][obj.getAttribute("id")].layer = parseInt(cur_layer) + 1;
                 obj.style.zIndex = parseInt(cur_layer) + 1;
                 document.getElementById("layer_inp").value = parseInt(cur_layer) + 1;
@@ -452,7 +452,7 @@
             }
             else if ((type == "inp")){
                 let inp_val = parseInt(document.getElementById("layer_inp").value);
-                if(inp_val >= 0 && inp_val < 99999){
+                if(inp_val >= 0 && inp_val < 9999){
                     objs[obj.classList[0]][obj.getAttribute("id")].layer = inp_val;
                     obj.style.zIndex = inp_val;
                 }
