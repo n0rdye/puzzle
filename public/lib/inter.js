@@ -82,9 +82,18 @@ function obj_click(id){
         let obj = document.getElementById(id);
 
         let cur_layer = obj.style.zIndex;
-        document.getElementById("layer_inp").value = cur_layer;
 
         cur_obj = id;
+        console.log(cur_layer,"99999");
+        if(cur_layer=="99999"){
+            document.getElementsByClassName("layer_changer")[0].style.pointerEvents = "none"; 
+            document.getElementById("layer_inp").value = "-";        
+        }
+        else{
+            document.getElementsByClassName("layer_changer")[0].style.pointerEvents = "all"; 
+            document.getElementById("layer_inp").value = cur_layer;
+        }
+
         if (obj.getAttribute("colors") == "true"){
             clear_palette();
             obj_colors_load(()=>{
