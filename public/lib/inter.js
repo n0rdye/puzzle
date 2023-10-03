@@ -66,8 +66,8 @@ function create(clas,x,y,color = null,id,size,layer = 0){
     if(id != "none"){obj.setAttribute("onclick",`obj_click("${id}")`);}
     // console.log(main_clas);
     if(main_clas.split("~p~").at(-1) == "Бизиборды"){
-        obj.setAttribute("layer",99999);
-        obj.style.zIndex = 99999;
+        obj.setAttribute("layer",9999);
+        obj.style.zIndex = 9999;
     }
     else{
         obj.setAttribute("layer",layer);
@@ -84,8 +84,7 @@ function obj_click(id){
         let cur_layer = obj.style.zIndex;
 
         cur_obj = id;
-        console.log(cur_layer,"99999");
-        if(cur_layer=="99999"){
+        if(cur_layer=="9999"){
             document.getElementsByClassName("layer_changer")[0].style.pointerEvents = "none"; 
             document.getElementById("layer_inp").value = "-";        
         }
