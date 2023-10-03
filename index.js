@@ -432,9 +432,6 @@ app.get("/temp", (req,res) =>{try{
 app.get("/htc/:hex",(req,res) =>{
     res.send(CssFilterConverter.hexToFilter(`#${req.params["hex"]}`));
 })
-app.get("/favicon.ico",(req,res) =>{
-    res.redirect("public/img/Умничка лого с обводкой-02 1.png")
-})
 app.post("/color",(req,res) =>{
     let inp = req.body;
     func.img_recolor(res,inp["img"],inp["hex"]);
