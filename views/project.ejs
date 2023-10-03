@@ -341,7 +341,7 @@
             spawn.src = "";
         })
         if(cost == true){
-            width += 252;
+            width += document.getElementById("proj_cost").getBoundingClientRect().width;
             document.getElementById("drags").append(document.getElementById("cost_div"));
             document.getElementById("cost_div").style.marginLeft = `${parseInt(document.getElementById("wall").style.width) + 4}px`;
             document.getElementById("cost_list").style.display = "block";

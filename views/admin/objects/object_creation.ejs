@@ -236,7 +236,9 @@
                         }
                         else if(res["out"] == "good"){
                             msg("товар добавлен");
-                            edit_get_objs();
+                            setTimeout(()=>{
+                                edit_get_objs();
+                            },500)
                         }
                     });
                 }
