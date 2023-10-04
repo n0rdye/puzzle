@@ -70,17 +70,17 @@
         </div>
         <div id="obj_input">
             <div>
-                <div style="display: flex;width: 40%;justify-content: space-between;">
+                <div style="display: flex;width: 50%;justify-content: space-between;">
                     <label for="obj_height">Высота</label>
-                    <div style="display: flex;"><input type="text" class="btn_white" style="width: 50px;" id="obj_height_value" value="100" oninput="this.value = this.value.replace(/[^0-9.]/g, '0').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');obj_size_change('height','text')">
+                    <div style="display: flex;"><input type="text" class="btn_white" style="width: 3vw;" id="obj_height_value" value="100" oninput="this.value = this.value.replace(/[^0-9.]/g, '0').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');obj_size_change('height','text')">
                         <div class="vc">см</div></div>
                 </div>
                 <input style="width: 100%;" type="range" step="1" min="1" max="300" id="obj_height" value="100" oninput="obj_size_change('height','range')"> 
             </div>
             <div>
-                <div style="display: flex;width: 40%;justify-content: space-between;">
+                <div style="display: flex;width: 50%;justify-content: space-between;">
                     <label for="obj_width" class="vc">Ширина</label>
-                    <div style="display: flex;"><input type="text" class="btn_white" style="width: 50px;" id="obj_width_value" value="100" oninput="this.value = this.value.replace(/[^0-9.]/g, '0').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');obj_size_change('width','text')">
+                    <div style="display: flex;"><input type="text" class="btn_white" style="width: 3vw;" id="obj_width_value" value="100" oninput="this.value = this.value.replace(/[^0-9.]/g, '0').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');obj_size_change('width','text')">
                         <div class="vc">см</div></div>
                 </div>
                 <input style="width: 100%;" type="range" step="1" min="1" max="300" id="obj_width" value="100" oninput="obj_size_change('width','range')"> 

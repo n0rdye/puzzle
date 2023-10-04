@@ -25,6 +25,24 @@
         margin: auto 0px;
         /* height: 25px; */
     }
+    .object *{
+        font-size: calc(var(--main-font-size)/1.6);
+    }
+    .object td{
+        border: 1px #777777 solid;
+        padding: 0.5vw;
+    }
+    .object{
+        table-layout: fixed;
+        border-collapse: collapse;
+        border: 1px solid #B9B9B9;
+    }
+    .obj_table_labels{
+        background-color: #B9B9B9;
+    }
+    .obj_table_divs{
+        background-color: #ffffff;
+    }
 </style>
 
 <h1>Изменение объектов</h1>
@@ -53,6 +71,10 @@
         menu.getAttribute("gid"),
         menu.getAttribute("colors"),
         menu.getAttribute("obj_id"));
+        window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+        });
     }
 
     function edit_get_objs(by_name = false){
@@ -176,6 +198,11 @@
         });
     }
         
+
+    img_cache(()=>{
+        loaded()
+    })
+
     function edit_load_objs(callback,by_name = false){
         // let select = document.getElementById("group_select");
         if(!by_name){
@@ -209,12 +236,14 @@
 
         function make_obj(img,value,list_id){
             let obj_list = document.getElementById(list_id);
-            let obj =  document.createElement('div');
-            let name_text =  document.createElement('div');
-            let img_elm =  document.createElement('img');
+            // let obj =  document.createElement('div');
+            // let name_text =  document.createElement('div');
+            // let img_elm =  document.createElement('img');
+            let obj = document.createElement("table");
+
             obj.title = `название:${value["name"].split("~")[0].replaceAll("$"," ")}\nцена:${value["cost"]}\nширина:${value["width"]}\nвысота${value["height"]}\nименение цвета:${Boolean(value["colors"])}\nартикуль:${value["name"]}`;
             obj.id = `object_${value["id"]}`;
-            obj.setAttribute("onclick",`set_edit(${value["id"]})`)
+            // obj.setAttribute("onclick",`set_edit(${value["id"]})`)
             obj.classList.add(value["name"]);
             obj.classList.add("object");
             obj.setAttribute("name",value["name"].split("~")[0].replaceAll("$"," "))
@@ -226,10 +255,61 @@
             obj.setAttribute("cost",value["cost"])
             obj.setAttribute("colors",Boolean(value["colors"]))
             obj.setAttribute("gid",value["gid"])
-            // name_text.innerText = value["name"].split("~")[0].replaceAll("$"," ");
-            img_elm.src = img;
-            obj.append(img_elm)
-            obj.append(name_text)
+            // // name_text.innerText = value["name"].split("~")[0].replaceAll("$"," ");
+            // img_elm.src = img;
+            // obj.append(img_elm)
+            // obj.append(name_text)
+
+
+            obj.style.width = "80vw";
+            obj.style.wordBreak = "break-all";
+
+
+            let divs = {
+                name : value["name"].split("~")[0].replaceAll("$"," "),
+                object : value["name"],
+                height : value["height"],
+                width : value["width"],
+                cost : value["cost"],
+                link : img,
+                color : Boolean(value["colors"]),
+                edit : `set_edit(${value["id"]})`
+            }
+
+            let labels = {
+                name : "Название",
+                object : "Объект",
+                height : "Высота",
+                width : "Ширина",
+                cost : "Цена",
+                link : "Ссылка на изображение",
+                color : "Меняет цвет",
+                edit : "Радактировать"
+            }
+
+
+            obj.innerHTML = 
+            "<tr class='obj_table_labels'>"+
+                `<td>${labels["name"]}</td>`+
+                `<td>${labels["object"]}</td>`+
+                `<td>${labels["height"]}</td>`+
+                `<td>${labels["width"]}</td>`+
+                `<td>${labels["cost"]}</td>`+
+                `<td>${labels["link"]}</td>`+
+                `<td>${labels["color"]}</td>`+
+                `<td>${labels["edit"]}</td>`+
+            "</tr>"+
+            "<tr class='obj_table_divs'>"+
+                `<td>${divs["name"]}</td>`+
+                `<td>${divs["object"]}</td>`+
+                `<td>${divs["height"]}</td>`+
+                `<td>${divs["width"]}</td>`+
+                `<td>${divs["cost"]}</td>`+
+                `<td><a href='${divs["link"]}'>${divs["link"]}</a></td>`+
+                `<td>${divs["color"]}</td>`+
+                `<td><button onclick='${divs["edit"]}' class='btn_blue'>Выбрать</button></td>`+
+            "</tr>";
+
             obj_list.append(obj)
 
             // console.log("obj");
