@@ -197,11 +197,6 @@
             }
         });
     }
-        
-
-    img_cache(()=>{
-        loaded()
-    })
 
     function edit_load_objs(callback,by_name = false){
         // let select = document.getElementById("group_select");
@@ -286,6 +281,9 @@
                 color : "Меняет цвет",
                 edit : "Радактировать"
             }
+
+            var load_img = new Image();
+            load_img.src = img;
 
 
             obj.innerHTML = 
