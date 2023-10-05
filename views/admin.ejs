@@ -16,7 +16,7 @@
         <button onclick="goto('/admin/objects')" class="btn_white">Панель управления объектами</button>
         <button onclick="goto('/admin/users')" class="btn_white">Панель управления пользователями</button>
         <div class="logs_div" style="margin: auto 0px;display: flex; margin-left: 20vw;">
-            <button onclick="goto('/get_logs');" class="btn_white">Скачать логи</button>
+            <button onclick="load_logs();" class="btn_blue">Скачать логи</button>
         </div>
     </section>
     <br>
@@ -67,6 +67,13 @@
             })
         }
         }})
+    }
+
+    function load_logs() {
+        $.get("/logs/get")
+        .done(function( res ) {
+            downloadTextFile(res["body"],"logs.txt");
+        })
     }
 
     function logs_check(event){
