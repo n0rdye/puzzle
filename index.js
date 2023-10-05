@@ -389,7 +389,7 @@ app.post("/template/loads", (req,res) => {try{
 
 // main routes
 app.get('/', (req, res) => {
-    let inp = req.body;
+    let inp = req.query;
     let cook = req.cookies;
     func.sid(cook,res,(include)=>{
         if(include){
@@ -401,28 +401,35 @@ app.get('/', (req, res) => {
     },false)
 });
 app.get("/main", (req,res) =>{try{
-        let inp = req.body;let cook = req.cookies;
+        let inp = req.query;let cook = req.cookies;
         func.sid(cook,res,()=>{
             res.render('main');
         })
     } catch (error) {route_err({req:req,error:error});}
 });
-app.get("/logs", (req,res) =>{try{
-    let inp = req.body;let cook = req.cookies;
+app.get("/logs/get", (req,res) =>{try{
+    let inp = req.query;let cook = req.cookies;
     func.sid(cook,res,()=>{
         func.get_logs(res);
-    })
+    },true,true)
+} catch (error) {route_err({req:req,error:error});}
+});
+app.get("/logs/del", (req,res) =>{try{
+    let inp = req.query;let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        func.del_logs(inp,res);
+    },true,true)
 } catch (error) {route_err({req:req,error:error});}
 });
 app.get("/help", (req,res) =>{try{
-    let inp = req.body;let cook = req.cookies;
+    let inp = req.query;let cook = req.cookies;
     func.sid(cook,res,()=>{
         res.render('help');
     })
 } catch (error) {route_err({req:req,error:error});}
 });
 app.get("/temp", (req,res) =>{try{
-    let inp = req.body;let cook = req.cookies;
+    let inp = req.query;let cook = req.cookies;
     func.sid(cook,res,()=>{
         res.render('templates');
     })

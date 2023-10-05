@@ -36,6 +36,11 @@
         border: 0px;
         cursor: pointer;
     }
+    .yes-ans:hover, .no-ans:hover{
+        transition-duration: 200ms;
+        color: rgba(0, 144, 0, 0.5);
+        transform: scale(1.05);
+    }
 </style>
 
 
@@ -44,6 +49,9 @@
 <script>
     let msg_int = 0;
     function msg(text,params = {type:null,time:null,res:null,def:null}){
+        Object.values(document.getElementsByClassName("message")).forEach(element => {
+                element.setAttribute("ans","false");
+        });
         params.time = (params.time == null)? 8:params.time;
         params.type = (params.type == null)? "msg":params.type;
         msg_int++;
@@ -74,6 +82,9 @@
             case "wait":
                 msg_div.style.borderColor = "rgba(0, 0, 255, 0.5)";
                 break;            
+            case "date":
+                msg_div.style.borderColor = "rgba(0, 255, 0, 0.5)";
+                break;    
             default:
                 break;
         }
@@ -89,6 +100,8 @@
             no.innerText = "Нет";
             yes.classList.add("yes-ans")
             no.classList.add("no-ans")
+            yes.classList.add("ans")
+            no.classList.add("ans")
             yes.id = `${msg_div.id}-yes`;
             no.id = `${msg_div.id}-no`;
             q_div.append(yes)
@@ -101,10 +114,21 @@
             msg_div.setAttribute("ans","null")
             yes.setAttribute("onclick",`document.getElementById('${msg_div.id}').setAttribute("ans","true")`)
             no.setAttribute("onclick",`document.getElementById('${msg_div.id}').setAttribute("ans","false")`)
+            yes.focus();
+            yes.addEventListener('keydown', function(e) {
+                if (e.keyCode === 13) {
+                    document.getElementById(`${msg_div.id}`).setAttribute("ans","true")
+                }
+                else if (e.keyCode === 27) {
+                    document.getElementById(`${msg_div.id}`).setAttribute("ans","false")
+                }
+            })
+
+
             var observer = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
                     if (mutation.type = "attributes" && mutation.target.getAttribute("ans") != "null") {
-                        console.log(mutation);
+                        // console.log(mutation);
                         if(mutation.target.getAttribute("ans") == "true"){
                             params.res(true);fin();
                         }
@@ -143,6 +167,8 @@
             no.innerText = "Отменить";
             yes.classList.add("yes-ans")
             no.classList.add("no-ans")
+            yes.classList.add("ans")
+            no.classList.add("ans")
             yes.id = `${msg_div.id}-yes`;
             no.id = `${msg_div.id}-no`;
             q_div.append(yes)
@@ -152,13 +178,22 @@
             msg_div.setAttribute("ans","null")
             yes.setAttribute("onclick",`document.getElementById('${msg_div.id}').setAttribute("ans","true")`)
             no.setAttribute("onclick",`document.getElementById('${msg_div.id}').setAttribute("ans","false")`)
+            text.focus();
+            text.addEventListener('keydown', function(e) {
+                if (e.keyCode === 13) {
+                    document.getElementById(`${msg_div.id}`).setAttribute("ans","true")
+                }
+                else if (e.keyCode === 27) {
+                    document.getElementById(`${msg_div.id}`).setAttribute("ans","false")
+                }
+            })
             // document.getElementById("message_div").style.pointerEvents = "all";
             // document.getElementById("message_div").setAttribute("onclick",`document.getElementById('${msg_div.id}').setAttribute("ans","false")`)
 
             var observer = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
                     if (mutation.type = "attributes" && mutation.target.getAttribute("ans") != "null") {
-                        console.log(mutation);
+                        // console.log(mutation);
                         if(mutation.target.getAttribute("ans") == "true"){
                             params.res(text.value);fin();
                         }
@@ -182,7 +217,74 @@
                 }
             } 
         }
-        else if(params.type != "wait" && params.type != "ask"){
+        if (params.type == "date"){
+            // msg_div.setAttribute("onclick",`msg_del("msg_${msg_int}")`);
+            let yes = document.createElement("button");
+            let no = document.createElement("button");
+            let q_div = document.createElement("div");
+            let date = document.createElement("input");
+            q_div.style = "display:flex;justify-content: space-between;z-index:20000";
+            yes.innerText = "Да";
+            no.innerText = "Нет";
+            yes.classList.add("yes-ans")
+            no.classList.add("no-ans")
+            yes.classList.add("ans")
+            no.classList.add("ans")
+            yes.id = `${msg_div.id}-yes`;
+            no.id = `${msg_div.id}-no`;
+            q_div.append(yes)
+            q_div.append(no)
+            msg_div.append(date)
+            msg_div.append(q_div)
+            date.setAttribute("type","date");
+
+            // document.getElementById("message_div").style.pointerEvents = "all";
+            // document.getElementById("message_div").setAttribute("onclick",`document.getElementById('${msg_div.id}').setAttribute("ans","false")`)
+            let now = new Date().toLocaleDateString().split(".").reverse().join('-');;
+            date.value = now;
+
+            msg_div.setAttribute("ans","null")
+            yes.setAttribute("onclick",`document.getElementById('${msg_div.id}').setAttribute("ans","true")`)
+            no.setAttribute("onclick",`document.getElementById('${msg_div.id}').setAttribute("ans","false")`)
+            yes.focus();
+            yes.addEventListener('keydown', function(e) {
+                if (e.keyCode === 13) {
+                    document.getElementById(`${msg_div.id}`).setAttribute("ans","true")
+                }
+                else if (e.keyCode === 27) {
+                    document.getElementById(`${msg_div.id}`).setAttribute("ans","false")
+                }
+            })
+
+
+            var observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type = "attributes" && mutation.target.getAttribute("ans") != "null") {
+                        // console.log(mutation);
+                        if(mutation.target.getAttribute("ans") == "true"){
+                            params.res(date.value);fin();
+                        }
+                        else if (mutation.target.getAttribute("ans") == "false"){
+                            params.res(false);fin();
+                        }
+                    }
+                });
+            });
+            observer.observe(msg_div, {attributes: true });
+
+
+            function fin(){
+                observer.disconnect();
+                // document.getElementById("message_div").style.pointerEvents = "none";
+                if (document.getElementById(msg_div.id) != null){
+                    msg_div.style.transform = "translateX(120%)";
+                    setTimeout(() => {
+                        msg_root.removeChild(msg_div); 
+                    }, 200);
+                }
+            } 
+        }
+        else if(params.type != "wait" && params.type != "ask" && params.type != "date"){
             msg_div.setAttribute("onclick",`msg_del("msg_${msg_int}")`);
             setTimeout(()=>{
                 if (document.getElementById(msg_div.id) != null){

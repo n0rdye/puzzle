@@ -45,15 +45,15 @@
     }
 </style>
 
-<h1>Изменение объектов</h1>
+<div style="display: flex;justify-content: space-between;padding-block: 1vw;">
+    <h1>Изменение объектов</h1> 
+    <div id="find_obj_btns">
+        <button onclick="edit_get_objs(true)" class="btn_blue">Найти по имени</button>
+        <button onclick='gids = [];edit_get_objs();' class="btn_blue">Сбосить</button>
+    </div>
+</div>
 <div>
     <div id="objs_in_group"></div>
-</div>
-<div style="display: flex;justify-content: space-between;float: right;">
-    <div id="find_obj_btns">
-        <button onclick="edit_get_objs(true)" class="btn_blue">найти по имени</button>
-        <button onclick='gids = [];edit_get_objs();' class="btn_blue">очистить</button>
-    </div>
 </div>
 
 <script>
@@ -304,10 +304,10 @@
                 `<td>${divs["width"]}</td>`+
                 `<td>${divs["cost"]}</td>`+
                 `<td><a href='${divs["link"]}'>${divs["link"]}</a></td>`+
-                `<td>${divs["color"]}</td>`+
+                `<td><input type='checkbox' id='obj_edit_color_check' ${(divs["color"] == true)? "checked":""} onclick='return false' onkeydown='return false'/></td>`+
                 `<td><button onclick='${divs["edit"]}' class='btn_blue'>Выбрать</button></td>`+
             "</tr>";
-
+            
             obj_list.append(obj)
 
             // console.log("obj");

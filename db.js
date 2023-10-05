@@ -37,6 +37,18 @@ module.exports.dl = (table,key,value,callback,prevs = false) => {
     })
 }
 
+module.exports.dl_con = (table,condision,callback,prevs = false) => {
+    // console.log('SELECT * FROM `'+table+'` WHERE `'+key+'` = '+value);
+    db(prevs).query(`DELETE FROM ${table} WHERE ${condision}`, (err, rows, fields) => {
+        if (err) {
+            console.log("sql err");
+            throw err;
+        }else{
+            if(callback)callback(rows);
+        }
+    })
+}
+
 // get values where 
 module.exports.gv = (table,key,value,callback,prevs = false) => {
     // console.log(`SELECT * FROM ${table} WHERE ${key} = ${value}`);

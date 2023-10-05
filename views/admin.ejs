@@ -23,10 +23,10 @@
     <section style="display: flex;">
         <div style="width: 7.5vw;">
             <h1>Логи</h1>
-            <button onclick="logs();" class="btn_white">Обновить</button>
-            <br>
-            <label for="logs_check" style="font-size: calc(var(--main-font-size)/1.5);">Автозагрузка</label>
-            <input type="checkbox" id="logs_check" oninput="logs_check(event)">
+            <button onclick="get_logs();" class="btn_blue" style="margin-block: 0.5vh;">Обновить</button>
+            <button onclick="del_logs()" class="btn_blue" style="margin-block: 0.5vh; font-size: calc(var(--main-font-size)/1.4);">Удалить логи</button>
+            <label for="logs_check" style="font-size: calc(var(--main-font-size)/1.5);" style="margin-block: 0.5vh;">Автозагрузка</label>
+            <input type="checkbox" id="logs_check" oninput="logs_check(event)" style="margin-block: 0.5vh;">
         </div>
         <div id="logs" style="background-color: white;width: 70vw;font-size: calc(var(--main-font-size)/1.4);overflow: auto;height: 80vh;"></div>
     </section>
@@ -37,7 +37,7 @@
     function log_check(){
         if($.cookie("auto_log") != null){
             if(JSON.parse($.cookie("auto_log")) == true){
-                logs();
+                get_logs();
             }
         document.getElementById("logs_check").checked = JSON.parse($.cookie("auto_log"));
         }else{
@@ -46,14 +46,27 @@
         }
     }
 
-    function logs() {
+    function get_logs() {
         let wait_msg = msg("Загрузка логов",{type:"wait"});
-        $.get("/logs")
+        $.get("/logs/get")
         .done(function( res ) {
-            document.getElementById("logs").innerText = res;
+            document.getElementById("logs").innerText = res["body"];
             msg_del(wait_msg.id);
             msg("Логи загружены")
         })
+    }
+
+    function del_logs() {
+        msg("date",{type:"date",res:(date)=>{if(date != false){
+            let wait_msg = msg(`Удаление логов за ${date}`,{type:"wait"});
+            $.get("/logs/del",{date:date})
+            .done(function( res ) {
+                document.getElementById("logs").innerText = res["body"];
+                msg_del(wait_msg.id);
+                msg("Логи удалены")
+            })
+        }
+        }})
     }
 
     function logs_check(event){

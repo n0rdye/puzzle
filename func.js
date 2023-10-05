@@ -129,14 +129,26 @@ module.exports.logs_file = (res)=>{
 module.exports.get_logs = (res)=>{
     db.gav("logs","0",(db_logs)=>{
         let logs_str = "";
-        for (let i = Object.keys(db_logs).length-1; i >= 0; i--) {
-            const log = Object.values(db_logs)[i];
-            let date = moment(log[`date_time`]).utc().format('YYYY-MM-DD');
-            logs_str+=`${date}_${log.time}|${log.log} \n`;
-            if(i == 0){
-                res.send(logs_str);   
+        if(Object.keys(db_logs).length > 0){
+            for (let i = Object.keys(db_logs).length-1; i >= 0; i--) {
+                const log = Object.values(db_logs)[i];
+                let date = moment(log[`date_time`]).format('YYYY-MM-DD');
+                logs_str+=`${date}_${log.time}|${log.log} \n`;
+                if(i == 0){
+                    res.send({out:"good",body:logs_str});   
+                }
             }
         }
+        else{
+            res.send({out:"good",body:logs_str});   
+        }
+    },true);  
+}
+
+module.exports.del_logs = (inp,res)=>{
+    if(inp["date"] == '')inp["date"] = moment().format('YYYY-MM-DD');
+    db.dl_con("logs",`date = '${inp["date"]}'`,(db_logs)=>{
+        this.get_logs(res);
     },true);  
 }
 

@@ -1,7 +1,7 @@
 <div id="admin_colors" style="display: flex;justify-content: space-between;margin-top: 4vh;">
     <div id="obj_color_div" style="justify-content: space-between; width: 50vw;display: flex;">
         <label for="obj_colors" style="min-width: 10vw;float: left;">цвет объекта</label>
-        <div id="obj_colors" style="display: flex; width: 30vw;overflow: auto;"></div>      
+        <div id="obj_colors" style="display: flex; width: 30vw;overflow: auto;height: 4.5vh;"></div>      
     </div>
     <div id="inp">
         <input type="color" id="new_color" style="margin: auto;">
@@ -24,6 +24,7 @@
                 color_div.classList.add("color_palette");
                 color_div.id=`color_${value["color"]}`;
                 color_div.setAttribute("color_id",`${value["id"]}`)
+                color_div.setAttribute("color",`${value["color"]}`)
                 color_div.setAttribute("onclick",`clear_palette();document.getElementById('color_${value["color"]}').style.border = "1px blue solid";cur_color = 'color_${value["color"]}';`)
                 color_div.title = `#${value["color"]}`;
                 div.append(color_div);
@@ -48,17 +49,23 @@
         });
     }
     function del_color(){
-        let color_id = document.getElementById(cur_color).getAttribute("color_id")
-        msg("Удалить этот цвет?",{type:"ask",res:(out)=>{if(out){
-            $.post( "/admin/colors/delete", {id:color_id})
-            .done(function( res ) {
-                if(res["out"] == "good"){
-                    msg("цвет удалён");
-                    obj_colors_load();
-                    console.log(res["body"]);
-                }
-            });
-        }}})
+        if(document.getElementById(cur_color) == null){
+            msg("Цвет не выбран",{type:"warning"});
+        }
+        else{
+            let color_id = document.getElementById(cur_color).getAttribute("color_id")
+            let color = document.getElementById(cur_color).getAttribute("color")
+            msg("Удалить этот цвет?",{type:"ask",res:(out)=>{if(out){
+                $.post( "/admin/colors/delete", {id:color_id,color:color})
+                .done(function( res ) {
+                    if(res["out"] == "good"){
+                        msg("цвет удалён");
+                        obj_colors_load();
+                        console.log(res["body"]);
+                    }
+                });
+            }}})
+        }
 
     }
 </script>
