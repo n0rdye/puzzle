@@ -353,7 +353,7 @@ async function removeImageBackground(image) {
                     // }
                 }
                 list.push(img);
-                img.src = array[i];
+                img.src = `${array[i]}?${new Date().getTime()}`;
                 if(i==array.length-1){
                     callback();
                 }

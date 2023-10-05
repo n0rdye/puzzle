@@ -129,7 +129,7 @@
             name : document.getElementById("nobj_name").value,
             height : document.getElementById("obj_height").value,
             width : document.getElementById("obj_width").value,
-            img : document.getElementById('img_prev').src,
+            img : document.getElementById('img_prev').getAttribute("src"),
             cost : document.getElementById("obj_cost").value,
             colors : String(document.getElementById("obj_color_check").checked)
         }
@@ -157,7 +157,8 @@
                 changes[element] = cur_atts[element];
             }
             else if (element == "img" && cur_atts[element] != menu.getAttribute(`src`)){
-                changes[element] = cur_atts[element];
+                let tmp = getBase64Image(cur_atts[element]);
+                changes[element] = tmp;
             }
             else if ((element != "name" && element != "img") && cur_atts[element] != menu.getAttribute(`${element}`)){
                 changes[element] = cur_atts[element];
@@ -177,10 +178,8 @@
                         }
                         else{
                             msg("товар сохранён");
-                            setTimeout(()=>{
-                                edit_get_objs();
-                                set_obj_edit_params();
-                            },1500)
+                            set_obj_edit_params();
+                            edit_get_objs();
                         }
                     }
                 });
@@ -243,7 +242,7 @@
             obj.classList.add("object");
             obj.setAttribute("name",value["name"].split("~")[0].replaceAll("$"," "))
 
-            obj.setAttribute("src",img)
+            obj.setAttribute("src",`${img}?${new Date().getTime()}`)
             obj.setAttribute("height",value["height"])
             obj.setAttribute("width",value["width"])
             obj.setAttribute("obj_id",value["id"])

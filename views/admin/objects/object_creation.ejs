@@ -43,10 +43,9 @@
             <input type="checkbox" id="obj_color_check" onchange="color_warning()">
             <label for="obj_color_check">возможность менять цвет</label>
             <script>
-                old_prev = document.getElementById("img_prev");
                 function color_warning(){
                     let color_check = document.getElementById("obj_color_check");
-                    let old_prev = document.getElementById("img_prev").src;
+                    let old_prev = document.getElementById("img_prev").getAttribute("img_static");
                     if(color_check.checked == true){
                         obj_colors_load();
                         removeImageBackground(document.getElementById("img_prev").src).then((out)=>{
@@ -166,6 +165,7 @@
         name_div.value = name;
         img_file.value = null;
         img_prev.src = img;
+        img_prev.setAttribute("img_static",img);
         img_prev.style.height = `${height* cm_mult}px`;
         img_prev.style.width = `${width* cm_mult}px`;
         cost_text.value = cost;
