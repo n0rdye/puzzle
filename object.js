@@ -55,11 +55,13 @@ module.exports.new = (inp,cook,res)=>{
             })
         })
         function save_img(data,name,callback) {
-            let img = imageDataURI.decode(data);
-            if (!fs.existsSync(`public/img/object/${name}`)){fs.mkdirSync(`public/img/object/${name}`);}
-            fs.writeFile(`public/img/object/${name}/main.${img.imageType.split("/").at(-1)}`, img.dataBuffer,()=>{
-                if(callback)callback(`/img/object/${name}/main.${img.imageType.split("/").at(-1)}`);
-            });
+            if(data.split("/img/").at(-1) != "placeholder.png"){
+                let img = imageDataURI.decode(data);
+                if (!fs.existsSync(`public/img/object/${name}`)){fs.mkdirSync(`public/img/object/${name}`);}
+                fs.writeFile(`public/img/object/${name}/main.${img.imageType.split("/").at(-1)}`, img.dataBuffer,()=>{
+                    if(callback)callback(`/img/object/${name}/main.${img.imageType.split("/").at(-1)}`);
+                });
+            }
         }
     } catch (error) {
         func.log("backend object creating error - "+error);
@@ -139,11 +141,13 @@ module.exports.save = (inp,cook,res)=>{
                         })
     
                         function save_img(data,name,callback) {
-                            let img = imageDataURI.decode(data);
-                            if (!fs.existsSync(`public/img/object/${name}`)){fs.mkdirSync(`public/img/object/${name}`);}
-                            fs.writeFile(`public/img/object/${name}/main.${img.imageType.split("/").at(-1)}`, img.dataBuffer,()=>{
-                                if(callback)callback(`/img/object/${name}/main.${img.imageType.split("/").at(-1)}`);
-                            });
+                            if(data.split("/img/").at(-1) != "placeholder.png"){
+                                let img = imageDataURI.decode(data);
+                                if (!fs.existsSync(`public/img/object/${name}`)){fs.mkdirSync(`public/img/object/${name}`);}
+                                fs.writeFile(`public/img/object/${name}/main.${img.imageType.split("/").at(-1)}`, img.dataBuffer,()=>{
+                                    if(callback)callback(`/img/object/${name}/main.${img.imageType.split("/").at(-1)}`);
+                                });
+                            }
                         }
 
                     })

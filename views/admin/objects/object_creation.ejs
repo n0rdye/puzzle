@@ -165,7 +165,7 @@
 
         name_div.value = name;
         img_file.value = null;
-        img_prev.src = getBase64Image(img);
+        img_prev.src = img;
         img_prev.style.height = `${height* cm_mult}px`;
         img_prev.style.width = `${width* cm_mult}px`;
         cost_text.value = cost;
@@ -194,17 +194,22 @@
     }
 
     function new_obj(cost,name,img,height,width,gid,colors,callback){
-        let wait_msg = msg("добавление товара",{type:"wait"});
         if(gid != null){
             if(name!=""){
-                $.post( "/admin/objects/new", { cost:cost,name:name,img:img,height:height,width:width,gid:gid,colors:colors})
-                .done(function( res ) {
-                    // if(res["out"] == "good"){
-                    //     console.log(res["body"]);
-                    // }
-                    msg_del(wait_msg.id);
-                    callback(res);
-                });
+                if(img.split("/img/").at(-1) != "placeholder.png"){
+                    let wait_msg = msg("добавление товара",{type:"wait"});
+                    $.post( "/admin/objects/new", { cost:cost,name:name,img:img,height:height,width:width,gid:gid,colors:colors})
+                    .done(function( res ) {
+                        // if(res["out"] == "good"){
+                        //     console.log(res["body"]);
+                        // }
+                        msg_del(wait_msg.id);
+                        callback(res);
+                    });
+                }
+                else{
+                    msg("Изображение не выбрано",{type:"warning"})
+                }
             }
             else{
                 msg("название не должно быть пустым",{type:"warning"})
