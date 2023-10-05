@@ -107,7 +107,7 @@ module.exports.logs_file = (res)=>{
     function write_logs(res){
         db.gav("logs","0",(db_logs)=>{
             db_logs.forEach(log => {
-                let date = moment(log[`date_time`]).utc().format('YYYY-MM-DD');
+                let date = moment(log[`date`]).format('YYYY-MM-DD');
                 fs.appendFile(path, `${date}_${log["time"]}|${log["log"]} \n`, function (err) {
                     if (err) throw err;
                     if(log["id"] == db_logs.at(-1)["id"]){
@@ -132,7 +132,7 @@ module.exports.get_logs = (res)=>{
         if(Object.keys(db_logs).length > 0){
             for (let i = Object.keys(db_logs).length-1; i >= 0; i--) {
                 const log = Object.values(db_logs)[i];
-                let date = moment(log[`date_time`]).format('YYYY-MM-DD');
+                let date = moment(log[`date`]).format('YYYY-MM-DD');
                 logs_str+=`${date}_${log.time}|${log.log} \n`;
                 if(i == 0){
                     res.send({out:"good",body:logs_str});   
