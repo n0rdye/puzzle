@@ -3,6 +3,7 @@ const func = require('./func');
 const vars = require('./vars');
 const fs = require('fs');
 const imageDataURI = require('image-data-uri');
+const moment = require("moment");
 
 
 module.exports.loads = (inp,cook,res)=>{
@@ -145,7 +146,7 @@ module.exports.save = (inp,cook,res)=>{
                                 let img = imageDataURI.decode(data);
                                 if (!fs.existsSync(`public/img/object/${name}`)){fs.mkdirSync(`public/img/object/${name}`);}
                                 fs.writeFile(`public/img/object/${name}/main.${img.imageType.split("/").at(-1)}`, img.dataBuffer,()=>{
-                                    if(callback)callback(`/img/object/${name}/main.${img.imageType.split("/").at(-1)}`);
+                                    if(callback)callback(`/img/object/${name}/main.${img.imageType.split("/").at(-1)}?${new Date().getTime()}`);
                                 });
                             }
                         }
