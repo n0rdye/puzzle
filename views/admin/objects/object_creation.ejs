@@ -165,6 +165,7 @@
         name_div.value = name;
         img_file.value = null;
         img_prev.src = img;
+        img_prev.setAttribute("onerror",`msg('Изображение объекта "${name}" не найдено')`);
         img_prev.setAttribute("img_static",img);
         img_prev.style.height = `${height* cm_mult}px`;
         img_prev.style.width = `${width* cm_mult}px`;

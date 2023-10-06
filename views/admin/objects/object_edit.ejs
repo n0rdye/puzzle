@@ -48,7 +48,7 @@
 <div style="display: flex;justify-content: space-between;padding-block: 1vw;">
     <h1>Изменение объектов</h1> 
     <div id="find_obj_btns">
-        <button onclick="edit_get_objs(true)" class="btn_blue">Найти по имени</button>
+        <button onclick="edit_get_objs(true)" class="btn_blue">Найти по названию</button>
         <button onclick='gids = [];edit_get_objs();' class="btn_blue">Сбосить</button>
     </div>
 </div>
@@ -77,16 +77,23 @@
         });
     }
 
-    function edit_get_objs(by_name = false){
+    function edit_get_objs(by_name = false,callback){
         document.getElementById("objs_in_group").innerHTML = "";
         if (obj_edit_type == "edit") set_obj_edit_params();
         edit_load_objs((data)=>{
+            let wait_msg = msg("Загрузка объектов",{type:"wait"})
             data.forEach(value => {
                 // console.log(value);
                 // // console.log($.cookie("cache"));
                 edit_load_obj(value["name"],"`img`",(odata)=>{
                     make_obj(odata["img"],value,"objs_in_group");
-                })           
+                    if(data.at(-1)["id"] == value["id"]){
+                        msg_del(wait_msg.id);
+                        msg("Объекты загружены")
+                        if(callback)callback(true);
+                    }
+                })       
+                
             });
         },by_name)
     }
@@ -94,12 +101,12 @@
     function gids_change(){
         if (typeof gids[0] == 'undefined'){
             gids = []
-            edit_get_objs();
+            // edit_get_objs();
         }
         else{
             let last = gids.at(-1)
             gids = [last];
-            edit_get_objs();
+            // edit_get_objs();
         }
         hide_menus();
         
@@ -179,7 +186,6 @@
                         else{
                             msg("товар сохранён");
                             set_obj_edit_params();
-                            edit_get_objs();
                         }
                     }
                 });
@@ -200,18 +206,16 @@
     function edit_load_objs(callback,by_name = false){
         // let select = document.getElementById("group_select");
         if(!by_name){
-            gids.forEach(gid => {
-                $.post( "/get_objs",{gid:gid})
-                .done(function( res ) {
-                    if(res["out"] == "good"){
-                        // console.log(res["body"]);
-                        // res["body"].forEach(object => {
-                        //     // objs_store[`${element["name"]}`] = {description:element["description"],height:element["height"],width:element["width"],id:element["id"],name:element["name"]}
-                        //     let obj_main = document.createElement("div");
-                        // });
-                        callback(res["body"]);
-                    }
-                });
+            $.post( "/get_objs")
+            .done(function( res ) {
+                if(res["out"] == "good"){
+                    // console.log(res["body"]);
+                    // res["body"].forEach(object => {
+                    //     // objs_store[`${element["name"]}`] = {description:element["description"],height:element["height"],width:element["width"],id:element["id"],name:element["name"]}
+                    //     let obj_main = document.createElement("div");
+                    // });
+                    callback(res["body"]);
+                }
             });
         }
         else{
@@ -281,8 +285,8 @@
                 edit : "Радактировать"
             }
 
-            var load_img = new Image();
-            load_img.src = img;
+            // var load_img = new Image();
+            // load_img.src = img;
 
 
             obj.innerHTML = 
@@ -311,4 +315,7 @@
 
             // console.log("obj");
         }              
+
+
+    edit_get_objs();
 </script>
