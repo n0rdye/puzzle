@@ -5,9 +5,9 @@ const vars = require('./vars');
 
 module.exports.load = (inp,cook,res)=>{
     try {
-        db.gv("projects","id",inp["id"],(pdata)=>{pdata = pdata[0];
+        db.gv("templates","name",`'${inp["name"]}'`,(pdata)=>{pdata = pdata[0];
+            console.log(pdata);
             if (pdata != null){
-                func.log(`good boy ${cook["uuid"]} loaded project ${pdata["name"]}`);
                 res.send({out:"good",body:pdata["body"]});
             }
             else{
@@ -15,72 +15,93 @@ module.exports.load = (inp,cook,res)=>{
             }
         })
     } catch (error) {
-        func.log("backend project loading error - ");
+        func.log("backend template loading error - ");
+    }
+}
+
+module.exports.load_all = (inp,cook,res)=>{
+    try {
+        db.gav("templates","0",(pdata)=>{
+            res.send({out:"good",body:pdata});
+        })
+    } catch (error) {
+        func.log("backend templates loading err0r - " - error);
     }
 }
 
 module.exports.loads = (inp,cook,res)=>{
     try {
-        db.gav("projects","0",(pdata)=>{
+        db.gv("templates",'gid',`${inp["gid"]}`,(pdata)=>{
             res.send({out:"good",body:pdata});
         })
     } catch (error) {
-        func.log("backend projects loading err0r - " - error);
+        func.log("backend templates loading err0r - " - error);
+    }
+}
+
+
+module.exports.load_groups = (inp,cook,res)=>{
+    try {
+        db.gav("template_groups","0",(pdata)=>{
+            res.send({out:"good",body:pdata});
+        })
+    } catch (error) {
+        func.log("backend templates loading err0r - " - error);
     }
 }
 
 module.exports.rename = (inp,cook,res)=>{
     try {
-        db.gv("projects","`id`",`'${inp["id"]}'`,(proj_name)=>{ proj_name = proj_name[0];
+        db.gv("templates","`id`",`'${inp["id"]}'`,(proj_name)=>{ proj_name = proj_name[0];
             // console.log(proj_name);
             if(proj_name == null){
-                db.sv("projects","name",`${inp["name"]}`,"id",`${inp["id"]}`, (db)=>{
+                db.sv("templates","name",`${inp["name"]}`,"id",`${inp["id"]}`, (db)=>{
                     res.send({out:"good"});
                 })
             }
         })
     } catch (error) {
-        func.log("backend projects loading err0r - " - error);
+        func.log("backend templates loading err0r - " - error);
     }
 }
 
 module.exports.del = (inp,cook,res)=>{
     try {
-        db.gv("projects","id",`'${inp["id"]}'`,(pdata)=>{pdata=pdata[0]
+        db.gv("templates","name",`'${inp["name"]}'`,(pdata)=>{pdata=pdata[0]
             // res.send({out:"good",body:pdata});
             if(pdata != null){
-                db.dl("projects","id",pdata["id"],()=>{
+                db.dl("templates","id",pdata["id"],()=>{
                     res.send({out:"good"});
                     func.log(`good boy ${cook["uuid"]} deleted project ${inp["name"]}`);
-                })
+                },true)
             }
             else{
                 res.send({out:"bad"});
             }
         })
     } catch (error) {
-        func.log("backend projects delete err0r - " - error);
+        func.log("backend templates delete err0r - " - error);
     }
 }
 
 module.exports.save = (inp,cook,res)=>{
     try {
-        db.gv("projects","id",`'${inp["id"]}'`,(pdata)=>{pdata = pdata[0]
+        db.gv("templates","name",`'${inp["name"]}'`,(pdata)=>{pdata = pdata[0]
             var date = moment().format('YYYY-MM-DD');
             var time = moment().format('hh:mm:ss');
             if(pdata == null){
                 // func.log("proj not in");
                 // func.log(pname,udata["id"],proj);
-                func.log(`good boy ${cook["uuid"]} created project ${inp["name"]}`);
-                db.nr("projects","`name`,`body`,`img`,creation_date",`'${inp["name"]}','${inp["proj"]}','${inp["img"]}','${date+"T"+time}'`,true);
+                func.log(`good boy ${cook["uuid"]} created template ${inp["name"]}`);
+                db.nr("templates","`name`,`body`,`img`,`creation_date`,`gid`",`'${inp["name"]}','${inp["proj"]}','${inp["img"]}','${date+"T"+time}','${inp["gid"]}'`,true);
                 res.send({out:"good"});
             } else if (pdata != null){
                 if(inp["proj"] != JSON.stringify({height:"2",width:"4"})){
-                    db.gv("projects","id",pdata["id"],(projin)=>{projin = projin[0]
-                        db.sv("projects","body",inp["proj"],"id",projin["id"],()=>{},true);
-                        db.sv("projects","last_change_date",`${date+"T"+time}`,"id",projin["id"],()=>{},true);
-                        if(inp["img"] != "") db.sv("projects","img",inp["img"],"id",projin["id"],()=>{});
-                        func.log(`good boy ${cook["uuid"]} saved project ${projin["name"]}`);
+                    db.gv("templates","id",pdata["id"],(projin)=>{projin = projin[0]
+                        db.sv("templates","body",inp["proj"],"id",projin["id"],()=>{},true);
+                        db.sv("templates","last_change_date",`${date+"T"+time}`,"id",projin["id"],()=>{},true);
+                        if(inp["img"] != "") db.sv("templates","img",inp["img"],"id",projin["id"],()=>{},true);
+                        func.log(`good boy ${cook["uuid"]} saved template ${projin["name"]}`);
                         // func.log("proj in");
                         res.send({out:"good"});
                     })
@@ -91,6 +112,6 @@ module.exports.save = (inp,cook,res)=>{
             }
         })
     } catch (error) {
-        func.log("backend project saving err0r - "+error);
+        func.log("backend templates saving err0r - "+error);
     }
 }

@@ -346,7 +346,18 @@ app.post("/admin/users/find", (req,res) => {try{
 
 
 // templates
-app.post('/admin/template/save', (req, res) => {try{
+app.get("/template/load/:name" , (req,res) =>{
+    res.render('template',{proj_name:req.params["name"]});
+})
+app.post("/template/get", (req,res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        templates.load(inp,cook,res);
+    })
+} catch (error) {route_err({req:req,error:error});}
+})
+app.post('/template/save', (req, res) => {try{
     let inp = req.body;
     let cook = req.cookies;
     func.sid(cook,res,()=>{
@@ -362,20 +373,20 @@ app.post("/admin/template/rename", (req,res) => {try{
     },true,true)
 } catch (error) {route_err({req:req,error:error});}
 })
+app.post("/template/group/loads", (req,res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        templates.load_groups(inp,cook,res);
+    },true,true)
+} catch (error) {route_err({req:req,error:error});}
+})
 app.post("/admin/template/delete", (req,res) => {try{
     let inp = req.body;
     let cook = req.cookies;
     func.sid(cook,res,()=>{
         templates.del(inp,cook,res);
     },true,true)
-} catch (error) {route_err({req:req,error:error});}
-})
-app.post("/template/load", (req,res) => {try{
-    let inp = req.body;
-    let cook = req.cookies;
-    func.sid(cook,res,()=>{
-        templates.load(inp,cook,res);
-    })
 } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/template/loads", (req,res) => {try{

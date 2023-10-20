@@ -4,7 +4,7 @@
 <style>
     .t_img{
         /* pointer-events: none; */
-        height: 200px;
+        height: 250px;
         border-radius: 10px;
         width: 290px;
         box-shadow: 0px 4px 4px 0px #00000040;
@@ -40,13 +40,58 @@
         padding: 0px;
         margin-top: 10px;
     }
+    .temp_group_drop{
+        display: flex;
+        /* width: 100%; */
+        justify-content: space-between;
+        border: 1px gray solid;
+        border-radius: 0.5vw;
+        padding: 1vw;
+    }
+    .temp_group_drop div{
+        /* display: flex; */
+        width: 100%;
+        /* justify-content: space-between; */
+        margin: auto;
+    }
+    .temp_group_list{
+        display: flex;
+    }
+    .temp_group_div{
+        margin-block: 6vh;
+    }
+    .temp_div{
+        display: block;
+        padding: 1vw;
+        width: 15vw;
+    }
+    .temp_desc{
+        padding: 0.5vw;
+    }
+    .temp_btn{
+        margin: auto;
+        display: flex;
+    }
+    .admin_panel{
+        display: flex;
+        justify-content: flex-end;
+    }
+    .admin_panel img{
+        margin: 0.5vw;
+        width:24px;
+        height:24px;
+    }
 </style>
 <!-- <script src="/lib/interact.min.js"></script> -->
 
 <section class="main">
-    <div id="temp_div">
-        
-    </div>
+    <!-- <div id="temp_group_div-0" class="temp_group_div">
+        <div class="temp_group_drop" id="temp_group_drop-0"  onclick="temp_group_drop('0')">
+            <div style="text-align: center;">Городская среда </div>
+            <img style="width: 1.5vw; height: 1.5vh; margin: auto;" src="/img/drop.png" alt="">
+        </div>
+        <div class="temp_group_list" id="temp_group_list-0" ></div>
+    </div> -->
 </section>
 
 <!-- <script src="/lib/inter.js"></script> -->
@@ -55,11 +100,185 @@
 
 <%- include('./static/end.ejs',{soc:true}) %>
 <script>
-    setTimeout(()=>{loaded()},500);
-    admin["temp"] = ()=>{
+    setTimeout(()=>{loaded();load_temp_groups()},500);
 
-        document.getElementById("temp_div").innerHTML += `
-        <button onclick="new_temp()" class="new_temp"><img class="t_img" src="/img/new_proj.png" alt=""><h1>Новый проект</h1></button>
-        `
+    function load_temp_groups(){
+        $.post( "/template/group/loads")
+        .done(function( res ) {
+            console.log(res);
+            Object.values(res["body"]).forEach(group => {
+                let temp_group_div = document.createElement("div");
+                let temp_group_drop = document.createElement("div");
+                let temp_group_list = document.createElement("div");
+                let name = document.createElement("div");
+                let img = document.createElement("img");
+
+                temp_group_div.id = `temp_group_div-${group["id"]}`;
+                temp_group_drop.id = `temp_group_drop-${group["id"]}`;
+                temp_group_list.id = `temp_group_list-${group["id"]}`;
+
+                temp_group_div.classList.add(`temp_group_div`);
+                temp_group_drop.classList.add(`temp_group_drop`);
+                temp_group_list.classList.add(`temp_group_list`);
+
+                temp_group_drop.setAttribute("onclick", `temp_group_drop('${group["id"]}')`)
+
+                img.style = "width: 1.5vw; height: 1.5vh; margin: auto;";
+                name.style = "text-align: center;";
+                name.innerText = group["name"];
+                img.src = "/img/drop.png";
+
+                temp_group_drop.append(name)
+                temp_group_drop.append(img)
+
+
+                temp_group_div.append(temp_group_drop);
+                temp_group_div.append(temp_group_list);
+                document.getElementsByClassName("main")[0].append(temp_group_div);
+            });
+        });
+    }
+
+    function groups_close(){
+        Object.values(document.getElementsByClassName("temp_group_list")).forEach(element => {
+            element.innerHTML = "";
+        });
+    }
+
+    function temp_group_drop(gid){
+        groups_close()
+        let temp_group_div = document.getElementById(`temp_group_div-${gid}`);
+        let temp_group_list = document.getElementById(`temp_group_list-${gid}`);
+        temp_group_list.innerHTML = "";
+        $.post( "/template/loads",{gid:gid})
+        .done(function( res ) {
+            console.log(res);
+            if(Object.values(res["body"]).length > 0){
+                Object.values(res["body"]).forEach(temp => {
+                    let div = document.createElement("div");
+                    let name = document.createElement("div");
+                    let cost = document.createElement("div");
+                    let desc = document.createElement("div");
+                    let use_btn = document.createElement("button");
+
+                    desc.classList.add("temp_desc")
+
+                    div.classList.add("temp_div")
+                    div.id = `temp-${temp["id"]}`;
+
+                    div.innerHTML = `<img class="t_img" src="${temp["img"]}" alt="">`
+                    name.innerText = `Название: ${temp["name"]}`;
+                    cost.innerText = `цена: ${JSON.parse(temp["body"])["total"]}`;
+                    use_btn.innerText = "Использовать шаблон";
+                    use_btn.setAttribute("onclick", `copy_temp("${temp['name']}")`);
+                    use_btn.classList.add("btn_blue")
+                    use_btn.classList.add("temp_btn")
+
+                    if(globalThis._admin_){
+                        let admin_div = document.createElement("div");
+
+                        let edit_btn = document.createElement("img");
+                        edit_btn.setAttribute("onclick",`goto("/template/load/${temp["name"]}");`)
+                        edit_btn.src = "/img/icon/edit.svg"
+                        admin_div.append(edit_btn)
+
+                        let del_btn = document.createElement("img");
+                        del_btn.setAttribute("onclick",`del_proj("${temp["name"]}")`)
+                        del_btn.src = "/img/icon/del.png"
+                        admin_div.append(del_btn)
+
+                        admin_div.classList.add("admin_panel")
+                        div.append(admin_div)
+                    }
+
+                    desc.append(name)
+                    desc.append(cost)
+                    div.append(desc)
+                    div.append(use_btn)
+                    temp_group_list.append(div)
+                });
+                if(globalThis._admin_){
+                    let div = document.createElement("div");
+                    let use_btn = document.createElement("button");
+                    let name = document.createElement("div");
+                    div.classList.add("temp_div")
+
+                    div.innerHTML = `<img class="t_img" src="/img/new_proj.png" onclick='new_temp(null,${gid})'>`
+                    name.innerText = "новый шаблон";
+                    name.style.textAlign = "center";
+
+                    div.append(name)
+                    temp_group_list.append(div)            
+                }
+            }
+            else{
+                if(globalThis._admin_){
+                    let div = document.createElement("div");
+                    let use_btn = document.createElement("button");
+                    let name = document.createElement("div");
+                    div.classList.add("temp_div")
+
+                    div.innerHTML = `<img class="t_img" src="/img/new_proj.png" onclick='new_temp(null,${gid})'>`
+                    name.innerText = "новый шаблон";
+                    name.style.textAlign = "center";
+
+                    div.append(name)
+                    temp_group_list.append(div)            
+                }
+            }
+        })
+    }
+
+
+    function copy_temp(temp){
+        $.post( "/template/get",{name:temp})
+        .done(function( res ) {
+            if(res["out"] == "good"){
+                let name = ask("Введите название копии проекта ",{func:(name)=>{
+                    if(name != null && name!= "" && name!=" " && typeof name != "undefined" && name!="undefined"){
+                        $.post( "/save_proj", {proj:res["body"],name:name,img:"/img/placeholder.png"})
+                        .done(function( res ) {
+                            if(res["out"] == "good"){
+                                goto(`/proj/load/${name}`);
+                            }
+                            else if(res["out"] == "bad" && res["err"] == "proj"){
+                                msg("Проект уже существует")
+                            }
+                        })
+                    }
+                }});
+            }
+        })
+    }
+
+    function new_temp(objs = null,gid){
+        msg("название нового шаблона",{type:"enter",res:(out)=>{
+            name = out;
+            objs = (objs == null)? { height:"2",width:"4"}:objs;
+            if(name != null && name!= "" && name!=" " && typeof name != "undefined" && name!="undefined"){
+                $.post( "/template/save/", {proj:JSON.stringify(objs),name:name,img:"/img/placeholder.png",gid})
+                .done(function( res ) {
+                    if(res["out"] == "good"){
+                        goto(`/template/load/${out}`);
+                    }
+                    else if(res["out"] == "bad" && res["err"] == "proj"){
+                        msg("Проект уже существует")
+                    }
+                })
+            }
+        }})
+    }
+
+    function del_proj(proj_name){
+        msg(`удалить шаблон ${proj_name}?`,{type:"ask",res:(out)=>{
+            if(out){
+                $.post( "/admin/template/delete",{name:proj_name})
+                .done(function( res ) {
+                    if(res["out"] == "good"){
+                        goto("/temp")
+                    }
+                })
+            }
+        }})
     }
 </script>

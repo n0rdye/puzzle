@@ -1,0 +1,661 @@
+<%- include('./static/start.ejs',{name:proj_name,async:true}) %>
+<%- include('./header.ejs') %>
+<script src="/lib/interact.js"></script>
+<script src="/lib/html2canvas.js"></script>
+<style>
+    .drag{
+        height: 5vw;
+        width: 5vw;
+        position: absolute;
+        text-align: center;
+        margin: auto;
+        z-index: 10;
+        touch-action: none;
+    }
+
+    #drags{
+        position: absolute;
+        margin: auto;
+    }
+    .spawn{
+        object-fit: contain;
+    }
+
+    .zones{
+        margin-block: 10px;
+    }
+
+    .wall {
+        /* border: dashed 4px transparent; */
+        border-radius: 4px;
+        transition: background-color 0.3s;
+        position: absolute;
+        inset: 0px;
+        margin: 5px auto;
+        width: 400px;
+        height: 200px;
+        background-color: #fff;
+        /* background-image: url("/img/bg1red.png"); */
+        background-size: 200px;
+        background-repeat: repeat;
+        background-position: bottom 0px left 0px;
+        border: 2px solid black;
+        /* overflow: visible; */
+        z-index: -1;
+    }
+
+    .createzone {
+        background-color: #bfe4ff;
+        border: dashed 4px transparent;
+        border-radius: 0.4vw;
+        height: 3vw;
+        width: 3vw;
+        margin: 10px;
+        margin-top: 0px;
+        padding: 0.8vw;
+        transition: background-color 0.3s;
+    }
+
+    .trash {
+        background-color: #bfe4ff;
+        border: dashed 4px transparent;
+        border-radius: 4px;
+        /* margin: 10px auto 30px; */
+        /* padding: 10px; */
+        height: 50px;
+        width: 50px;
+        transition: background-color 0.3s;
+        text-align: center;
+        /* z-index: -1; */
+    }
+    .czones{
+        display: flex;
+        margin: 0px auto;
+        margin-top: 3vh;
+        /* justify-content: space-around; */
+        flex-wrap: wrap;
+        width: 75%;
+        height: 40vh;
+        /* overflow-x: auto; */
+    }
+
+    .drop-active {
+        border-color: #aaa;
+    }
+
+    /* .drop-target {
+        background-color: #29e;
+        border-color: #fff;
+        border-style: solid;
+    } */
+
+    #proj_top{
+        margin: auto;
+        width: 90%;
+        display: flex;
+        justify-content: space-around;
+    }
+    #proj_name{
+        background-color: #aaa;
+        border: 0px;
+        text-align: center;
+    }
+
+    .inputs{
+        display: flex;
+        width: 80vw;
+        margin: auto;
+        padding-block: 20px;
+        padding-bottom: 0px;
+        /* margin-top: 50px; */
+    }
+    #group{
+        display: none;
+        position: absolute;
+        padding: 0px;
+        margin: 0px;
+    }
+</style>
+
+
+<div id="project_menu" class="cmenu">
+    <button id='proj_csave_btn' onclick='save_proj()'>сохранить в облако</button> <br>
+    <!-- <button id='proj_cload_btn' onclick='load_proj_cloud()'>загрузить из облака</button> <br> -->
+    <!-- <button id='proj_lsave_btn' onclick='save_proj_local()'>сохранить на локальное хранилище</button> <br>
+    <button id='proj_lload_btn' onclick='load_proj_local()'>загрузить из локальное хранилище</button> <br> -->
+    <!-- <button id='proj_del_btn' onclick='del_proj()'>удалить проект</button> <br> -->
+</div>
+
+    
+    <!-- <div class="dropzone"></div> -->
+
+<div class="inputs">
+    <div id="wall_input" style="display: flex;justify-content: space-between;width: 95%;margin-left: 20px;">
+        <div style="display: flex;width: 16vw;justify-content: space-between;">
+            <label for="wall_height" style="margin: auto;">Высота стены</label>
+            <input type="text" id="wall_height" style="width: 5vw; text-align: center; border-radius: 0.5vw; border: 1px solid gray;" value="2" oninput="this.value = this.value.replace(/[^0-9.]/g, '0').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');wall_size_change('height');resize_drags();"> 
+            <label for="wall_width" style="margin: auto;">М.</label>
+        </div>
+        <div style="display: flex;width: 16vw;justify-content: space-between;">
+            <label for="wall_width" style="margin: auto;">Длина стены</label>
+            <input type="text" id="wall_width" style="width: 5vw; text-align: center; border-radius: 0.5vw; border: 1px solid gray;" value="4" oninput="this.value = this.value.replace(/[^0-9.]/g, '0').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');wall_size_change('width');resize_drags();"> 
+            <label for="wall_width" style="margin: auto;">М.</label>
+        </div>
+        <div style="display: flex;width: 16vw;justify-content: space-between;">
+            <label for="wall_color" style="margin: auto;">Цвет стены</label>
+            <input type="color" id="wall_color" style="width: 5vw; border-radius: 0.5vw; border: 1px solid gray; min-height: 3.9vw;" value="#FFFFFF" onchange="wall_color_change()"> 
+        </div>
+        <div id="cost_div" style="display: flex;width: 15vw;justify-content: space-between;">
+            <button id="proj_cost" class="menu_btn" style="width: 100%;z-index: 3;">
+                <div id="proj_cost_text" style="pointer-events: none;">Расчет стоимости</div>
+                <img src="/img/drop.png" style="width: 1vw;height: 0.5vw;pointer-events: none;" alt="\/">
+            </button>
+            <style>
+                #cost_list li{
+                    display: flex;
+                    justify-content: space-between;
+                    width: 14vw;
+                    padding-block: 0.4vw;
+                }
+                #cost_list{
+                    list-style-type: none;
+                    padding-left: 0px;
+                    margin-top: 59px;
+                    position: absolute;
+                    width: 14vw;
+                    padding: 0.45vw;
+                }
+            </style>
+            <ul id="cost_list" class="cmenu">
+            </ul>
+            <!-- <div style="display: flex;"><div id="proj_cost"></div>&nbsp;руб.</div> -->
+        </div>
+        <!-- <div style="display: flex;width: 150px;justify-content: space-between;">
+            <label style="margin: auto;">Расчёт стоимости</label>
+        </div> -->
+    </div>
+    <!-- <img class="trash" style="height: 100px; width: 100px;" src="/img/shadow-energy.gif" alt="чёрная дыра"> -->
+</div>
+
+<div class="zones" style="position: relative;">
+    <div id="drags">
+
+    </div>
+    <div class="wall dropzone" id="wall"></div>
+</div>
+
+<div style="display:flex; justify-content: space-around;"></div>
+
+
+<div class="inputs" style="display: flex;justify-content: space-between;height: 5vh;">
+    <div id="obj_color_div" style="justify-content: space-evenly; width: 50vw;display: none;transform: translateX(30%);">
+        <label for="obj_colors" style="min-width: 10vw;">цвет объекта</label>
+        <div id="obj_colors" style="display: flex; width: 30vw;overflow: auto;height: 4.5vh;"></div>      
+        <!-- <input id="obj_color" type="color" onchange="obj_color_change(event)"> -->
+    </div>
+</div>
+<div class="inputs" style="display: flex;justify-content: space-between;">
+    <style>
+        .btn_icon{
+            border: 1px solid gray;
+            border-radius: 0.5vw;
+            padding: 0.5vw;
+            height: 2vw;
+            width: 2vw;
+            cursor: pointer;
+        }
+        .btn_icon img{
+            height: 2vw;
+            width: 2vw;
+        }
+    </style>
+    <div style="display: flex;justify-content: space-between; width: 35vw;">
+        <div class="btn_icon"><img src="/img/icon/copy.png" alt="copy"></div>
+        <div class="btn_icon" onclick="go_back()"><img src="/img/icon/back.png" alt="back"></div>
+        <div class="btn_icon" onclick="go_forw()"><img src="/img/icon/forw.png" alt="forw"></div>
+        <div class="btn_icon" onclick="obj_del()"><img src="/img/icon/del.png" alt="del"></div>
+        <div class="layer_changer">
+            <div class="btn_icon layer_btn" onclick="obj_change_layer('up')"><img src="/img/icon/up.png" alt="up"></div>
+            <input id="layer_inp" type="number" oninput="obj_change_layer('inp')">
+            <div class="btn_icon layer_btn" onclick="obj_change_layer('down')"><img src="/img/icon/down.png" alt="down"></div>
+        </div>
+        <style>
+            #layer_inp{
+                width: 2vw;
+                appearance: textfield;
+                text-align: center;
+                border: 0px;
+            }
+            .layer_btn{
+                border: 0px;
+            }
+            .layer_changer{
+                display: flex;
+                background-color: white;
+                border: 1px gray solid;
+                border-radius: 0.5vw;
+            }
+        </style>
+    </div>
+    <div style="display: flex;justify-content: space-between; width: 15vw;">
+        <div><input type="checkbox" id="grid_checkbox" checked="true" onchange='grid_view(JSON.parse(event.target.checked));'><label for="grid_checkbox">Показывать сетку</label></div>
+    </div>
+    <div style="display: flex;justify-content: space-between; width: 7vw;">
+        <div id="save_btn_icon" class="btn_icon" onclick="save_proj()"><img src="/img/icon/save.png" alt="save"></div>
+        <div class="btn_icon" onclick="img_download()"><img src="/img/icon/download.png" alt="load"></div>
+        <!-- <div class="btn_icon" onclick="document.getElementById('import_file').click();"><img src="/img/icon/download.png" alt="load"></div> -->
+        <!-- <input type='file' id="import_file" style="display: none;" accept="application/JSON" onchange='openFile(event,load_file)'> -->
+    </div>
+</div>
+<div class="inputs" style="display: flex;justify-content: space-between;margin-top: 0px;">
+    <div id="obj_group" style="display: flex;justify-content:space-evenly; width: 100vw;">
+        <!-- <button name="" id="group_drop" >Помехи на стене</button> -->
+        <style>
+            .obj_group{
+                /* width: 100%; */
+                display: flex;
+                padding-block: 0.3vw;         
+            }
+            .obj_group label{
+                width: 90%;
+                /* padding-inline: 0.3vw;          */
+            }
+            .group_drop{
+                width: 15vw;
+                padding: 2px;
+                min-width: 15vw;
+            }
+            .group_drop *{
+                pointer-events: none;
+                overflow: auto;
+            }
+            .group_drop img{
+                width: 1vw;
+                height: 0.5vw;
+            }
+        </style>
+        <div id="obj_parts" style="min-width: 50vw;display: flex;justify-content: space-evenly;">
+        </div>
+        <style>
+            .group_inp{
+                height: 1vw;
+                width: 1vw;
+                border: 0px;
+                border-radius: 0.4vw;
+                overflow: auto;
+            }
+        </style>
+        <ul id="group" class="cmenu"></ul>
+    </div>
+</div>
+<div class="czones"></div>
+<script src="/lib/inter_temp.js"></script>
+<script>
+    let proj_name = "<%= proj_name %>";
+    document.getElementById("layer_inp").value = 0;
+    img_cache(()=>{})
+
+
+    if ( $.cookie("grid") != null){
+        document.getElementById("grid_checkbox").checked = JSON.parse($.cookie("grid"));
+        grid_view(JSON.parse($.cookie("grid")))
+    }else{
+        $.cookie("grid",true)
+        document.getElementById("grid_checkbox").checked = true;
+        grid_view(true)
+    }
+    function grid_view(check){
+        let grid = document.getElementsByClassName("wall")[0]
+        console.log(check);
+        if (check == false) {
+            grid.style.backgroundImage = "";
+            $.cookie("grid",false);
+
+        }
+        else{
+            grid.style.backgroundImage = 'url("/img/bg1red.png")';
+            $.cookie("grid",true);
+
+        }
+    }
+
+    function img_download(){
+        msg("добавить на фото стоимость?",{type:"ask",res:(out)=>{
+            let wait_msg = msg("делаем фото",{type:"wait"})
+            proj_img((src)=>{
+                msg("изображение проекта готово",{time:3})
+                msg_del(wait_msg.id)
+                downloadImg(src,`${proj_name}.png`)
+            },out)
+        }})
+    }
+
+    function proj_img(callback,cost = false){
+        let width = (parseInt(document.getElementById("wall").style.width))
+        document.getElementById("drags").append(document.getElementById("wall"));
+        document.getElementById("drags").style.height = document.getElementById("wall").style.height;
+        document.getElementById("cost_list").style.left = "";
+        Object.values(document.getElementsByClassName("spawn")).forEach((spawn)=>{
+            spawn.src = "";
+        })
+        if(cost == true){
+            width += document.getElementById("proj_cost").getBoundingClientRect().width;
+            document.getElementById("drags").append(document.getElementById("cost_div"));
+            document.getElementById("cost_div").style.marginLeft = `${parseInt(document.getElementById("wall").style.width) + 4}px`;
+            document.getElementById("cost_list").style.display = "block";
+        }
+        html2canvas(document.getElementById("drags"),{
+            y:7,
+            x:2,
+            width:width,
+            logging:false,
+            scale:5
+        }).then(canvas => {
+            if(cost == true){
+                document.getElementById("cost_div").style.marginLeft = `0`;
+                document.getElementById("cost_list").style.display = "none";
+                document.getElementById("wall_input").append(document.getElementById("cost_div"));
+            }
+            document.getElementsByClassName("zones")[0].append(document.getElementById("wall"));
+            let src = "";
+            src = canvas.toDataURL();
+            // console.log(src);
+            callback(src)
+            drag_start();
+        });
+    }
+
+    function obj_colors_load(callback) {
+        let div = document.getElementById("obj_colors");
+        div.innerHTML = "";
+        load_colors((colors)=>{
+            Object.entries(colors).forEach(([key,value]) => {
+                // console.log(value);
+                let color_div = document.createElement("div");
+                color_div.style = `background-color: #${value["color"]}; border-radius: 50%;height: 2vw;min-width: 2vw;margin-inline: 0.5vw;`;
+                color_div.classList.add("color_palette");
+                color_div.id=`color_${value["color"]}`;
+                color_div.setAttribute("color",`${value["color"]}`)
+                color_div.setAttribute("onclick",`clear_palette();document.getElementById('color_${value["color"]}').style.border = "1px blue solid";obj_color_change('${value["color"]}')`)
+                color_div.title = `#${value["color"]}`;
+                div.append(color_div);
+                if(key = Object.keys(colors).at(-1)){
+                    if(callback)callback();
+                }
+            });
+        })
+    }
+
+    function obj_color_change(color,in_obj = null){
+        if(color != "null"){
+            if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
+            let obj = (in_obj == null)? document.getElementById(cur_obj):in_obj;
+            // console.log(color);
+            color_change(color,obj.getAttribute("data-img"),(img)=>{
+                obj.src = img;
+                obj.setAttribute("color",color)
+                objs[obj.classList[0]][obj.id]["color"] = color;
+            });
+        }
+    } 
+
+    function load_file(text){
+        if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
+
+        // console.log(text);
+        // console.log(objs);
+        try{
+            objs = JSON.parse(JSON.parse(text)["body"]);
+        }
+        catch{}
+        // console.log(objs);
+        reload();
+        // save((res)=>{
+        //     goto("");
+        //     // document.getElementById('top_panel_center').innerHTML=`сохранено ${proj_name} в облако`;
+        // },false)    
+    }
+
+    function go_back(){
+        if(objs_back.length > 0){
+            objs_forw.push(objs);
+            objs = objs_back.at(-1);
+            objs_back.pop();
+            reload();
+            calc_total();
+        }
+    }
+    function go_forw(){
+        if(objs_forw.length > 0){
+            objs_back.push(objs);
+            objs = objs_forw.at(-1);
+            objs_forw.pop();
+            reload();
+            calc_total();
+        }
+    }
+
+    function obj_change_layer(type) {
+        let obj = document.getElementById(cur_obj);
+        if(obj != null){
+            let cur_layer = obj.style.zIndex;
+            if (type == "up" && cur_layer < 9999){
+                objs[obj.classList[0]][obj.getAttribute("id")].layer = parseInt(cur_layer) + 1;
+                obj.style.zIndex = parseInt(cur_layer) + 1;
+                document.getElementById("layer_inp").value = parseInt(cur_layer) + 1;
+            } else if (type == "down" && cur_layer > 0){
+                objs[obj.classList[0]][obj.getAttribute("id")].layer = parseInt(cur_layer) - 1;
+                obj.style.zIndex = parseInt(cur_layer) - 1;
+                document.getElementById("layer_inp").value = parseInt(cur_layer) - 1;
+            }
+            else if ((type == "inp")){
+                let inp_val = parseInt(document.getElementById("layer_inp").value);
+                if(inp_val >= 0 && inp_val < 9999){
+                    objs[obj.classList[0]][obj.getAttribute("id")].layer = inp_val;
+                    obj.style.zIndex = inp_val;
+                }
+                else{
+                    document.getElementById("layer_inp").value = cur_layer;
+                }
+            }
+        }
+        // console.log(objs[obj.classList[0]][obj.getAttribute("id")]);
+    }
+
+    function obj_del(){
+       if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
+       document.getElementById("layer_inp").value = 0;
+
+       try{
+        let drag = document.getElementById(cur_obj);
+        if(drag.id != "none"){
+            console.log(cur_obj);
+            // console.log(drag.classList);
+            if(objs[drag.classList[0]] != null&&objs[drag.classList[0]][drag.id] != null) {
+                console.log(objs[drag.classList[0]]);
+                delete objs[drag.classList[0]][drag.id];
+                if (Object.keys(objs[drag.classList[0]]).length < 1){
+                    delete objs[drag.classList[0]];
+                }
+            }
+            calc_total()
+            drag.remove();
+            document.getElementById("obj_color_div").style.display = "none";
+            cur_obj = null;
+        }
+       }
+       catch{msg("объект не выбран")}
+    }
+
+    function group_drop(){
+        let e = document.getElementById("group_drop")
+        setTimeout(()=>{
+            document.getElementById("group").style.display = "block";
+            // document.getElementById("group").style.left = document.getElementById("group_drop").getBoundingClientRect().left;
+            let childs = document.getElementById("group").getElementsByTagName("input");
+            let i = 0;
+            Object.entries(childs).forEach(([key,value]) => {
+                console.log(key,value);
+                if(value.checked == true){
+                    get_objs(value)
+                    i++;
+                }
+                if (i==0){
+                    // document.getElementsByClassName("czones")[0].innerHTML = "";
+                    drag_start()
+                    // e.removeChild(e.getElementsByClassName(value))
+                }
+            });
+        },1)
+    }
+
+    load_parts((db)=>{
+        let parts = document.getElementById("obj_parts");
+        Object.values(db).forEach((value)=>{
+            let part = document.createElement("button")
+            let part_text = document.createElement("div")
+            let part_drop = document.createElement("img")
+            
+            part_drop.src = "/img/drop.png";
+            part_drop.alt = "\/";
+
+            part_text.innerText = `${value["name"].replaceAll("$", " ")}`;
+
+            part.id = `group_drop-${value["id"]}`;
+            part.classList.add("menu_btn")
+            part.classList.add("group_drop")
+            part.setAttribute("groups",`${value["groups"]}`)
+            part.setAttribute("count",`${value["count"]}`)
+            part.setAttribute("no-cost",`${value["no-cost"]}`)
+            part.setAttribute("pid",`${value["id"]}`)
+
+            part.append(part_text);
+            part.append(part_drop);
+
+            parts.append(part);
+            console.log(value);
+        })
+    })
+    
+    // function cost_drop(id){
+    //     // let e = document.getElementById("cost")
+    //     // setTimeout(()=>{
+    //     //     document.getElementById("group").style.display = "block";
+    //     //     // document.getElementById("group").style.left = document.getElementById("group_drop").getBoundingClientRect().left;
+    //     //     let childs = document.getElementById("group").getElementsByTagName("input");
+    //     //     let i = 0;
+    //     //     Object.entries(childs).forEach(([key,value]) => {
+    //     //         console.log(key,value);
+    //     //         if(value.checked == true){
+    //     //             get_objs(value)
+    //     //             i++;
+    //     //         }
+    //     //         if (i==0){
+    //     //             document.getElementsByClassName("czones")[0].innerHTML = "";
+    //     //             drag_start()
+    //     //             // e.removeChild(e.getElementsByClassName(value))
+    //     //         }
+    //     //     });
+    //     // },1)
+    // }
+
+    function wall_color_change(){
+       if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
+
+        let wall = document.getElementById("wall")
+        let color = document.getElementById("wall_color")
+        wall.style.backgroundColor = color.value;
+        objs["color"] = color.value;
+    }
+
+    function gids_change(){
+        get_objs();
+        drag_start()
+    }
+
+    function get_groups(callback){
+        // let select = document.getElementById("group");
+        // let name = select.options[select.selectedIndex].text;
+        load_groups(callback(),gids);
+        // callback();
+        // $.post( "/get_groups")
+        // .done(function( res ) {
+        //     if(res["out"] == "good"){
+        //         // select.innerHTML = "";
+        //         res["body"].forEach(group => {
+        //             console.log(group);
+        //             let gd = document.createElement("div");
+        //             let group_div = document.createElement("input");
+        //             let label = document.createElement("label");
+
+        //             group_div.style.cursor = "pointer";
+        //             label.style.cursor = "pointer";
+        //             // group_div.style.pointerEvents = "none";
+        //             // label.style.pointerEvents = "none";
+
+        //             group_div.setAttribute("type","checkbox");
+        //             group_div.setAttribute("onchange","group_drop()");
+        //             label.setAttribute("for",`obj_group_${group["id"]}`);
+        //             label.innerText = group["name"].replace("$"," ");
+        //             // gd.innerText = group["name"].replace("$"," ");
+        //             group_div.setAttribute("group_count",group["count"]);
+        //             group_div.setAttribute("gid",group["id"]);
+        //             group_div.id = `obj_group_${group["id"]}`;
+        //             group_div.classList.add("group_inp");
+        //             gd.append(group_div);
+        //             gd.append(label);
+        //             select.append(gd);
+        //             // select.append(label);
+        //             if(group["id"] == res["body"].at(-1)["id"]){
+        //                 if(callback)callback();
+        //             }
+        //         });
+        //     }
+        //     // callback(res);
+        // });
+    }
+    // get_groups(()=>{
+        // get_objs();
+        load_proj_cloud();
+    // });
+    function get_objs(group_div){
+        document.getElementsByClassName("czones")[0].innerHTML = "";
+        gids.forEach(group => {
+            load_objs((data)=>{
+                data.forEach(value => {
+                    let czones = document.getElementsByClassName("czones")[0];
+                    let czone =  document.createElement('div');
+                    czone.classList.add(value["name"]);
+                    czone.classList.add("createzone");
+                    czones.append(czone)    
+                });
+                drag_start()
+            },group)
+        });
+        drag_start()
+    }
+
+
+    // console.log(proj_name);
+    // let menu = document.getElementById("project_menu");
+    // document.getElementById("top_panel_left").innerHTML = `<div id='proj_menu' class="menu_btn">настройки проекта</div>`;
+    
+
+    function save_proj(){
+        // document.getElementById('top_panel_center').innerHTML=`сохранение ${proj_name}`;
+        let wait_msg = msg("идёт сохранение проекта",{type:"wait"});
+        save((res)=>{
+            msg_del(wait_msg.id);
+            msg("проект сохранён")
+            // document.getElementById('top_panel_center').innerHTML=`сохранено ${proj_name} в облако`;
+        })
+    }
+    // drag_start();
+    // console.log(px_ratio);
+    $(window).resize(function(){isZooming();});
+
+    function isZooming(){
+        resize_drags();
+    }
+</script>
+<%- include('./static/end.ejs',{soc:true}) %>

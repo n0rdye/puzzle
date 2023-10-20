@@ -361,26 +361,26 @@ async function removeImageBackground(image) {
         }
     }
 
-    $.post( "/get_objs")
-    .done(function( res ) {
-        if(res["out"] == "good"){
-            // console.log(res["body"]);
-            let sources = [];
-            res["body"].forEach(element => {
-                sources.push(element["img"]);
-                if(element == res["body"].at(-1)){
-                    // console.log(sources);
-                    preloadImages(sources,()=>{
-                        // console.log("cached");
-                        callback();
-                        sources.forEach(element => {
-                            console.log(element,is_cached(element));
-                        });
-                    })
-                }
-            });
-        }
-    });
+    // $.post( "/get_objs")
+    // .done(function( res ) {
+    //     if(res["out"] == "good"){
+    //         // console.log(res["body"]);
+    //         let sources = [];
+    //         res["body"].forEach(element => {
+    //             sources.push(element["img"]);
+    //             if(element == res["body"].at(-1)){
+    //                 // console.log(sources);
+    //                 preloadImages(sources,()=>{
+    //                     // console.log("cached");
+    //                     callback();
+    //                     // sources.forEach(element => {
+    //                     //     console.log(element,is_cached(element));
+    //                     // });
+    //                 })
+    //             }
+    //         });
+    //     }
+    // });
 
     function is_cached(img_url){
         var imgEle = document.createElement("img");
