@@ -50,6 +50,42 @@ module.exports.load_groups = (inp,cook,res)=>{
     }
 }
 
+module.exports.new_group = (inp,cook,res)=>{
+    try {
+        db.gv("template_groups","name",`'${inp["name"]}'`,(gdata)=>{gdata = gdata[0]
+            if(gdata == null){
+                func.log(`admin ${cook["uuid"]} created template group ${inp["name"]}`);
+                db.nr("template_groups","`name`,`count`",`'${inp["name"]}','0'`,true);
+                res.send({out:"good"});
+            }
+            else{
+                res.send({out:"bad"});
+            }
+        })
+    } catch (error) {
+        func.log("backend template group creating err0r - "+error);
+    }
+}
+
+module.exports.del_group = (inp,cook,res)=>{
+    try {
+        db.gv("template_groups","name",`'${inp["name"]}'`,(pdata)=>{pdata=pdata[0]
+            // res.send({out:"good",body:pdata});
+            if(pdata != null){
+                db.dl("template_groups","id",pdata["id"],()=>{
+                    res.send({out:"good"});
+                    func.log(`good boy ${cook["uuid"]} deleted template group ${inp["name"]}`);
+                },true)
+            }
+            else{
+                res.send({out:"bad"});
+            }
+        })
+    } catch (error) {
+        func.log("backend template group delete err0r - " - error);
+    }
+}
+
 module.exports.rename = (inp,cook,res)=>{
     try {
         db.gv("templates","`id`",`'${inp["id"]}'`,(proj_name)=>{ proj_name = proj_name[0];

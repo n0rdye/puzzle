@@ -389,6 +389,22 @@ app.post("/admin/template/delete", (req,res) => {try{
     },true,true)
 } catch (error) {route_err({req:req,error:error});}
 })
+app.post("/admin/template/group/new", (req,res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        templates.new_group(inp,cook,res);
+    },true,true)
+} catch (error) {route_err({req:req,error:error});}
+})
+app.post("/admin/template/group/delete", (req,res) => {try{
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,()=>{
+        templates.del_group(inp,cook,res);
+    },true,true)
+} catch (error) {route_err({req:req,error:error});}
+})
 app.post("/template/loads", (req,res) => {try{
     let inp = req.body;
     let cook = req.cookies;

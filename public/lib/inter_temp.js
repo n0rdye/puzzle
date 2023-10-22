@@ -1,6 +1,6 @@
 window.dragMoveListener = dragMoveListener;
 let root = document.getElementById("drags");
-let objs = { height:"2",width:"4",color:"#FFFFFF"};
+let objs = { height:"2",width:"4",color:"#FFFFFF",total:0};
 let objs_store = {};
 let proj_from = "cloud";
 let cur_obj;

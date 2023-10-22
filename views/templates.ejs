@@ -62,8 +62,9 @@
     }
     .temp_div{
         display: block;
-        padding: 1vw;
-        width: 15vw;
+        padding-block: 3vh;
+        padding-inline: 1vw;
+        width: 17vw;
     }
     .temp_desc{
         padding: 0.5vw;
@@ -76,10 +77,12 @@
         display: flex;
         justify-content: flex-end;
     }
-    .admin_panel img{
+    .admin_panel img, .admin_panel_group img{
         margin: 0.5vw;
         width:24px;
         height:24px;
+        z-index: 100;
+        position: relative;
     }
 </style>
 <!-- <script src="/lib/interact.min.js"></script> -->
@@ -106,37 +109,86 @@
         $.post( "/template/group/loads")
         .done(function( res ) {
             console.log(res);
-            Object.values(res["body"]).forEach(group => {
-                let temp_group_div = document.createElement("div");
-                let temp_group_drop = document.createElement("div");
-                let temp_group_list = document.createElement("div");
-                let name = document.createElement("div");
-                let img = document.createElement("img");
+            if(Object.values(res["body"]).length > 0){
+        
+                Object.values(res["body"]).forEach(group => {
+                    let temp_group_div = document.createElement("div");
+                    let temp_group_drop = document.createElement("div");
+                    let temp_group_list = document.createElement("div");
+                    let name = document.createElement("div");
+                    let img = document.createElement("img");
 
-                temp_group_div.id = `temp_group_div-${group["id"]}`;
-                temp_group_drop.id = `temp_group_drop-${group["id"]}`;
-                temp_group_list.id = `temp_group_list-${group["id"]}`;
+                    temp_group_div.id = `temp_group_div-${group["id"]}`;
+                    temp_group_drop.id = `temp_group_drop-${group["id"]}`;
+                    temp_group_list.id = `temp_group_list-${group["id"]}`;
 
-                temp_group_div.classList.add(`temp_group_div`);
-                temp_group_drop.classList.add(`temp_group_drop`);
-                temp_group_list.classList.add(`temp_group_list`);
+                    temp_group_div.classList.add(`temp_group_div`);
+                    temp_group_drop.classList.add(`temp_group_drop`);
+                    temp_group_list.classList.add(`temp_group_list`);
 
-                temp_group_drop.setAttribute("onclick", `temp_group_drop('${group["id"]}')`)
+                    temp_group_drop.setAttribute("onclick", `temp_group_drop('${group["id"]}')`)
 
-                img.style = "width: 1.5vw; height: 1.5vh; margin: auto;";
-                name.style = "text-align: center;";
-                name.innerText = group["name"];
-                img.src = "/img/drop.png";
+                    img.style = "width: 1.5vw; height: 1.5vh; margin: auto;";
+                    name.style = "text-align: center;";
+                    name.innerText = group["name"];
+                    img.src = "/img/drop.png";
 
-                temp_group_drop.append(name)
-                temp_group_drop.append(img)
+                    if(globalThis._admin_){
+                        let admin_div = document.createElement("div");
+
+                        let edit_btn = document.createElement("img");
+                        edit_btn.setAttribute("onclick",`rename_group(${group["name"]})");`)
+                        edit_btn.src = "/img/icon/edit.svg"
+                        admin_div.append(edit_btn)
+
+                        let del_btn = document.createElement("img");
+                        del_btn.setAttribute("onclick",`del_group("${group["name"]}")`)
+                        del_btn.src = "/img/icon/del.png"
+                        admin_div.append(del_btn)
+
+                        admin_div.classList.add("admin_panel_group")
+                        temp_group_div.append(admin_div)
+                        temp_group_drop.style.marginTop = "-60px"
+                    }
 
 
-                temp_group_div.append(temp_group_drop);
-                temp_group_div.append(temp_group_list);
-                document.getElementsByClassName("main")[0].append(temp_group_div);
-            });
-        });
+                    temp_group_drop.append(name)
+                    temp_group_drop.append(img)
+
+                    temp_group_div.append(temp_group_drop);
+                    temp_group_div.append(temp_group_list);
+                    document.getElementsByClassName("main")[0].append(temp_group_div);
+                })
+                if(globalThis._admin_){
+                    admin_btn_new()
+                }
+            }else{
+                if(globalThis._admin_){
+                    admin_btn_new()              
+                }
+            }
+        })
+
+        function admin_btn_new(){
+            let temp_group_div = document.createElement("div");
+            let temp_group_drop = document.createElement("div");
+            let name = document.createElement("div");
+
+
+            temp_group_div.classList.add(`temp_group_div`);
+            temp_group_drop.classList.add(`temp_group_drop`);
+            temp_group_drop.classList.add(`btn_blue`);
+
+            temp_group_drop.setAttribute("onclick", `new_group()`)
+
+            name.classList.add(`btn_blue`);
+            name.style = "text-align: center;";
+            name.innerText = 'Добавить новую группу шаблонов';
+
+            temp_group_drop.append(name)
+            temp_group_div.append(temp_group_drop);
+            document.getElementsByClassName("main")[0].append(temp_group_div);  
+        }
     }
 
     function groups_close(){
@@ -198,35 +250,29 @@
                     temp_group_list.append(div)
                 });
                 if(globalThis._admin_){
-                    let div = document.createElement("div");
-                    let use_btn = document.createElement("button");
-                    let name = document.createElement("div");
-                    div.classList.add("temp_div")
-
-                    div.innerHTML = `<img class="t_img" src="/img/new_proj.png" onclick='new_temp(null,${gid})'>`
-                    name.innerText = "новый шаблон";
-                    name.style.textAlign = "center";
-
-                    div.append(name)
-                    temp_group_list.append(div)            
+                    admin_btn_new()
                 }
             }
             else{
                 if(globalThis._admin_){
-                    let div = document.createElement("div");
-                    let use_btn = document.createElement("button");
-                    let name = document.createElement("div");
-                    div.classList.add("temp_div")
-
-                    div.innerHTML = `<img class="t_img" src="/img/new_proj.png" onclick='new_temp(null,${gid})'>`
-                    name.innerText = "новый шаблон";
-                    name.style.textAlign = "center";
-
-                    div.append(name)
-                    temp_group_list.append(div)            
+                    admin_btn_new()
                 }
             }
         })
+
+        function admin_btn_new(){
+            let div = document.createElement("div");
+            let use_btn = document.createElement("button");
+            let name = document.createElement("div");
+            div.classList.add("temp_div")
+
+            div.innerHTML = `<img class="t_img" src="/img/new_proj.png" onclick='new_temp(null,${gid})'>`
+            name.innerText = "новый шаблон";
+            name.style.textAlign = "center";
+
+            div.append(name)
+            temp_group_list.append(div)         
+        }
     }
 
 
@@ -253,18 +299,20 @@
 
     function new_temp(objs = null,gid){
         msg("название нового шаблона",{type:"enter",res:(out)=>{
-            name = out;
-            objs = (objs == null)? { height:"2",width:"4"}:objs;
-            if(name != null && name!= "" && name!=" " && typeof name != "undefined" && name!="undefined"){
-                $.post( "/template/save/", {proj:JSON.stringify(objs),name:name,img:"/img/placeholder.png",gid})
-                .done(function( res ) {
-                    if(res["out"] == "good"){
-                        goto(`/template/load/${out}`);
-                    }
-                    else if(res["out"] == "bad" && res["err"] == "proj"){
-                        msg("Проект уже существует")
-                    }
-                })
+            if(out){
+                name = out;
+                objs = (objs == null)? {height:"2",width:"4",color:"#FFFFFF",total:0}:objs;
+                if(name != null && name!= "" && name!=" " && typeof name != "undefined" && name!="undefined"){
+                    $.post( "/template/save/", {proj:JSON.stringify(objs),name:name,img:"/img/placeholder.png",gid})
+                    .done(function( res ) {
+                        if(res["out"] == "good"){
+                            goto(`/template/load/${out}`);
+                        }
+                        else if(res["out"] == "bad" && res["err"] == "proj"){
+                            msg("Проект уже существует")
+                        }
+                    })
+                }
             }
         }})
     }
@@ -273,6 +321,39 @@
         msg(`удалить шаблон ${proj_name}?`,{type:"ask",res:(out)=>{
             if(out){
                 $.post( "/admin/template/delete",{name:proj_name})
+                .done(function( res ) {
+                    if(res["out"] == "good"){
+                        goto("/temp")
+                    }
+                })
+            }
+        }})
+    }
+    
+
+    function new_group(name){
+        msg("название новой группы шаблонов",{type:"enter",res:(out)=>{
+            if(out){
+                name = out;
+                if(name != null && name!= "" && name!=" " && typeof name != "undefined" && name!="undefined"){
+                    $.post( "/admin/template/group/new", {name:name})
+                    .done(function( res ) {
+                        if(res["out"] == "good"){
+                            goto(`/temp`);
+                        }
+                        else if(res["out"] == "bad"){
+                            msg("группа уже существует")
+                        }
+                    })
+                }
+            }
+        }})
+    }
+
+    function del_group(name){
+        msg(`удалить группу шаблонов ${name}?`,{type:"ask",res:(out)=>{
+            if(out){
+                $.post( "/admin/template/group/delete",{name:name})
                 .done(function( res ) {
                     if(res["out"] == "good"){
                         goto("/temp")
