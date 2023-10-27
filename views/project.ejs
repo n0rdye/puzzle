@@ -331,6 +331,7 @@
     }
 
     function proj_img(callback,cost = false){
+        obj_selection(true)
         let width = (parseInt(document.getElementById("wall").style.width))
         document.getElementById("drags").append(document.getElementById("wall"));
         document.getElementById("drags").style.height = document.getElementById("wall").style.height;

@@ -108,19 +108,20 @@ function obj_click(id){
         obj_selection();
         // console.log(obj.);
     }
-    function obj_selection(){
-        let drags = document.getElementsByClassName("drag");
-        Object.values(drags).forEach(element => {
-            // console.log(element.id,cur_obj);
-            if (element.id != cur_obj){
-                element.style.border = "0px";
-            }
-            else{
-                element.style.border = "2px black solid"; 
-                element.style.borderRadius = "0.2vw"; 
-            }
-        });
-    }
+}
+function obj_selection(clear = false){
+    cur_obj = (clear == true)? null:cur_obj;
+    let drags = document.getElementsByClassName("drag");
+    Object.values(drags).forEach(element => {
+        // console.log(element.id,cur_obj);
+        if (element.id != cur_obj){
+            element.style.border = "0px";
+        }
+        else{
+            element.style.border = "2px black solid"; 
+            element.style.borderRadius = "0.2vw"; 
+        }
+    });
 }
 
 function resize_drags(){
