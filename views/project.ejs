@@ -440,18 +440,22 @@
         let obj = document.getElementById(cur_obj);
         if(obj != null){
             let cur_layer = obj.style.zIndex;
-            if (type == "up" && cur_layer < 9999){
-                objs[obj.classList[0]][obj.getAttribute("id")].layer = parseInt(cur_layer) + 1;
-                obj.style.zIndex = parseInt(cur_layer) + 1;
-                document.getElementById("layer_inp").value = parseInt(cur_layer) + 1;
+            if (type == "up" && cur_layer < 10000){
+                let new_layer = parseInt(cur_layer) + 1;
+                objs[obj.classList[0]][obj.getAttribute("id")].layer = new_layer;
+                obj.style.zIndex = new_layer;
+                obj.setAttribute("layer",new_layer);
+                document.getElementById("layer_inp").value = new_layer;
             } else if (type == "down" && cur_layer > 0){
-                objs[obj.classList[0]][obj.getAttribute("id")].layer = parseInt(cur_layer) - 1;
-                obj.style.zIndex = parseInt(cur_layer) - 1;
-                document.getElementById("layer_inp").value = parseInt(cur_layer) - 1;
+                let new_layer = parseInt(cur_layer) - 1;
+                objs[obj.classList[0]][obj.getAttribute("id")].layer = new_layer;
+                obj.style.zIndex = new_layer;
+                obj.setAttribute("layer",new_layer);
+                document.getElementById("layer_inp").value = new_layer;
             }
             else if ((type == "inp")){
                 let inp_val = parseInt(document.getElementById("layer_inp").value);
-                if(inp_val >= 0 && inp_val < 9999){
+                if(inp_val >= 0 && inp_val < 10000){
                     objs[obj.classList[0]][obj.getAttribute("id")].layer = inp_val;
                     obj.style.zIndex = inp_val;
                 }
