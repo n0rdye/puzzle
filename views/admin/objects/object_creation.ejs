@@ -41,13 +41,13 @@
         </div>
         <div>
             <input type="checkbox" id="obj_color_check" onchange="color_warning()">
-            <label for="obj_color_check">возможность менять цвет</label>
+            <label for="obj_color_check">возможность менять цвет</label><br>
             <script>
                 function color_warning(){
                     let color_check = document.getElementById("obj_color_check");
                     let old_prev = document.getElementById("img_prev").getAttribute("img_static");
                     if(color_check.checked == true){
-                        obj_colors_load();
+                        // obj_colors_load();
                         removeImageBackground(document.getElementById("img_prev").src).then((out)=>{
                             document.getElementById("img_prev").src = out;
                         })
@@ -55,6 +55,23 @@
                     }
                     else{
                         document.getElementById("img_prev").src = old_prev;
+                    }
+
+                }
+            </script>
+            
+            <input type="checkbox" id="obj_group_check" onchange="group_object_check()">
+            <label for="obj_group_check">Сделать обьект группированным</label>
+            <script>
+                function group_object_check(){
+                    let onc = `document.getElementById('img_file').click();msg('помните что граници обозначают элемент с которым можно взаимодействовать даже если он прозрачный',{time:10,type:'help'});msg('старайтесь не оставлять пустые/прозрачные отступы',{time:15,type:'help'})`
+                    let group_check = document.getElementById("obj_group_check");
+                    let img_div = document.getElementById("img_prev_div");
+                    if(group_check.checked == true){
+                        img_div.setAttribute("onclick",`save_edited_obj(${group_check.getAttribute("object_id")});goto('/admin/group_object?object_id=${group_check.getAttribute("object_id")}')`);
+                    }
+                    else{
+                        img_div.setAttribute("onclick",onc);
                     }
 
                 }
@@ -130,7 +147,7 @@
         }
     }
 
-    function set_obj_edit_params(img = "/img/placeholder.png",name = "",height = 100,width = 100,cost = 0,gid = 0,colors = false, id = null){
+    function set_obj_edit_params(img = "/img/placeholder.png",name = "",height = 100,width = 100,cost = 0,gid = 0,colors = false,grouped = false,id = null){
         // поменять на if id == null усё
         if(id == null){
             obj_edit_type = "new";
@@ -145,6 +162,7 @@
             del_btn.innerText = "удалить товар";
             del_btn.classList.add("btn_blue");
             document.getElementById("object_edit_type").append(del_btn);
+            document.getElementById("obj_group_check").setAttribute("object_id",id)
             document.getElementById("obj_apply_btn").value = "сохранить";
             document.getElementById("obj_apply_btn").setAttribute("onclick",`save_edited_obj(${id})`);
             // document.getElementById("group_select").selectedIndex = document.getElementById("group_select").options[`obj_group_${gid}`].index;
@@ -161,6 +179,7 @@
         let width_text = document.getElementById("obj_width_value");
         let cost_text = document.getElementById("obj_cost");
         let colors_div = document.getElementById("obj_color_check");
+        let grouped_div = document.getElementById("obj_group_check");
 
         name_div.value = name;
         img_file.value = null;
@@ -171,11 +190,14 @@
         img_prev.style.width = `${width* cm_mult}px`;
         cost_text.value = cost;
         colors_div.checked = JSON.parse(colors);
+        grouped_div.checked = JSON.parse(grouped);
 
         height_slider.value = height;
         width_slider.value = width;
         height_text.value = `${height}`;
         width_text.value = `${width}`;
+
+        group_object_check();
     }
 
     function previewFile() {

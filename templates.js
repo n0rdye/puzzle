@@ -6,7 +6,7 @@ const vars = require('./vars');
 module.exports.load = (inp,cook,res)=>{
     try {
         db.gv("templates","name",`'${inp["name"]}'`,(pdata)=>{pdata = pdata[0];
-            console.log(pdata);
+            // console.log(pdata);
             if (pdata != null){
                 res.send({out:"good",body:pdata["body"]});
             }

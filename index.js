@@ -203,6 +203,14 @@ app.get("/admin", (req,res) =>{try {
         },true,true)
     } catch (error) {route_err({req:req,error:error});}
 });
+app.get("/admin/group_object", (req,res) =>{try {
+    let inp = req.body;
+    let cook = req.cookies;
+    func.sid(cook,res,(rights)=>{
+        res.render('admin/objects/group_object');
+    },true,true)
+} catch (error) {route_err({req:req,error:error});}
+});
 app.get("/admin/:type", (req,res) =>{try {
     let inp = req.body;
     let cook = req.cookies;
@@ -213,13 +221,33 @@ app.get("/admin/:type", (req,res) =>{try {
         else if ((req.params["type"] == "users") && (rights == 2 || rights == 3)){
             res.render('admin/users');
         }
-        else{res.redirect('/admin');}
+        // else{res.redirect('/admin');}
     },true,true)
 } catch (error) {route_err({req:req,error:error});}
 });
 app.get("/get_logs", (req,res) => {
     try{let cook = req.cookies;func.sid(cook,res,()=>{func.logs_file(res);})} 
     catch (error) {route_err({req:req,error:error});}
+})
+app.post("/admin/object/grouped/save", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        // func.log(inp["name"]);
+        func.sid(cook,res,()=>{
+            obj.save_grouped(inp,cook,res);
+        },true,true)
+    } catch (error) {route_err({req:req,error:error});}
+})
+app.post("/admin/object/grouped/load", (req,res) => {
+    try{
+        let inp = req.body;
+        let cook = req.cookies;
+        // func.log(inp["name"]);
+        func.sid(cook,res,()=>{
+            obj.load_grouped(inp,cook,res);
+        },true,true)
+    } catch (error) {route_err({req:req,error:error});}
 })
 app.post("/admin/colors/new", (req,res) => {try{
     let inp = req.body;

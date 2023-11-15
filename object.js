@@ -11,7 +11,7 @@ module.exports.loads = (inp,cook,res)=>{
         let gin
         if (typeof inp["gid"] == 'undefined' || inp["gid"] == null) gin = "1 OR 1=1"
         else gin = inp["gid"]
-        db.ggv("objects","`name`,`id`,`height`,`width`,`cost`,`gid`,`colors`,`pid`,`img`","gid",`${gin}`,(odata)=>{
+        db.ggv("objects","`name`,`id`,`height`,`width`,`cost`,`gid`,`colors`,`grouped`,`pid`,`img`","gid",`${gin}`,(odata)=>{
             // func.log(odata);
             res.send({out:"good",body:odata});
         })
@@ -35,6 +35,7 @@ module.exports.load = (inp,cook,res)=>{
 module.exports.new = (inp,cook,res)=>{
     try {
         if (typeof inp["colors"] != 'undefined'){inp["colors"] = (inp["colors"] == "false")? 0:1;}
+        if (typeof inp["grouped"] != 'undefined'){inp["grouped"] = (inp["grouped"] == "false")? 0:1;}
         db.gv("object_groups","id",`'${inp["gid"]}'`,(gname)=>{gname = gname[0]
             db.gv("object_partition","id",`'${gname["pid"]}'`,(pname)=>{pname = pname[0]
                 save_img(inp["img"],`${inp["name"]}~g~${gname["name"]}~p~${pname["name"]}`,(img_path)=>{
@@ -43,7 +44,7 @@ module.exports.new = (inp,cook,res)=>{
                             res.send({out:"bad",err:"name"});
                         }
                         else if (db_name[0] == null){
-                            db.nr("objects","`cost`,`name`,`img`,`height`,`width`,`gid`,`colors`,`pid`",`'${inp["cost"]}','${inp["name"]}~g~${gname["name"]}~p~${pname["name"]}','${img_path}','${inp["height"]}','${inp["width"]}','${inp["gid"]}','${inp["colors"]}','${gname["pid"]}'`,true);
+                            db.nr("objects","`cost`,`name`,`img`,`height`,`width`,`gid`,`colors`,`grouped`,`pid`",`'${inp["cost"]}','${inp["name"]}~g~${gname["name"]}~p~${pname["name"]}','${img_path}','${inp["height"]}','${inp["width"]}','${inp["gid"]}','${inp["colors"]}','${inp["grouped"]}','${gname["pid"]}'`,true);
                                 db.sv("object_groups","count",`(count + 1)`,"id",inp["gid"],()=>{},true,true)
                                 func.log(`admin object created name:${inp["name"]} group:${gname["name"]}`);
                                 res.send({out:"good"});
@@ -105,12 +106,37 @@ module.exports.load_colors = (inp,cook,res)=>{
     }
 }
 
+module.exports.save_grouped = (inp,cook,res)=>{
+    try {
+        db.sv("objects","group_obj",inp["json"],"id",inp["id"],()=>{
+            let img = imageDataURI.decode(inp["data"]);
+            if (!fs.existsSync(`public/img/object/${inp["name"]}`)){fs.mkdirSync(`public/img/object/${inp["name"]}`);}
+            fs.writeFile(`public/img/object/${inp["name"]}/main.${img.imageType.split("/").at(-1)}`, img.dataBuffer,()=>{
+                res.send({body:"good"})
+            });
+        },true)
+    } catch (error) {
+        func.log("backend object creating error - "+error);
+    }
+}
+module.exports.load_grouped = (inp,cook,res)=>{
+    try {
+        db.ggv("objects","group_obj","id",`'${inp["id"]}'`,(odata)=>{
+            // func.log(odata);
+            res.send({out:"good",body:odata[0]});
+        },true)
+    } catch (error) {
+        func.log("backend object creating error - "+error);
+    }
+}
+
 module.exports.save = (inp,cook,res)=>{
     try {
         // let changed = [];
         let changes = JSON.parse(inp["changes"]);
         let taken_name = false;
         if (typeof changes["colors"] != 'undefined'){changes["colors"] = (changes["colors"] == "false")? 0:1;}
+        if (typeof changes["grouped"] != 'undefined'){changes["grouped"] = (changes["grouped"] == "false")? 0:1;}
         // console.log(changes);
         Object.entries(changes).forEach(([key,value]) => {
             // console.log(key,value);

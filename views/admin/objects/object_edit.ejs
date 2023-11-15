@@ -60,6 +60,7 @@
     // load_groups(()=>{
     //     edit_get_objs();
     // });
+    
 
     function set_edit(id){
         let menu = document.getElementById(`object_${id}`);
@@ -70,10 +71,11 @@
         menu.getAttribute("cost"),
         menu.getAttribute("gid"),
         menu.getAttribute("colors"),
+        menu.getAttribute("grouped"),
         menu.getAttribute("obj_id"));
         window.scrollTo({
-        top: 0,
-        behavior: "smooth",
+            top: 0,
+            behavior: "smooth",
         });
     }
 
@@ -90,6 +92,10 @@
                     if(data.at(-1)["id"] == value["id"]){
                         msg_del(wait_msg.id);
                         msg("Объекты загружены")
+                        if(new URL(window.location).searchParams.get("object_id") != null){
+                            const get_object_id = new URL(window.location).searchParams.get("object_id");
+                            set_edit(new URL(window.location).searchParams.get("object_id"));
+                        }
                         if(callback)callback(true);
                     }
                 })       
@@ -131,14 +137,15 @@
     function save_edited_obj(id){
         let gid = gids[0];
         let menu = document.getElementById(`object_${id}`);
-        let attributes = ["name","img","height","width","cost","colors"];
+        let attributes = ["name","img","height","width","cost","colors","grouped"];
         let cur_atts = {
             name : document.getElementById("nobj_name").value,
             height : document.getElementById("obj_height").value,
             width : document.getElementById("obj_width").value,
             img : document.getElementById('img_prev').getAttribute("src"),
             cost : document.getElementById("obj_cost").value,
-            colors : String(document.getElementById("obj_color_check").checked)
+            colors : String(document.getElementById("obj_color_check").checked),
+            grouped : String(document.getElementById("obj_group_check").checked)
         }
         let changes = {}
         attributes.forEach(element => {
@@ -253,6 +260,7 @@
             obj.setAttribute("obj_id",value["id"])
             obj.setAttribute("cost",value["cost"])
             obj.setAttribute("colors",Boolean(value["colors"]))
+            obj.setAttribute("grouped",Boolean(value["grouped"]))
             obj.setAttribute("gid",value["gid"])
             // // name_text.innerText = value["name"].split("~")[0].replaceAll("$"," ");
             // img_elm.src = img;
@@ -272,6 +280,7 @@
                 cost : value["cost"],
                 link : img,
                 color : Boolean(value["colors"]),
+                grouped : Boolean(value["grouped"]),
                 edit : `set_edit(${value["id"]})`
             }
 
@@ -283,6 +292,7 @@
                 cost : "Цена",
                 link : "Ссылка на изображение",
                 color : "Меняет цвет",
+                grouped : "группированный",
                 edit : "Радактировать"
             }
 
@@ -299,6 +309,7 @@
                 `<td>${labels["cost"]}</td>`+
                 `<td>${labels["link"]}</td>`+
                 `<td>${labels["color"]}</td>`+
+                `<td>${labels["grouped"]}</td>`+
                 `<td>${labels["edit"]}</td>`+
             "</tr>"+
             "<tr class='obj_table_divs'>"+
@@ -309,6 +320,7 @@
                 `<td>${divs["cost"]}</td>`+
                 `<td><a href='${divs["link"]}'>${divs["link"]}</a></td>`+
                 `<td><input type='checkbox' id='obj_edit_color_check' ${(divs["color"] == true)? "checked":""} onclick='return false' onkeydown='return false'/></td>`+
+                `<td><input type='checkbox' id='obj_edit_group_check' ${(divs["grouped"] == true)? "checked":""} onclick='return false' onkeydown='return false'/></td>`+
                 `<td><button onclick='${divs["edit"]}' class='btn_blue'>Выбрать</button></td>`+
             "</tr>";
             

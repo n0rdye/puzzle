@@ -1,5 +1,5 @@
-<%- include('./static/start.ejs',{name:proj_name,async:true}) %>
-<%- include('./header.ejs') %>
+<%- include('../../static/start.ejs',{name:"",async:true}) %>
+<%- include('../../header.ejs') %>
 <script src="/lib/interact.js"></script>
 <script src="/lib/html2canvas.js"></script>
 <style>
@@ -237,12 +237,8 @@
             }
         </style>
     </div>
-    <div style="display: flex;justify-content: space-between; width: 15vw;">
-        <div><input type="checkbox" id="grid_checkbox" checked="true" onchange='grid_view(JSON.parse(event.target.checked));'><label for="grid_checkbox">Показывать сетку</label></div>
-    </div>
     <div style="display: flex;justify-content: space-between; width: 7vw;">
-        <div id="save_btn_icon" class="btn_icon" onclick="save_proj()"><img src="/img/icon/save.png" alt="save"></div>
-        <div class="btn_icon" onclick="img_download()"><img src="/img/icon/download.png" alt="load"></div>
+        <div id="save_btn_icon" class="btn_icon" onclick="save()"><img src="/img/icon/save.png" alt="save"></div>
         <!-- <div class="btn_icon" onclick="document.getElementById('import_file').click();"><img src="/img/icon/download.png" alt="load"></div> -->
         <!-- <input type='file' id="import_file" style="display: none;" accept="application/JSON" onchange='openFile(event,load_file)'> -->
     </div>
@@ -289,45 +285,44 @@
     </div>
 </div>
 <div class="czones"></div>
-<script src="/lib/inter.js"></script>
+<script src="/lib/inter_group_object.js"></script>
 <script>
-    let proj_name = "<%= proj_name %>";
+    const get_object_id = new URL(window.location).searchParams.get("object_id");
     document.getElementById("layer_inp").value = 0;
     img_cache(()=>{})
-
-
-    if ( $.cookie("grid") != null){
-        document.getElementById("grid_checkbox").checked = JSON.parse($.cookie("grid"));
-        grid_view(JSON.parse($.cookie("grid")))
-    }else{
-        $.cookie("grid",true)
-        document.getElementById("grid_checkbox").checked = true;
-        grid_view(true)
-    }
-    function grid_view(check){
-        let grid = document.getElementsByClassName("wall")[0]
-        console.log(check);
-        if (check == false) {
-            grid.style.backgroundImage = "";
-            $.cookie("grid",false);
-
-        }
-        else{
-            grid.style.backgroundImage = 'url("/img/bg1red.png")';
-            $.cookie("grid",true);
-
-        }
-    }
+    wall_size_change('height');resize_drags();
+    wall_size_change('width');resize_drags();
 
     function img_download(){
-        msg("добавить на фото стоимость?",{type:"ask",res:(out)=>{
-            let wait_msg = msg("делаем фото",{type:"wait"})
+        let wait_msg = msg("делаем фото",{type:"wait"})
+        proj_img((src)=>{
+            msg("изображение проекта готово",{time:3})
+            downloadImg(src,`${proj_name}.png`)
+        },false)
+    }
+
+    function get_data(id,callback) {
+        $.post( "/get_objs")
+            .done(function( res ) {
+                if(res["out"] == "good"){
+                    Object.entries(res["body"]).forEach(([key,value]) => {
+                        if(id == value["id"]){
+                            callback(value)
+                        }
+                    });
+                }
+            });
+    }
+    
+    function save() {
+        get_data(get_object_id,(data)=>{
             proj_img((src)=>{
-                msg("изображение проекта готово",{time:3})
-                msg_del(wait_msg.id)
-                downloadImg(src,`${proj_name}.png`)
-            },out)
-        }})
+                $.post( "/admin/object/grouped/save",{name:data["name"],data:src,json:JSON.stringify(objs),id:data["id"]})
+                .done(function( res ) {
+                    goto(`/admin/objects?object_id=${data["id"]}`);
+                });        
+            })
+        })
     }
 
     function proj_img(callback,cost = false){
@@ -387,6 +382,15 @@
         })
     }
 
+    function wall_color_change(){
+       if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
+
+        let wall = document.getElementById("wall")
+        let color = document.getElementById("wall_color")
+        wall.style.backgroundColor = color.value;
+        objs["color"] = color.value;
+    }
+
     function obj_color_change(color,in_obj = null){
         if(color != "null"){
             if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
@@ -399,23 +403,6 @@
             });
         }
     } 
-
-    function load_file(text){
-        if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
-
-        // console.log(text);
-        // console.log(objs);
-        try{
-            objs = JSON.parse(JSON.parse(text)["body"]);
-        }
-        catch{}
-        // console.log(objs);
-        reload();
-        // save((res)=>{
-        //     goto("");
-        //     // document.getElementById('top_panel_center').innerHTML=`сохранено ${proj_name} в облако`;
-        // },false)    
-    }
 
     function go_back(){
         if(objs_back.length > 0){
@@ -542,37 +529,6 @@
         })
     })
     
-    // function cost_drop(id){
-    //     // let e = document.getElementById("cost")
-    //     // setTimeout(()=>{
-    //     //     document.getElementById("group").style.display = "block";
-    //     //     // document.getElementById("group").style.left = document.getElementById("group_drop").getBoundingClientRect().left;
-    //     //     let childs = document.getElementById("group").getElementsByTagName("input");
-    //     //     let i = 0;
-    //     //     Object.entries(childs).forEach(([key,value]) => {
-    //     //         console.log(key,value);
-    //     //         if(value.checked == true){
-    //     //             get_objs(value)
-    //     //             i++;
-    //     //         }
-    //     //         if (i==0){
-    //     //             document.getElementsByClassName("czones")[0].innerHTML = "";
-    //     //             drag_start()
-    //     //             // e.removeChild(e.getElementsByClassName(value))
-    //     //         }
-    //     //     });
-    //     // },1)
-    // }
-
-    function wall_color_change(){
-       if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
-
-        let wall = document.getElementById("wall")
-        let color = document.getElementById("wall_color")
-        wall.style.backgroundColor = color.value;
-        objs["color"] = color.value;
-    }
-
     function gids_change(){
         get_objs();
         drag_start()
@@ -582,46 +538,9 @@
         // let select = document.getElementById("group");
         // let name = select.options[select.selectedIndex].text;
         load_groups(callback(),gids);
-        // callback();
-        // $.post( "/get_groups")
-        // .done(function( res ) {
-        //     if(res["out"] == "good"){
-        //         // select.innerHTML = "";
-        //         res["body"].forEach(group => {
-        //             console.log(group);
-        //             let gd = document.createElement("div");
-        //             let group_div = document.createElement("input");
-        //             let label = document.createElement("label");
-
-        //             group_div.style.cursor = "pointer";
-        //             label.style.cursor = "pointer";
-        //             // group_div.style.pointerEvents = "none";
-        //             // label.style.pointerEvents = "none";
-
-        //             group_div.setAttribute("type","checkbox");
-        //             group_div.setAttribute("onchange","group_drop()");
-        //             label.setAttribute("for",`obj_group_${group["id"]}`);
-        //             label.innerText = group["name"].replace("$"," ");
-        //             // gd.innerText = group["name"].replace("$"," ");
-        //             group_div.setAttribute("group_count",group["count"]);
-        //             group_div.setAttribute("gid",group["id"]);
-        //             group_div.id = `obj_group_${group["id"]}`;
-        //             group_div.classList.add("group_inp");
-        //             gd.append(group_div);
-        //             gd.append(label);
-        //             select.append(gd);
-        //             // select.append(label);
-        //             if(group["id"] == res["body"].at(-1)["id"]){
-        //                 if(callback)callback();
-        //             }
-        //         });
-        //     }
-        //     // callback(res);
-        // });
     }
     // get_groups(()=>{
         // get_objs();
-        load_proj_cloud();
     // });
     function get_objs(group_div){
         document.getElementsByClassName("czones")[0].innerHTML = "";
@@ -645,25 +564,6 @@
     // let menu = document.getElementById("project_menu");
     // document.getElementById("top_panel_left").innerHTML = `<div id='proj_menu' class="menu_btn">настройки проекта</div>`;
     
-
-    function save_proj(){
-        // document.getElementById('top_panel_center').innerHTML=`сохранение ${proj_name}`;
-        let wait_msg = msg("идёт сохранение проекта",{type:"wait"});
-        save((res)=>{
-            msg_del(wait_msg.id);
-            msg("проект сохранён")
-            // document.getElementById('top_panel_center').innerHTML=`сохранено ${proj_name} в облако`;
-        })
-    }
-
-    function save_proj_local(){
-        // document.getElementById('top_panel_center').innerHTML=`сохранение ${proj_name}`;
-        save_local();
-        // document.getElementById('top_panel_center').innerHTML=`сохранено ${proj_name} в локальное хранилище`;
-        setTimeout((res)=>{
-            // document.getElementById("top_panel_center").innerText = `${proj_name} (локальное хранилище)`;
-        },3000)
-    }
     
     // drag_start();
     // console.log(px_ratio);
@@ -672,5 +572,24 @@
     function isZooming(){
         resize_drags();
     }
+
+    if(get_object_id != null){
+        $.post("/admin/object/grouped/load",{id:get_object_id})
+            .done(function( res ) {
+                if(res["out"] == "good"){
+                    console.log(JSON.parse(res["body"]["group_obj"]));
+                    if(res["body"]["group_obj"]!=null){
+                        load(JSON.parse(res["body"]["group_obj"]));               
+                    }
+                    else{
+                        setTimeout(() => {
+                            proj_state = "loaded";
+                            loaded();     
+                        }, 1000);
+                    }
+                }
+        });
+    }
+    
 </script>
-<%- include('./static/end.ejs',{soc:true}) %>
+<%- include('../../static/end.ejs',{soc:true}) %>

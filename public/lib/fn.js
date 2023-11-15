@@ -363,6 +363,7 @@ async function removeImageBackground(image) {
 
     // $.post( "/get_objs")
     // .done(function( res ) {
+        // let wait_msg = msg("загрузка изображений",{type:"wait"})
     //     if(res["out"] == "good"){
     //         // console.log(res["body"]);
     //         let sources = [];
@@ -373,6 +374,7 @@ async function removeImageBackground(image) {
     //                 preloadImages(sources,()=>{
     //                     // console.log("cached");
     //                     callback();
+    //                     msg_del(wait_msg.id)
     //                     // sources.forEach(element => {
     //                     //     console.log(element,is_cached(element));
     //                     // });

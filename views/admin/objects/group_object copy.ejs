@@ -1,5 +1,5 @@
-<%- include('./static/start.ejs',{name:proj_name,async:true}) %>
-<%- include('./header.ejs') %>
+<%- include('../../static/start.ejs',{name:"",async:true}) %>
+<%- include('../../header.ejs') %>
 <script src="/lib/interact.js"></script>
 <script src="/lib/html2canvas.js"></script>
 <style>
@@ -289,9 +289,8 @@
     </div>
 </div>
 <div class="czones"></div>
-<script src="/lib/inter.js"></script>
+<script src="/lib/inter_group_object.js"></script>
 <script>
-    let proj_name = "<%= proj_name %>";
     document.getElementById("layer_inp").value = 0;
     img_cache(()=>{})
 
@@ -399,23 +398,6 @@
             });
         }
     } 
-
-    function load_file(text){
-        if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
-
-        // console.log(text);
-        // console.log(objs);
-        try{
-            objs = JSON.parse(JSON.parse(text)["body"]);
-        }
-        catch{}
-        // console.log(objs);
-        reload();
-        // save((res)=>{
-        //     goto("");
-        //     // document.getElementById('top_panel_center').innerHTML=`сохранено ${proj_name} в облако`;
-        // },false)    
-    }
 
     function go_back(){
         if(objs_back.length > 0){
@@ -542,27 +524,6 @@
         })
     })
     
-    // function cost_drop(id){
-    //     // let e = document.getElementById("cost")
-    //     // setTimeout(()=>{
-    //     //     document.getElementById("group").style.display = "block";
-    //     //     // document.getElementById("group").style.left = document.getElementById("group_drop").getBoundingClientRect().left;
-    //     //     let childs = document.getElementById("group").getElementsByTagName("input");
-    //     //     let i = 0;
-    //     //     Object.entries(childs).forEach(([key,value]) => {
-    //     //         console.log(key,value);
-    //     //         if(value.checked == true){
-    //     //             get_objs(value)
-    //     //             i++;
-    //     //         }
-    //     //         if (i==0){
-    //     //             document.getElementsByClassName("czones")[0].innerHTML = "";
-    //     //             drag_start()
-    //     //             // e.removeChild(e.getElementsByClassName(value))
-    //     //         }
-    //     //     });
-    //     // },1)
-    // }
 
     function wall_color_change(){
        if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
@@ -582,46 +543,9 @@
         // let select = document.getElementById("group");
         // let name = select.options[select.selectedIndex].text;
         load_groups(callback(),gids);
-        // callback();
-        // $.post( "/get_groups")
-        // .done(function( res ) {
-        //     if(res["out"] == "good"){
-        //         // select.innerHTML = "";
-        //         res["body"].forEach(group => {
-        //             console.log(group);
-        //             let gd = document.createElement("div");
-        //             let group_div = document.createElement("input");
-        //             let label = document.createElement("label");
-
-        //             group_div.style.cursor = "pointer";
-        //             label.style.cursor = "pointer";
-        //             // group_div.style.pointerEvents = "none";
-        //             // label.style.pointerEvents = "none";
-
-        //             group_div.setAttribute("type","checkbox");
-        //             group_div.setAttribute("onchange","group_drop()");
-        //             label.setAttribute("for",`obj_group_${group["id"]}`);
-        //             label.innerText = group["name"].replace("$"," ");
-        //             // gd.innerText = group["name"].replace("$"," ");
-        //             group_div.setAttribute("group_count",group["count"]);
-        //             group_div.setAttribute("gid",group["id"]);
-        //             group_div.id = `obj_group_${group["id"]}`;
-        //             group_div.classList.add("group_inp");
-        //             gd.append(group_div);
-        //             gd.append(label);
-        //             select.append(gd);
-        //             // select.append(label);
-        //             if(group["id"] == res["body"].at(-1)["id"]){
-        //                 if(callback)callback();
-        //             }
-        //         });
-        //     }
-        //     // callback(res);
-        // });
     }
     // get_groups(()=>{
         // get_objs();
-        load_proj_cloud();
     // });
     function get_objs(group_div){
         document.getElementsByClassName("czones")[0].innerHTML = "";
@@ -645,25 +569,6 @@
     // let menu = document.getElementById("project_menu");
     // document.getElementById("top_panel_left").innerHTML = `<div id='proj_menu' class="menu_btn">настройки проекта</div>`;
     
-
-    function save_proj(){
-        // document.getElementById('top_panel_center').innerHTML=`сохранение ${proj_name}`;
-        let wait_msg = msg("идёт сохранение проекта",{type:"wait"});
-        save((res)=>{
-            msg_del(wait_msg.id);
-            msg("проект сохранён")
-            // document.getElementById('top_panel_center').innerHTML=`сохранено ${proj_name} в облако`;
-        })
-    }
-
-    function save_proj_local(){
-        // document.getElementById('top_panel_center').innerHTML=`сохранение ${proj_name}`;
-        save_local();
-        // document.getElementById('top_panel_center').innerHTML=`сохранено ${proj_name} в локальное хранилище`;
-        setTimeout((res)=>{
-            // document.getElementById("top_panel_center").innerText = `${proj_name} (локальное хранилище)`;
-        },3000)
-    }
     
     // drag_start();
     // console.log(px_ratio);
@@ -672,5 +577,6 @@
     function isZooming(){
         resize_drags();
     }
+    setTimeout(()=>{loaded()},500);
 </script>
-<%- include('./static/end.ejs',{soc:true}) %>
+<%- include('../../static/end.ejs',{soc:true}) %>
