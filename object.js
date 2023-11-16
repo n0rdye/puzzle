@@ -109,11 +109,13 @@ module.exports.load_colors = (inp,cook,res)=>{
 module.exports.save_grouped = (inp,cook,res)=>{
     try {
         db.sv("objects","group_obj",inp["json"],"id",inp["id"],()=>{
-            let img = imageDataURI.decode(inp["data"]);
-            if (!fs.existsSync(`public/img/object/${inp["name"]}`)){fs.mkdirSync(`public/img/object/${inp["name"]}`);}
-            fs.writeFile(`public/img/object/${inp["name"]}/main.${img.imageType.split("/").at(-1)}`, img.dataBuffer,()=>{
-                res.send({body:"good"})
-            });
+            db.sv("objects","cost",inp["cost"],"id",inp["id"],()=>{
+                let img = imageDataURI.decode(inp["data"]);
+                if (!fs.existsSync(`public/img/object/${inp["name"]}`)){fs.mkdirSync(`public/img/object/${inp["name"]}`);}
+                fs.writeFile(`public/img/object/${inp["name"]}/main.${img.imageType.split("/").at(-1)}`, img.dataBuffer,()=>{
+                    res.send({body:"good"})
+                });
+            },true)
         },true)
     } catch (error) {
         func.log("backend object creating error - "+error);

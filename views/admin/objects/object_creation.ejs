@@ -60,20 +60,31 @@
                 }
             </script>
             
-            <input type="checkbox" id="obj_group_check" onchange="group_object_check()">
+            <input type="checkbox" id="obj_group_check" onchange='group_object_check(event)'>
             <label for="obj_group_check">Сделать обьект группированным</label>
             <script>
-                function group_object_check(){
+                function group_object_check(event){
                     let onc = `document.getElementById('img_file').click();msg('помните что граници обозначают элемент с которым можно взаимодействовать даже если он прозрачный',{time:10,type:'help'});msg('старайтесь не оставлять пустые/прозрачные отступы',{time:15,type:'help'})`
                     let group_check = document.getElementById("obj_group_check");
                     let img_div = document.getElementById("img_prev_div");
                     if(group_check.checked == true){
-                        img_div.setAttribute("onclick",`save_edited_obj(${group_check.getAttribute("object_id")});goto('/admin/group_object?object_id=${group_check.getAttribute("object_id")}')`);
+                        document.getElementById("obj_cost").disabled = true;
+                        img_div.setAttribute("onclick",
+                        `save_edited_obj(${group_check.getAttribute("object_id")});goto('/admin/group_object?`+
+                        `object_id=${group_check.getAttribute("object_id")}&`+
+                        `object_name=${document.getElementById(`object_${group_check.getAttribute("object_id")}`).getAttribute("class").split(" ")[0]}')`);
                     }
                     else{
+                        document.getElementById("obj_cost").disabled = false;
                         img_div.setAttribute("onclick",onc);
                     }
 
+                    if(event != null && group_check.checked == true){
+                        msg("при изменении изображения вы перейдёте в режим редактирования гриппированного обьекта",{type:"help",time:11});
+                        msg("нынешние изменения сохраняться",{type:"help",time:12});
+                        msg("цена будет равна цене группы обьектов",{type:"help",time:13});
+                        msg("при сохранении гриппированного обьекта вы вернётесь в это меню с сохранением всех параметров",{type:"help",time:14});
+                    }
                 }
             </script>
         </div>

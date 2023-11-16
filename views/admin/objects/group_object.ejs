@@ -237,6 +237,9 @@
             }
         </style>
     </div>
+    <div style="display: flex;justify-content: space-between; width: 15vw;">
+        <div><input type="checkbox" id="trans_checkbox" checked="true" onchange='wall_color_change()'><label for="trans_checkbox">прозрачный фон</label></div>
+    </div>
     <div style="display: flex;justify-content: space-between; width: 7vw;">
         <div id="save_btn_icon" class="btn_icon" onclick="save()"><img src="/img/icon/save.png" alt="save"></div>
         <!-- <div class="btn_icon" onclick="document.getElementById('import_file').click();"><img src="/img/icon/download.png" alt="load"></div> -->
@@ -288,6 +291,7 @@
 <script src="/lib/inter_group_object.js"></script>
 <script>
     const get_object_id = new URL(window.location).searchParams.get("object_id");
+    const get_object_name = new URL(window.location).searchParams.get("object_name");
     document.getElementById("layer_inp").value = 0;
     img_cache(()=>{})
     wall_size_change('height');resize_drags();
@@ -300,27 +304,35 @@
             downloadImg(src,`${proj_name}.png`)
         },false)
     }
-
-    function get_data(id,callback) {
-        $.post( "/get_objs")
+    
+    function get_data(name,callback) {
+        $.post( "/get_obj",{name:name,key:"*"})
             .done(function( res ) {
                 if(res["out"] == "good"){
-                    Object.entries(res["body"]).forEach(([key,value]) => {
-                        if(id == value["id"]){
-                            callback(value)
-                        }
-                    });
+                    // Object.entries(res["body"]).forEach(([key,value]) => {
+                    //     if(id == value["id"]){
+                    //         callback(value)
+                    //     }
+                    // });
+                    console.log(res["body"]);
+                    callback(res["body"])
                 }
             });
     }
     
     function save() {
-        get_data(get_object_id,(data)=>{
-            proj_img((src)=>{
-                $.post( "/admin/object/grouped/save",{name:data["name"],data:src,json:JSON.stringify(objs),id:data["id"]})
-                .done(function( res ) {
-                    goto(`/admin/objects?object_id=${data["id"]}`);
-                });        
+        let wait_msg = msg("Сохраняем изображение", {type:"wait"})
+        get_data(get_object_name,(data)=>{
+            proj_img((src_orig)=>{
+                removeImageBackground(src_orig).then((src_chaged)=>{
+                    src = (JSON.parse(document.getElementById("trans_checkbox").checked) == true)? src_chaged:src_orig;
+                    console.log("posting");
+                    $.post( "/admin/object/grouped/save",{name:data["name"],data:src,json:JSON.stringify(objs),id:data["id"],cost:objs["total"]})
+                    .done(function( res ) {
+                        msg_del(wait_msg.id)
+                        goto(`/admin/objects?object_id=${data["id"]}`);
+                    });                          
+                })
             })
         })
     }
@@ -344,8 +356,8 @@
             y:7,
             x:2,
             width:width,
-            logging:false,
-            scale:5
+            logging:false
+            // scale:0.2
         }).then(canvas => {
             if(cost == true){
                 document.getElementById("cost_div").style.marginLeft = `0`;
@@ -384,11 +396,19 @@
 
     function wall_color_change(){
        if (proj_state == "loaded"){objs_back.push(JSON.parse(JSON.stringify(objs)));}
-
-        let wall = document.getElementById("wall")
-        let color = document.getElementById("wall_color")
-        wall.style.backgroundColor = color.value;
-        objs["color"] = color.value;
+        if (JSON.parse(document.getElementById("trans_checkbox").checked) == true) {
+            let wall = document.getElementById("wall")
+            wall.style.backgroundColor = "#ffffff";
+            objs["color"] = "#ffffff";
+            document.getElementById("wall_color").disabled = true;
+        }
+        else{
+            document.getElementById("wall_color").disabled = false;
+            let wall = document.getElementById("wall")
+            let color = document.getElementById("wall_color")
+            wall.style.backgroundColor = color.value;
+            objs["color"] = color.value;
+        }
     }
 
     function obj_color_change(color,in_obj = null){

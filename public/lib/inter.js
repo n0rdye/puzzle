@@ -1,6 +1,6 @@
 window.dragMoveListener = dragMoveListener;
 let root = document.getElementById("drags");
-let objs = { height:"2",width:"4",color:"#FFFFFF"};
+let objs = { height:"2",width:"3",color:"#FFFFFF"};
 let objs_store = {};
 let proj_from = "cloud";
 let cur_obj;
@@ -19,7 +19,18 @@ function create(clas,x,y,color = null,id,size,layer = 0){
     clas.forEach(cl => {
         obj.classList.add(cl);
     });
-    get_obj(main_clas,(db_data)=>{
+    if(objs_store[main_clas] == null){
+        load_objs(()=>{
+            make_obj(objs_store[main_clas])
+        });
+    }
+    else{
+        make_obj(objs_store[main_clas])
+    }
+    // get_obj(main_clas,(db_data)=>{
+
+    // })
+    function make_obj(db_data) {
         // console.log(db_data);
         // console.log(db_data);
         // db_data.forEach(db_data => {
@@ -60,7 +71,7 @@ function create(clas,x,y,color = null,id,size,layer = 0){
             }
         }
         calc_total();
-    })
+    }
     obj.setAttribute("decoding","async");
     obj.setAttribute("loading","lazy");
     if(id != "none"){obj.setAttribute("onclick",`obj_click("${id}")`);}

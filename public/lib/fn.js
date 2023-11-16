@@ -302,7 +302,7 @@ async function removeImageBackground(image) {
     }
   
     ctx.putImageData(imageData, 0, 0);
-    return canvas.toDataURL(`image/png`);
+    return canvas.toDataURL(`image/jpg`);
   }
 
   function downloadImg(url, filename) {

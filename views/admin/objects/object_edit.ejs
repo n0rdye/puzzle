@@ -60,9 +60,11 @@
     // load_groups(()=>{
     //     edit_get_objs();
     // });
+    const get_object_id = new URL(window.location).searchParams.get("object_id");
     
 
     function set_edit(id){
+        window.history.pushState({}, null, `${(new URL(window.location)).toString().split("?")[0]}?object_id=${id}`);
         let menu = document.getElementById(`object_${id}`);
         set_obj_edit_params(menu.getAttribute("src"),
         menu.getAttribute("name").split("~")[0],
@@ -81,6 +83,7 @@
 
     function edit_get_objs(by_name = false,callback){
         document.getElementById("objs_in_group").innerHTML = "";
+        let wait_msg_object_load = (get_object_id != null)? msg("загружаем прошлый объект",{type:"wait"}):null;
         if (obj_edit_type == "edit") set_obj_edit_params();
         edit_load_objs((data)=>{
             let wait_msg = msg("Загрузка объектов",{type:"wait"})
@@ -92,9 +95,9 @@
                     if(data.at(-1)["id"] == value["id"]){
                         msg_del(wait_msg.id);
                         msg("Объекты загружены")
-                        if(new URL(window.location).searchParams.get("object_id") != null){
-                            const get_object_id = new URL(window.location).searchParams.get("object_id");
-                            set_edit(new URL(window.location).searchParams.get("object_id"));
+                        if(get_object_id != null && wait_msg_object_load != null){
+                            set_edit(get_object_id);
+                            msg_del(wait_msg_object_load.id);
                         }
                         if(callback)callback(true);
                     }
