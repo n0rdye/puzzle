@@ -84,7 +84,7 @@
     function edit_get_objs(by_name = false,callback){
         document.getElementById("objs_in_group").innerHTML = "";
         let wait_msg_object_load = (get_object_id != null)? msg("загружаем прошлый объект",{type:"wait"}):null;
-        if (obj_edit_type == "edit") set_obj_edit_params();
+        // if (obj_edit_type == "edit") set_obj_edit_params();
         edit_load_objs((data)=>{
             let wait_msg = msg("Загрузка объектов",{type:"wait"})
             data.forEach(value => {
