@@ -83,8 +83,8 @@
 
     function edit_get_objs(by_name = false,callback){
         document.getElementById("objs_in_group").innerHTML = "";
+        if (obj_edit_type == "edit") set_obj_edit_params();
         let wait_msg_object_load = (get_object_id != null)? msg("загружаем прошлый объект",{type:"wait"}):null;
-        // if (obj_edit_type == "edit") set_obj_edit_params();
         edit_load_objs((data)=>{
             let wait_msg = msg("Загрузка объектов",{type:"wait"})
             data.forEach(value => {
@@ -194,9 +194,9 @@
                             msg("название товара не было изменино поскольку оно занято",{type:"warning"})
                         }
                         else{
-                            // window.history.pushState({}, null, `${(new URL(window.location)).toString().split("?")[0]}?object_id=${id}`);
+                            window.history.pushState({}, null, `${(new URL(window.location)).toString().split("?")[0]}`);
                             msg("товар сохранён");
-                            // set_obj_edit_params();
+                            set_obj_edit_params();
                             edit_get_objs();
                         }
                     }
