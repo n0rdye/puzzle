@@ -61,6 +61,7 @@
     //     edit_get_objs();
     // });
     const get_object_id = new URL(window.location).searchParams.get("object_id");
+    let wait_msg_object_load = (get_object_id != null)? msg("загружаем прошлый объект",{type:"wait"}):null;
     
 
     function set_edit(id){
@@ -83,8 +84,7 @@
 
     function edit_get_objs(by_name = false,callback){
         document.getElementById("objs_in_group").innerHTML = "";
-        if (obj_edit_type == "edit") set_obj_edit_params();
-        let wait_msg_object_load = (get_object_id != null)? msg("загружаем прошлый объект",{type:"wait"}):null;
+        // if (obj_edit_type == "edit") set_obj_edit_params();
         edit_load_objs((data)=>{
             let wait_msg = msg("Загрузка объектов",{type:"wait"})
             data.forEach(value => {
@@ -98,6 +98,7 @@
                         if(get_object_id != null && wait_msg_object_load != null){
                             set_edit(get_object_id);
                             msg_del(wait_msg_object_load.id);
+                            wait_msg_object_load = null;
                         }
                         if(callback)callback(true);
                     }
@@ -194,9 +195,10 @@
                             msg("название товара не было изменино поскольку оно занято",{type:"warning"})
                         }
                         else{
-                            window.history.pushState({}, null, `${(new URL(window.location)).toString().split("?")[0]}`);
+                            // window.history.pushState({}, null, `${(new URL(window.location)).toString().split("?")[0]}`);
+                            // delete get_object_id;
                             msg("товар сохранён");
-                            set_obj_edit_params();
+                            // set_obj_edit_params();
                             edit_get_objs();
                         }
                     }
