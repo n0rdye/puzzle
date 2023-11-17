@@ -190,7 +190,7 @@ function calc_total(start = false){
                 let obj_cost_div = document.createElement("li");
                 obj_cost_div.innerHTML =
                 `<div style="display:flex;"> ` +
-                    `<div id='obj_cost_name' style='font-size:calc(var(--main-font-size)/1);'>${key.split("~g~")[0].replaceAll("$"," ")}`+
+                    `<div id='obj_cost_name'>${key.split("~g~")[0].replaceAll("$"," ")}`+
                     `<div id='obj_cost_count'>&nbsp${Object.keys(value).length}X</div> </div>`+
                 `</div>`+
                 `<div id='obj_cost'>${parseInt(parseInt(objs_store[key]["cost"]) * Object.keys(value).length)}</div>`;
@@ -202,7 +202,7 @@ function calc_total(start = false){
     // return total;
 
     objs["total"] = total;
-    document.getElementById("proj_cost_text").innerText = `стоимость: ${total} руб.`;
+    document.getElementById("proj_cost_text").innerText = `Стоимость: ${total} руб.`;
 }
 
 function load(objss){
@@ -242,8 +242,12 @@ function load(objss){
 function reload(save = false){
     // objs = JSON.parse($.cookie("objs"));
     // console.log(objs);
+    // objs = objs.sort();
     document.getElementById("drags").innerHTML = "";
+    let cro = cur_obj;
     load(objs);
+    cur_obj = cro;
+    obj_selection();
     if(save){save(()=>{},false)}
 }
 
