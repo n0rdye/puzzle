@@ -194,8 +194,9 @@
                             msg("название товара не было изменино поскольку оно занято",{type:"warning"})
                         }
                         else{
+                            // window.history.pushState({}, null, `${(new URL(window.location)).toString().split("?")[0]}?object_id=${id}`);
                             msg("товар сохранён");
-                            set_obj_edit_params();
+                            // set_obj_edit_params();
                             edit_get_objs();
                         }
                     }
