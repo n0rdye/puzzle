@@ -1,6 +1,6 @@
 const mysql = require('mysql');
 const vars = require('./vars');
-const db_host = "localhost";
+const db_host = "db";
 
 const admin = mysql.createConnection({
     host: db_host,
