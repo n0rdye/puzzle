@@ -123,6 +123,10 @@ function obj_click(id){
 function obj_selection(clear = false){
     cur_obj = (clear == true)? null:cur_obj;
     let drags = document.getElementsByClassName("drag");
+    // let layer_inp = document.getElementsByClassName("layer_inp");
+    // let obj_color = document.getElementsByClassName("obj_color_div");
+    // layer_inp.value = 0;
+    // obj_color.style.display = "none";
     Object.values(drags).forEach(element => {
         // console.log(element.id,cur_obj);
         if (element.id != cur_obj){
